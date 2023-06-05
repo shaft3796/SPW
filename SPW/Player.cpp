@@ -361,8 +361,8 @@ void Player::WakeUpSurroundings()
     PE_World &world = m_scene.GetWorld();
     PE_Vec2 position = GetBody()->GetPosition();
     PE_AABB aabb(
-        position.x - 20.0f, position.y - 10.0f,
-        position.x + 20.0f, position.y + 10.0f
+            position.x - 20.0f, position.y - 10.0f,
+            position.x + 20.0f, position.y + 10.0f
     );
     WakeUpCallback callback;
     world.QueryAABB(callback, aabb);

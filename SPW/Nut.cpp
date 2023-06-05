@@ -44,7 +44,7 @@ void Nut::Start()
     PE_CircleShape circle(PE_Vec2(0.0f, 0.45f), 0.45f);
     PE_ColliderDef colliderDef;
     colliderDef.friction = 0.005f;
-    colliderDef.filter.categoryBits = CATEGORY_ENEMY;
+    colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_PLAYER | CATEGORY_ENEMY;
     colliderDef.shape = &circle;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 
@@ -94,7 +94,12 @@ void Nut::FixedUpdate()
         return;
     }
 
-    // TODO : Mettre la noisette en mouvement à l'approche du joueur
+    if (dist < 5.0f && m_state == State::IDLE)
+    {
+        m_state = State::SPINNING;
+        velocity.x = -10.0f;
+        body->SetVelocity(velocity);
+    }
 }
 
 void Nut::Render()
@@ -131,7 +136,14 @@ void Nut::OnRespawn()
 
 void Nut::Damage(GameBody *damager)
 {
-    // TODO
+    Player *player = dynamic_cast<Player *>(damager);
+    if (player == nullptr)
+    {
+        assert(false);
+        return;
+    }
+    player->Bounce();
+    SetEnabled(false);
 }
 
 void Nut::OnCollisionStay(GameCollision &collision)
@@ -139,7 +151,10 @@ void Nut::OnCollisionStay(GameCollision &collision)
     PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
 
-    // TODO : Désactiver les collisions lorsque la noisette est en train de mourir
+    if (m_state == State::DYING){
+        collision.SetEnabled(false);
+        return;
+    }
 
     // Collision avec le joueur
     if (otherCollider->CheckCategory(CATEGORY_PLAYER))
