@@ -8,7 +8,7 @@
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
         m_jump(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
-        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
+        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE), m_onGround(true)
 {
     m_name = "Player";
 
@@ -81,8 +81,7 @@ void Player::Update()
     // sa physique au prochain FixedUpdate()
 
     m_hDirection = controls.hAxis;
-    // TODO: and !m_onGround
-    if (controls.jumpPressed) m_jump = true;
+    if (controls.jumpPressed && m_onGround) m_jump = true;
 }
 
 void Player::Render()
@@ -126,7 +125,7 @@ void Player::FixedUpdate()
     //--------------------------------------------------------------------------
     // D�tection du sol
 
-    bool m_onGround = false;
+    m_onGround = false;
     PE_Vec2 gndNormal = PE_Vec2::up;
 
     // Lance deux rayons vers le bas ayant pour origines
