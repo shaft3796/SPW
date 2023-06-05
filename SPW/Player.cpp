@@ -47,10 +47,10 @@ Player::~Player()
 
 void Player::Start()
 {
-    // Joue l'animation par défaut
+    // Joue l'animation par dï¿½faut
     m_animator.PlayAnimation("Idle");
 
-    // Crée le corps
+    // Crï¿½e le corps
     PE_World &world = m_scene.GetWorld();
     PE_BodyDef bodyDef;
     bodyDef.type = PE_BodyType::DYNAMIC;
@@ -60,11 +60,10 @@ void Player::Start()
     PE_Body *body = world.CreateBody(bodyDef);
     SetBody(body);
 
-    // Création du collider
+    // Crï¿½ation du collider
     PE_ColliderDef colliderDef;
-
-    // TODO : Donner une taille normale à la capsule
-    PE_PolygonShape shape(-0.7f, -0.5f, 1.0f, 1.0f);
+    
+    PE_PolygonShape shape(-.5f, -.6f, .5f, .6f);
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
     colliderDef.shape = &shape;
@@ -75,12 +74,14 @@ void Player::Update()
 {
     ControlsInput &controls = m_scene.GetInputManager().GetControls();
 
-    // Sauvegarde les contrôles du joueur pour modifier
+    // Sauvegarde les contrï¿½les du joueur pour modifier
     // sa physique au prochain FixedUpdate()
-    
-	// TODO : Mettre à jour l'état du joueur en fonction des contrôles de jump
 
     m_hDirection = controls.hAxis;
+    if (controls.jumpPressed){
+        m_jump = true;
+    }
+
 }
 
 void Player::Render()
@@ -88,20 +89,18 @@ void Player::Render()
     SDL_Renderer *renderer = m_scene.GetRenderer();
     Camera *camera = m_scene.GetActiveCamera();
 
-    // Met à jour les animations du joueur
+    // Met ï¿½ jour les animations du joueur
     m_animator.Update(m_scene.GetTime());
 
     float scale = camera->GetWorldToViewScale();
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     SDL_FRect rect = { 0 };
-
-    // TODO : Trouver les bonnes diemnsions de l'affichage en fonction du sprite (dimensions en tuiles)
-    rect.h = 1.0f * scale; 
-    rect.w = 2.0f * scale; 
+    
+    rect.h = 1.375f * scale; 
+    rect.w = 1.0f * scale; 
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     // Dessine l'animateur du joueur
-    // TODO : Trouver le bon anchor
     m_animator.RenderCopyExF(
         &rect, RE_Anchor::CENTER , 0.0f, Vec2(0.5f, 0.5f), flip
     );
@@ -111,9 +110,9 @@ void Player::FixedUpdate()
 {
     PE_Body *body = GetBody();
     PE_Vec2 position = body->GetPosition();
-    // TODO : Récuperer la vitesse du joueur
+    PE_Vec2 velocity = body->GetLocalVelocity();
 
-    // Réveille les corps autour du joueur
+    // Rï¿½veille les corps autour du joueur
     WakeUpSurroundings();
 
     // Tue le joueur s'il tombe dans un trou
@@ -124,31 +123,31 @@ void Player::FixedUpdate()
     }
 
     //--------------------------------------------------------------------------
-    // Détection du sol
+    // Dï¿½tection du sol
 
     bool m_onGround = false;
     PE_Vec2 gndNormal = PE_Vec2::up;
 
     // Lance deux rayons vers le bas ayant pour origines
     // les coins gauche et droit du bas du collider du joueur
-    // Ces deux rayons sont dessinés en jaune dans DrawGizmos()
+    // Ces deux rayons sont dessinï¿½s en jaune dans DrawGizmos()
     PE_Vec2 originL = position + PE_Vec2(-0.35f, 0.0f);
     PE_Vec2 originR = position + PE_Vec2(+0.35f, 0.0f);
 
     // Les rayons ne touchent que des colliders solides (non trigger)
-    // ayant la catégorie FILTER_TERRAIN
+    // ayant la catï¿½gorie FILTER_TERRAIN
     RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
     RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
 
     if (hitL.collider != NULL)
     {
-        // Le rayon gauche à touché le sol
+        // Le rayon gauche ï¿½ touchï¿½ le sol
         m_onGround = true;
         gndNormal = hitL.normal;
     }
     if (hitR.collider != NULL)
     {
-        // Le rayon droit à touché le sol
+        // Le rayon droit ï¿½ touchï¿½ le sol
         m_onGround = true;
         gndNormal = hitR.normal;
     }
@@ -156,44 +155,60 @@ void Player::FixedUpdate()
     //--------------------------------------------------------------------------
     // Etat du joueur
 
-    // Détermine l'état du joueur et change l'animation si nécessaire
-
-    // TODO : Ajouter la gestion des animations Idle et Falling
-    m_animator.PlayAnimation("Idle");
+    // Dï¿½termine l'ï¿½tat du joueur et change l'animation si nï¿½cessaire
+    
+    if (m_onGround)
+    {
+        if (m_state != State::IDLE)
+        {
+            m_state = State::IDLE;
+            m_animator.PlayAnimation("Idle");
+        }
+    }
+    else
+    {
+        if (m_state != State::FALLING)
+        {
+            m_state = State::FALLING;
+            m_animator.PlayAnimation("Falling");
+        }
+    }
+    
 
     // Orientation du joueur
     // Utilisez m_hDirection qui vaut :
-    // *  0.0f si le joueur n'accélère pas ;
-    // * +1.0f si le joueur accélère vers la droite ;
-    // * -1.0f si le joueur accélère vers la gauche.
+    // *  0.0f si le joueur n'accï¿½lï¿½re pas ;
+    // * +1.0f si le joueur accï¿½lï¿½re vers la droite ;
+    // * -1.0f si le joueur accï¿½lï¿½re vers la gauche.
     m_facingRight = true;
 
     //--------------------------------------------------------------------------
     // Modification de la vitesse et application des forces
 
     // Application des forces
-    // Définit la force d'accélération horizontale du joueur
+    // Dï¿½finit la force d'accï¿½lï¿½ration horizontale du joueur
     PE_Vec2 direction = PE_Vec2::right;
-
-    // TODO : Donner une valeur cohérente au vecteur force
-    PE_Vec2 force = (200.0f * m_hDirection) * direction;
+    
+    PE_Vec2 force = (30.0f * m_hDirection) * direction;
     body->ApplyForce(force);
+    float maxHSpeed = 9.0f;
+    velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
-
-    // TODO : Limiter la vitesse horizontale
-
-    // TODO : Ajouter un jump avec une vitesse au choix
+    if(m_jump){
+        velocity.y = 15;
+        m_jump = false;
+    }
 
     // TODO : Rebond sur les ennemis
 
     // Remarques :
-    // Le facteur de gravité peut être modifié avec l'instruction
+    // Le facteur de gravitï¿½ peut ï¿½tre modifiï¿½ avec l'instruction
     // -> body->SetGravityScale(0.5f);
-    // pour faire des sauts de hauteurs différentes.
-    // La physique peut être différente si le joueur touche ou non le sol.
+    // pour faire des sauts de hauteurs diffï¿½rentes.
+    // La physique peut ï¿½tre diffï¿½rente si le joueur touche ou non le sol.
 
-    // Définit la nouvelle vitesse du corps
-    // TODO : Appliquer la nouvelle velocity au player
+    // Dï¿½finit la nouvelle vitesse du corps
+    body->SetVelocity(velocity);
 }
 
 void Player::OnRespawn()
@@ -228,7 +243,7 @@ void Player::DrawGizmos()
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     graphics.DrawVector(0.5f * velocity, position);
 
-    // Dessine en jaune les rayons pour la détection du sol
+    // Dessine en jaune les rayons pour la dï¿½tection du sol
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     PE_Vec2 originL = position + PE_Vec2(-0.35f, 0.0f);
     PE_Vec2 originR = position + PE_Vec2(+0.35f, 0.0f);
@@ -254,7 +269,7 @@ void Player::OnCollisionEnter(GameCollision &collision)
         // Calcule l'angle entre la normale de contact et le vecteur "UP"
         // L'angle vaut :
         // * 0 si le joueur est parfaitement au dessus de l'ennemi,
-        // * 90 s'il est à gauche ou à droite
+        // * 90 s'il est ï¿½ gauche ou ï¿½ droite
         // * 180 s'il est en dessous
         float angle = PE_AngleDeg(manifold.normal, PE_Vec2::up);
         if (angle < PLAYER_DAMAGE_ANGLE)
@@ -291,8 +306,8 @@ void Player::OnCollisionStay(GameCollision &collision)
 
     if (otherCollider->CheckCategory(CATEGORY_COLLECTABLE))
     {
-        // Désactive la collision avec un objet
-        // Evite d'arrêter le joueur quand il prend un coeur
+        // Dï¿½sactive la collision avec un objet
+        // Evite d'arrï¿½ter le joueur quand il prend un coeur
         collision.SetEnabled(false);
         return;
     }
@@ -301,7 +316,7 @@ void Player::OnCollisionStay(GameCollision &collision)
         float angleUp = PE_AngleDeg(manifold.normal, PE_Vec2::up);
         if (angleUp <= 55.0f)
         {
-            // Résoud la collision en déplaçant le joueur vers le haut
+            // Rï¿½soud la collision en dï¿½plaï¿½ant le joueur vers le haut
             // Evite de "glisser" sur les pentes si le joueur ne bouge pas
             collision.ResolveUp();
         }
@@ -320,7 +335,7 @@ void Player::AddHeart()
 
 void Player::Damage()
 {
-    // Méthode appelée par un ennemi qui touche le joueur
+    // Mï¿½thode appelï¿½e par un ennemi qui touche le joueur
     Kill();
 }
 
