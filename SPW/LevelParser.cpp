@@ -7,8 +7,8 @@
 #include "LevelEnd.h"
 #include "Bonus.h"
 #include "Camera.h"
+#include "Firefly.h"
 
-// TODO : Ajouter le fichier "Firefly.h"
 
 LevelParser::LevelParser(const std::string &path)
 {
@@ -145,7 +145,7 @@ LevelParser::~LevelParser()
 
 void LevelParser::InitScene(LevelScene &scene) const
 {
-    // Crée la TileMap
+    // Crï¿½e la TileMap
     StaticMap *map = new StaticMap(scene, m_width, m_height);
 
     for (int x = 0; x < m_width; ++x)
@@ -205,7 +205,8 @@ void LevelParser::InitScene(LevelScene &scene) const
             }
             case 'o':
             {
-                // TODO : Créer une luciolle
+                Firefly *firefly = new Firefly(scene);
+                firefly->SetStartPosition(position);
                 break;
             }
             default:
