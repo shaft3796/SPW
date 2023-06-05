@@ -17,7 +17,7 @@ Firefly::Firefly(Scene &scene) :
     AssertNew(part);
     RE_TexAnim *idleAnim = new RE_TexAnim(m_animator, "Idle", part);
     idleAnim->SetCycleCount(-1);
-    idleAnim->SetCycleCount(0.3f);
+    idleAnim->SetCycleTime(0.3f);
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;

@@ -7,7 +7,7 @@
 
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
-        m_jump(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
+        m_jump(false), m_climb(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
         m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE), m_onGround(true)
 {
     m_name = "Player";
@@ -34,7 +34,7 @@ Player::Player(Scene &scene) :
     );
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
-
+    
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 0;
@@ -189,11 +189,17 @@ void Player::FixedUpdate()
 
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
-    
 
-    if (m_jump) {
+    // TODO: review cette partie, le check de l'état sur IDLE est-il vrmt requis ?
+    if (m_jump && (m_state == State::IDLE || m_climb)) {
         velocity.y = 20.0f;
         m_jump = false;
+        m_climb = false;
+    }
+    if (m_climb && m_state == State::FALLING)
+    {
+        velocity.y = -1.0f;
+        m_climb = false;
     }
     
 
@@ -223,6 +229,7 @@ void Player::OnRespawn()
     m_facingRight = true;
     m_bounce = false;
     m_jump = false;
+    m_climb = false;
 
     m_animator.StopAnimations();
     m_animator.PlayAnimation("Idle");
@@ -301,6 +308,10 @@ void Player::OnCollisionStay(GameCollision &collision)
 {
     const PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
+    
+    PE_Body *body = GetBody();
+    PE_Vec2 velocity = body->GetLocalVelocity();
+    
 
     if (otherCollider->CheckCategory(CATEGORY_COLLECTABLE))
     {
@@ -317,6 +328,12 @@ void Player::OnCollisionStay(GameCollision &collision)
             // R�soud la collision en d�pla�ant le joueur vers le haut
             // Evite de "glisser" sur les pentes si le joueur ne bouge pas
             collision.ResolveUp();
+        }
+
+        // Le joueur glisse le long d'un mur
+        if (angleUp == 90.0f && velocity.y < 0.0f)
+        {
+            m_climb = true;
         }
     }
 }
