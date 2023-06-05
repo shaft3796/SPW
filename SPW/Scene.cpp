@@ -59,7 +59,7 @@ public:
 
 void Scene::Render()
 {
-    // Détermine les objets visibles par la caméra
+    // DÃ©termine les objets visibles par la camÃ©ra
     if (m_activeCam != nullptr)
     {
         PE_AABB worldView = m_activeCam->GetWorldView();
@@ -67,7 +67,7 @@ void Scene::Render()
         m_objectManager.AddVisibleBodies(m_world, worldView);
     }
 
-    // Dessine les objets visibles par la caméra
+    // Dessine les objets visibles par la camÃ©ra
     // Message : Render()
     m_objectManager.ProcessVisibleObjects();
     for (auto it = m_objectManager.visibleObjectsBegin();
@@ -77,7 +77,7 @@ void Scene::Render()
         object->Render();
     }
 
-    // Dessine les corps présents dans le moteur physique
+    // Dessine les corps prÃ©sents dans le moteur physique
     // Messages : DrawCollider(), DrawBody()
     if (m_drawPhysics && m_activeCam != nullptr)
     {
@@ -125,10 +125,10 @@ void Scene::Render()
 
 bool Scene::Update()
 {
-    // Appelle les méthodes asynchrones
+    // Appelle les mÃ©thodes asynchrones
     if (m_respawn)
     {
-        // Réinitialise la scene
+        // RÃ©initialise la scene
         // Message : OnRespawn()
         m_objectManager.RespawnObjects();
         m_respawn = false;
@@ -138,10 +138,10 @@ bool Scene::Update()
     // Messages : Start(), OnEnable(), OnDisable(), Delete()
     m_objectManager.ProcessObjects();
 
-    // Met à jour les entrées de l'utilisateur
+    // Met Ã  jour les entrÃ©es de l'utilisateur
     m_inputManager.ProcessEvents();
 
-    // Met à jour les objets
+    // Met Ã  jour les objets
     // Messages : Update(), FixedUpdate()
     UpdateGameObjects();
 
@@ -164,10 +164,10 @@ void Scene::OnRespawn()
 
 void Scene::UpdateGameObjects()
 {
-    // Appelle la méthode FixedUpdate de chaque GameObject
+    // Appelle la mÃ©thode FixedUpdate de chaque GameObject
     if (m_mode == UpdateMode::REALTIME)
     {
-        // Mode temps réel
+        // Mode temps rÃ©el
         m_accu += m_time.GetDelta();
         while (m_accu >= m_timeStep)
         {
@@ -187,7 +187,7 @@ void Scene::UpdateGameObjects()
     }
     else
     {
-        // Mode pas à pas
+        // Mode pas Ã  pas
         if (m_makeStep)
         {
             m_world.FixedUpdate();
@@ -205,7 +205,7 @@ void Scene::UpdateGameObjects()
         m_alpha = 1.0f;
     }
 
-    // Appelle la méthode Update de chaque GameObject
+    // Appelle la mÃ©thode Update de chaque GameObject
     int enabledCount = 0;
     for (auto it = m_objectManager.begin();
          it != m_objectManager.end(); ++it)
