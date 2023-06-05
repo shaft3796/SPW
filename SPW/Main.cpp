@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 #endif
 
     SDL_Window *window = SDL_CreateWindow(
-        u8"Super Potoo World ++", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        u8"SPW++ Loe & Hugo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         WINDOW_WIDTH, WINDOW_HEIGHT, sdlFlags
     );
 
@@ -106,10 +106,12 @@ int main(int argc, char *argv[])
     const std::vector<LevelData> levels(LevelData::Init());
     int levelID = 0;
 
+    /*
 #ifdef SKIP_MENU
     state = GameState::LEVEL;
     levelID = DEFAUT_LEVEL;
 #endif
+*/
 
     while (quitGame == false)
     {

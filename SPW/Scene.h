@@ -9,19 +9,19 @@ class Camera;
 
 struct SceneStats
 {
-    /// @brief Nombre d'objets visibles par la caméra active.
+    /// @brief Nombre d'objets visibles par la camÃ©ra active.
     int visibleCount;
 
-    /// @brief Nombre d'objets présents dans la scène.
+    /// @brief Nombre d'objets prÃ©sents dans la scÃ¨ne.
     int objectCount;
 
     /// @brief Nombre d'objets inactifs.
     int disabledCount;
 
-    /// @brief Nombre d'objets à réinitialiser quand le joueur meurt.
+    /// @brief Nombre d'objets Ã  rÃ©initialiser quand le joueur meurt.
     int toRespawnCount;
 
-    /// @brief Nombre de corps présents dans le moteur physique.
+    /// @brief Nombre de corps prÃ©sents dans le moteur physique.
     int bodyCount;
 };
 
@@ -129,7 +129,7 @@ protected:
         REALTIME,
         STEP_BY_STEP
     };
-    /// @brief Mode de mise à jour du moteur physique de la scène (temps réel ou pas-à-pas).
+    /// @brief Mode de mise Ã  jour du moteur physique de la scÃ¨ne (temps rÃ©el ou pas-Ã -pas).
     UpdateMode m_mode;
 
     RE_Timer &m_time;
@@ -143,39 +143,39 @@ protected:
     ///// @brief Gestionnaire des instances de GameObject.
     ObjectManager m_objectManager;
 
-    ///// @brief Gestionnaire des entrées utilisateur.
+    ///// @brief Gestionnaire des entrÃ©es utilisateur.
     InputManager m_inputManager;
 
-    ///// @brief Gestionnaire des ressources de la scène.
+    ///// @brief Gestionnaire des ressources de la scÃ¨ne.
     AssetManager m_assetManager;
 
-    ///// @brief Pointeur vers la caméra utilisée pour rendre la scène.
+    ///// @brief Pointeur vers la camÃ©ra utilisÃ©e pour rendre la scÃ¨ne.
     Camera *m_activeCam;
 
     /// @brief Pas de temps fixe.
     float m_timeStep;
 
-    /// @brief Accumulateur pour la mise à jour à pas de temps fixe.
+    /// @brief Accumulateur pour la mise Ã  jour Ã  pas de temps fixe.
     float m_accu;
 
-    /// @brief Paramètre d'interpolation pour les positions des corps physiques.
+    /// @brief ParamÃ¨tre d'interpolation pour les positions des corps physiques.
     float m_alpha;
 
-    /// @brief Booléen indiquant s'il faut afficher les "gizmos" (debug).
+    /// @brief BoolÃ©en indiquant s'il faut afficher les "gizmos" (debug).
     bool m_drawGizmos;
 
-    /// @brief Booléen indiquant s'il faut afficher corps (debug).
+    /// @brief BoolÃ©en indiquant s'il faut afficher corps (debug).
     bool m_drawPhysics;
 
     bool m_drawID;
 
-    /// @brief Booléen indiquant s'il faut effectuer un pas fixe en mode pas-à-pas.
+    /// @brief BoolÃ©en indiquant s'il faut effectuer un pas fixe en mode pas-Ã -pas.
     bool m_makeStep;
 
-    /// @brief Booléen indiquant s'il faut réinitialiser la scène.
+    /// @brief BoolÃ©en indiquant s'il faut rÃ©initialiser la scÃ¨ne.
     bool m_respawn;
 
-    /// @brief Booléen indiquant s'il faut quitter la scène.
+    /// @brief BoolÃ©en indiquant s'il faut quitter la scÃ¨ne.
     bool m_quit;
 
     SceneListener m_collisionListener;

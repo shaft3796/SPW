@@ -21,20 +21,19 @@ Player::Player(Scene &scene) :
     // Animation "Idle"
     part = atlas->GetPart("Idle");
     AssertNew(part);
-    RE_TexAnim *idleAnim = new RE_TexAnim(
+    auto *idleAnim = new RE_TexAnim(
         m_animator, "Idle", part
     );
     idleAnim->SetCycleCount(0);
 
-    // Animation "Falling"
+     // Animation "Falling"
     part = atlas->GetPart("Falling");
     AssertNew(part);
-    RE_TexAnim *fallingAnim = new RE_TexAnim(
-            m_animator, "Falling", part
+    auto *fallingAnim = new RE_TexAnim(
+        m_animator, "Falling", part
     );
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
-
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -63,12 +62,14 @@ void Player::Start()
 
     // Cr�ation du collider
     PE_ColliderDef colliderDef;
-
-    // TODO : Donner une taille normale � la capsule
-    PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
+    
+    PE_PolygonShape shape(-.5f, -.6f, .5f, .6f);
+    /*
+    PE_CapsuleShape shape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
+    */
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
-    colliderDef.shape = &capsule;
+    colliderDef.shape = &shape;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 }
 
@@ -80,6 +81,7 @@ void Player::Update()
     // sa physique au prochain FixedUpdate()
 
     m_hDirection = controls.hAxis;
+    // TODO: and !m_onGround
     if (controls.jumpPressed) m_jump = true;
 }
 
@@ -94,9 +96,9 @@ void Player::Render()
     float scale = camera->GetWorldToViewScale();
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     SDL_FRect rect = { 0 };
-
-    rect.h = 1.375f * scale;
-    rect.w = 1.0f * scale;
+    
+    rect.h = 1.375f * scale; 
+    rect.w = 1.0f * scale; 
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     // Dessine l'animateur du joueur
@@ -182,23 +184,19 @@ void Player::FixedUpdate()
     // Application des forces
     // D�finit la force d'acc�l�ration horizontale du joueur
     PE_Vec2 direction = PE_Vec2::right;
-
-    // TODO : Donner une valeur coh�rente au vecteur force
+    
     PE_Vec2 force = (15.0f * m_hDirection) * direction;
     body->ApplyForce(force);
 
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
-
-
-
-    // TODO : Limiter la vitesse horizontale
+    
 
     if (m_jump) {
         velocity.y = 20.0f;
         m_jump = false;
     }
-    body->SetVelocity(velocity);
+    
 
     // TODO : Rebond sur les ennemis
 
@@ -209,7 +207,7 @@ void Player::FixedUpdate()
     // La physique peut �tre diff�rente si le joueur touche ou non le sol.
 
     // D�finit la nouvelle vitesse du corps
-    // TODO : Appliquer la nouvelle velocity au player
+    body->SetVelocity(velocity);
 }
 
 void Player::OnRespawn()
@@ -361,8 +359,8 @@ void Player::WakeUpSurroundings()
     PE_World &world = m_scene.GetWorld();
     PE_Vec2 position = GetBody()->GetPosition();
     PE_AABB aabb(
-            position.x - 20.0f, position.y - 10.0f,
-            position.x + 20.0f, position.y + 10.0f
+    position.x - 20.0f, position.y - 10.0f,
+    position.x + 20.0f, position.y + 10.0f
     );
     WakeUpCallback callback;
     world.QueryAABB(callback, aabb);
