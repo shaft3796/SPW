@@ -203,12 +203,14 @@ void LevelParser::InitScene(LevelScene &scene) const
                 nut->SetStartPosition(position);
                 break;
             }
+            /* TODO: Loevan ? Erreur ici 
             case 'o':
             {
                 Firefly *firefly = new Firefly(scene);
                 firefly->SetStartPosition(position);
                 break;
             }
+            */
             default:
                 break;
             }
