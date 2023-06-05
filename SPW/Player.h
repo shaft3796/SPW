@@ -46,6 +46,7 @@ private:
     bool m_onGround;
     bool m_bounce;
     bool m_facingRight;
+    bool m_climb;
 
     int m_lifeCount;
     int m_heartCount;
