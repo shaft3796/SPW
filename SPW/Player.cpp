@@ -63,7 +63,7 @@ void Player::Start()
     // Cr�ation du collider
     PE_ColliderDef colliderDef;
     
-    PE_PolygonShape shape(-.5f, -.6f, .5f, .6f);
+    PE_PolygonShape shape(-.5f, 0.f, .5f, 1.375f);
     /*
     PE_CapsuleShape shape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
     */
