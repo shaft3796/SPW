@@ -21,12 +21,19 @@ Player::Player(Scene &scene) :
     // Animation "Idle"
     part = atlas->GetPart("Idle");
     AssertNew(part);
-    RE_TexAnim *idleAnim = new RE_TexAnim(
+    auto *idleAnim = new RE_TexAnim(
         m_animator, "Idle", part
     );
     idleAnim->SetCycleCount(0);
 
-    // TODO : ajouter l'animation "Falling"
+     // Animation "Falling"
+    part = atlas->GetPart("Falling");
+    AssertNew(part);
+    auto *fallingAnim = new RE_TexAnim(
+        m_animator, "Falling", part
+    );
+    fallingAnim->SetCycleCount(-1);
+    fallingAnim->SetCycleTime(0.2f);
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -57,10 +64,10 @@ void Player::Start()
     PE_ColliderDef colliderDef;
 
     // TODO : Donner une taille normale à la capsule
-    PE_CapsuleShape capsule(PE_Vec2(1.7f, 1.35f), PE_Vec2(-1.0f, 1.85f), 1.35f);
+    PE_PolygonShape shape(-0.7f, -0.5f, 1.0f, 1.0f);
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
-    colliderDef.shape = &capsule;
+    colliderDef.shape = &shape;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 }
 
