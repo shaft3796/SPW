@@ -190,11 +190,8 @@ void Player::FixedUpdate()
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
-
-
-    // TODO : Limiter la vitesse horizontale
-
-    if (m_jump) {
+    
+    if (m_jump && m_state == State::IDLE) {
         velocity.y = 20.0f;
         m_jump = false;
     }
