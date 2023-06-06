@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "LevelCanvas.h"
 #include "LevelData.h"
+#include "Constants.h"
 
 class LevelScene : public Scene
 {

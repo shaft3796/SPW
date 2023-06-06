@@ -76,6 +76,11 @@ LevelScene::LevelScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelDa
         break;
     }
     }
+
+    
+    // Set la gravité
+    m_world.SetGravity(PE_Vec2(DEFAULT_WORLD_GRAVITY_X, DEFAULT_WORLD_GRAVITY_Y));
+    
 }
 
 LevelScene::~LevelScene()
