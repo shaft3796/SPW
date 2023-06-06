@@ -7,7 +7,7 @@
 
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
-        m_jump(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
+        m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_hDirection(0.0f),
         m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
 {
     m_name = "Player";
@@ -197,12 +197,15 @@ void Player::FixedUpdate()
             m_animator.PlayAnimation("Running");
             m_state = State::RUNNING;
         }
+        // Réinitialise le timer
+        m_onAirTimer = 0.0f;
     }
     else {
         if (m_state != State::FALLING && m_state != State::CLIMBBING) {
             m_animator.PlayAnimation("Falling");
             m_state = State::FALLING;
         }
+        m_onAirTimer += m_scene.GetFixedTimeStep();
     }
 
     // Orientation du joueur
@@ -383,7 +386,7 @@ void Player::OnCollisionStay(GameCollision &collision)
         }
 
         // Le joueur glisse le long d'un mur
-        if (angleUp == 90.0f)
+        if (angleUp == 90.0f && m_onAirTimer > 0.5f)
         {
             m_state = State::CLIMBBING;
         }
