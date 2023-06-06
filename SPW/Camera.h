@@ -25,16 +25,16 @@ public:
     void ViewToWorld(float x, float y, PE_Vec2 &position) const;
 
 protected:
-    /// @brief Rectangle représentant la vue de la caméra.
-    /// Ces coordonnées sont dans le référentiel monde.
+    /// @brief Rectangle reprÃ©sentant la vue de la camÃ©ra.
+    /// Ces coordonnÃ©es sont dans le rÃ©fÃ©rentiel monde.
     PE_AABB m_worldView;
 
     PE_AABB m_worldBounds;
 
-    /// @brief Largeur en pixels de la caméra.
+    /// @brief Largeur en pixels de la camÃ©ra.
     int m_width;
 
-    /// @brief Hauteur en pixels de la caméra.
+    /// @brief Hauteur en pixels de la camÃ©ra.
     int m_height;
 };
 

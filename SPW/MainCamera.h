@@ -17,3 +17,18 @@ public:
 protected:
     DampedVec2 m_center;
 };
+
+
+class EditorScene;
+
+class EditorCamera : public Camera
+{
+public:
+    EditorCamera(EditorScene &scene);
+    virtual ~EditorCamera();
+
+    virtual void Update() override;
+
+protected:
+    DampedVec2 m_center;
+};

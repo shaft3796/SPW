@@ -20,7 +20,7 @@
 
 enum class GameState
 {
-    MAIN_MENU, LEVEL
+    MAIN_MENU, LEVEL, EDITOR
 };
 
 int main(int argc, char *argv[])
@@ -102,6 +102,7 @@ int main(int argc, char *argv[])
     // Boucle de jeu
     Scene *scene = nullptr;
     bool quitGame = false;
+    /* TODO: FOR EDITOR TESTING PURPOSES, RESET HERE TO MAIN_MENU */
     GameState state = GameState::MAIN_MENU;
     const std::vector<LevelData> levels(LevelData::Init());
     int levelID = 0;
@@ -123,6 +124,8 @@ int main(int argc, char *argv[])
         case GameState::LEVEL:
             assert(0 <= levelID && levelID < levels.size());
             scene = new LevelScene(renderer, time, levels[levelID]);
+            break;
+        case GameState::EDITOR:
             break;
 
         case GameState::MAIN_MENU:

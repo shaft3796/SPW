@@ -33,8 +33,8 @@ Camera::Camera(Scene &scene) :
 {
     m_name = "Camera";
 
-    // Dimensions de la vue dans le référentiel monde
-    // La hauteur est calculée pour un ratio 16/9
+    // Dimensions de la vue dans le rÃ©fÃ©rentiel monde
+    // La hauteur est calculÃ©e pour un ratio 16/9
     float worldW = 24.0f;
     float worldH = 9.0f / 16.0f * worldW;
 

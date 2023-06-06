@@ -145,6 +145,9 @@
     <ClCompile Include="ControlsInput.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DebugInput.cpp" />
+    <ClCompile Include="EditorCanvas.cpp" />
+    <ClCompile Include="EditorHeader.cpp" />
+    <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameBody.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -191,6 +194,9 @@
     <ClInclude Include="ControlsInput.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DebugInput.h" />
+    <ClInclude Include="EditorCanvas.h" />
+    <ClInclude Include="EditorHeader.h" />
+    <ClInclude Include="EditorScene.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameBody.h" />
     <ClInclude Include="GameObject.h" />
