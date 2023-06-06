@@ -97,6 +97,9 @@ void Player::Update()
 
     m_hDirection = controls.hAxis;
     if (controls.jumpPressed && (m_state != State::FALLING)) m_jump = true;
+
+    // Diving
+    if (controls.goDownDown && (m_state == State::FALLING)) m_dive = true;
 }
 
 void Player::Render()
@@ -165,7 +168,7 @@ void Player::FixedUpdate()
     //--------------------------------------------------------------------------
     // D�tection du sol
 
-    bool m_onGround = false;
+    m_onGround = false;
     PE_Vec2 gndNormal = PE_Vec2::up;
 
     // Lance deux rayons vers le bas ayant pour origines
@@ -211,12 +214,17 @@ void Player::FixedUpdate()
         m_onAirTimer = 0.0f;
     }
     else {
-        if (m_state != State::FALLING && m_state != State::CLIMBBING) {
+        if (m_state != State::FALLING && m_state != State::CLIMBBING && m_state != State::DIVE_LOADING && m_state != State::DIVING)
+        {
             m_animator.PlayAnimation("Falling");
             m_state = State::FALLING;
         }
         m_onAirTimer += m_scene.GetFixedTimeStep();
-    }
+        if (m_state == State::DIVE_LOADING)
+        {
+            m_animator.PlayAnimation("Idle");
+        }
+        }
 
     // Orientation du joueur
     // Utilisez m_hDirection qui vaut :
@@ -250,7 +258,8 @@ void Player::FixedUpdate()
     }
 
     // Saute
-    if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING)) {
+    if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING) && m_state != State::DIVE_LOADING && m_state != State::DIVING) {
+        velocity.y = 13.0f;
         if (m_state == State::CLIMBBING)
         {
                 // Saute à gauche du mur
@@ -266,6 +275,36 @@ void Player::FixedUpdate()
     if (m_state == State::CLIMBBING)
     {
         velocity.y = -1.0f;
+    }
+
+    // Déclenche le chargement du dive
+    if(m_dive && m_state == State::FALLING){
+        m_state = State::DIVE_LOADING;
+        m_dive_load_counter = DIVE_LOAD_DURATION;
+    }
+    m_dive = false;
+
+    // Action du chargement du dive
+    if(m_state == State::DIVE_LOADING){
+        velocity.y = -DEFAULT_WORLD_GRAVITY_Y/40.f;
+        if(!DIVE_LOAD_MODE){
+            velocity.x = 0;
+        }
+        if(m_dive_load_counter == 0){
+            m_state = State::DIVING;
+        }
+        else
+        {
+            m_dive_load_counter--;
+        }
+    }
+    if(m_state == State::DIVING){
+        if(m_onGround){
+            m_state = State::IDLE;
+        } else {
+            velocity.y = -30;
+            velocity.x = 0;
+        }
     }
     
 
@@ -295,6 +334,7 @@ void Player::OnRespawn()
     m_facingRight = true;
     m_bounce = false;
     m_jump = false;
+    m_dive = false;
 
     m_animator.StopAnimations();
     m_animator.PlayAnimation("Idle");
@@ -378,8 +418,6 @@ void Player::OnCollisionStay(GameCollision &collision)
     const PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
     
-    
-
     if (otherCollider->CheckCategory(CATEGORY_COLLECTABLE))
     {
         // D�sactive la collision avec un objet
