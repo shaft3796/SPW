@@ -203,6 +203,12 @@ void LevelParser::InitScene(LevelScene &scene) const
                 nut->SetStartPosition(position);
                 break;
             }
+            case 'c':
+            {
+                Checkpoint *checkpoint = new Checkpoint(scene);
+                checkpoint->SetStartPosition(position);
+                break;
+            }
             /* TODO: Loevan ? Erreur ici 
             case 'o':
             {
