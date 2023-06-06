@@ -34,6 +34,7 @@ public:
 
 private:
     void WakeUpSurroundings();
+    PE_Vec2 UpdateOnGround(PE_Vec2 position);
 
     enum class State
     {

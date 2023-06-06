@@ -131,9 +131,21 @@ void Player::FixedUpdate()
     PE_Body *body = GetBody();
     PE_Vec2 position = body->GetPosition();
     PE_Vec2 velocity = body->GetLocalVelocity();
+    ControlsInput &controls = m_scene.GetInputManager().GetControls();
+
+    bool noJump {false};
 
     // R�veille les corps autour du joueur
     WakeUpSurroundings();
+    // Update
+    UpdateOnGround(position);
+
+    // Tue le joueur s'il tombe dans un trou
+    if (position.y < -2.0f){
+        m_scene.Respawn();
+        return;
+    }
+    
 
     if (m_onWallTimer >= 0)
     {
@@ -145,61 +157,82 @@ void Player::FixedUpdate()
         }
     }
 
-    // Dying
-    if(m_state == State::DYING)
-    {
-        if(m_player_dying_counter == 0){
-            Kill();
-        }
-        else{
-            m_player_dying_counter--;
-            m_animator.PlayAnimation("Dying");
-        }
-        return;
+    // FORCE ET DIRECTION
+    PE_Vec2 direction = PE_Vec2::right;
+    
+    PE_Vec2 force = (15.0f * m_hDirection) * direction;
+    body->ApplyForce(force);
+
+    float maxHSpeed = 9.0f;
+    velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
+
+    /* --- STATE --- */
+    switch (m_state){
+        case State::DYING:{
+            if(m_player_dying_counter == 0){
+                Kill();
+            }
+            else{
+                m_player_dying_counter--;
+                m_animator.PlayAnimation("Dying");
+            }
+            return;
+        } break;
+        
+        case State::DIVE_LOADING:{
+            // TODO: Probably remove the condition
+            if(not m_onGround){
+                m_animator.PlayAnimation("Idle");
+            }
+            velocity.y = -DEFAULT_WORLD_GRAVITY_Y/40.f;
+            if(!DIVE_LOAD_MODE )velocity.x = 0;
+            if(m_dive_load_counter == 0) m_state = State::DIVING;
+            else m_dive_load_counter--;
+            noJump = true;
+        } break;
+
+        case State::CLIMBBING:{
+            velocity.x = 0;
+            if(m_jump){
+                velocity.y = 13.0f;
+                // Saute à gauche du mur
+                if (m_facingRight) velocity.x = -10.0f;
+                // Saute à gauche du mur
+                else velocity.x = 10.0f;
+                m_facingRight = !m_facingRight;
+                m_state = State::FALLING;
+            }
+            else velocity.y = -1.0f;
+        } break;
+
+        case State::FALLING:{
+             if(controls.jumpPressed){
+                 float gravity = PE_Clamp(body->GetGravityScale()*0.95f, 0.4f, 1.0f);
+                 body->SetGravityScale(gravity);
+             }
+             // Chargement du Dive
+             if(m_dive){
+                 m_state = State::DIVE_LOADING;
+                 m_dive_load_counter = DIVE_LOAD_DURATION;
+                 m_dive = false;
+             }
+        } break;
+
+        case State::DIVING:{
+             if(m_onGround) m_state = State::IDLE;
+             else {
+                 velocity.y = -30;
+                 velocity.x = 0;
+             }
+             noJump = true;
+        } break;
     }
 
-    // Tue le joueur s'il tombe dans un trou
-    if (position.y < -2.0f)
-    {
-        m_scene.Respawn();
-        return;
-    }
+    // Jump Additional
+    if(m_jump && m_onGround && not noJump) velocity.y = 13.0f;
+    m_jump = false;
 
-    //--------------------------------------------------------------------------
-    // D�tection du sol
-
-    m_onGround = false;
-    PE_Vec2 gndNormal = PE_Vec2::up;
-
-    // Lance deux rayons vers le bas ayant pour origines
-    // les coins gauche et droit du bas du collider du joueur
-    // Ces deux rayons sont dessin�s en jaune dans DrawGizmos()
-    PE_Vec2 originL = position + PE_Vec2(-0.35f, 0.0f);
-    PE_Vec2 originR = position + PE_Vec2(+0.35f, 0.0f);
-
-    // Les rayons ne touchent que des colliders solides (non trigger)
-    // ayant la cat�gorie FILTER_TERRAIN
-    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
-    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
-
-    if (hitL.collider != NULL)
-    {
-        // Le rayon gauche � touch� le sol
-        m_onGround = true;
-        gndNormal = hitL.normal;
-    }
-    if (hitR.collider != NULL)
-    {
-        // Le rayon droit � touch� le sol
-        m_onGround = true;
-        gndNormal = hitR.normal;
-    }
-
-    //--------------------------------------------------------------------------
-    // Etat du joueur
-
-    // D�termine l'�tat du joueur et change l'animation si n�cessaire
-
+    // Additional
     if (m_onGround){
         if (m_state != State::IDLE && velocity.x == 0.0f) {
             m_animator.PlayAnimation("Idle");
@@ -220,11 +253,7 @@ void Player::FixedUpdate()
             m_state = State::FALLING;
         }
         m_onAirTimer += m_scene.GetFixedTimeStep();
-        if (m_state == State::DIVE_LOADING)
-        {
-            m_animator.PlayAnimation("Idle");
-        }
-        }
+    }
 
     // Orientation du joueur
     // Utilisez m_hDirection qui vaut :
@@ -234,78 +263,6 @@ void Player::FixedUpdate()
 
     if (m_hDirection != 0.0f && m_state != State::CLIMBBING) m_facingRight = m_hDirection >= 0.0f;
 
-    //--------------------------------------------------------------------------
-    // Modification de la vitesse et application des forces
-
-    // Application des forces
-    // D�finit la force d'acc�l�ration horizontale du joueur
-    PE_Vec2 direction = PE_Vec2::right;
-    
-    PE_Vec2 force = (15.0f * m_hDirection) * direction;
-    body->ApplyForce(force);
-
-    float maxHSpeed = 9.0f;
-    if (m_state == State::CLIMBBING) velocity.x = 0;
-    else velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
-
-    ControlsInput &controls = m_scene.GetInputManager().GetControls();
-    
-    // Le joueur reste appuyé sur sauter, en plein saut
-    if (controls.jumpPressed && m_state == State::FALLING)
-    {
-        float gravity = PE_Clamp(body->GetGravityScale()*0.95f, 0.4f, 1.0f);
-        body->SetGravityScale(gravity);
-    }
-
-    // Saute
-    if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING) && m_state != State::DIVE_LOADING && m_state != State::DIVING) {
-        velocity.y = 13.0f;
-        if (m_state == State::CLIMBBING)
-        {
-                // Saute à gauche du mur
-                if (m_facingRight) velocity.x = -10.0f;
-                // Saute à gauche du mur
-                else velocity.x = 10.0f;
-                m_facingRight = !m_facingRight;
-                m_state = State::FALLING;
-        }
-        velocity.y = 13.0f;
-    }
-    m_jump = false;
-    if (m_state == State::CLIMBBING)
-    {
-        velocity.y = -1.0f;
-    }
-
-    // Déclenche le chargement du dive
-    if(m_dive && m_state == State::FALLING){
-        m_state = State::DIVE_LOADING;
-        m_dive_load_counter = DIVE_LOAD_DURATION;
-    }
-    m_dive = false;
-
-    // Action du chargement du dive
-    if(m_state == State::DIVE_LOADING){
-        velocity.y = -DEFAULT_WORLD_GRAVITY_Y/40.f;
-        if(!DIVE_LOAD_MODE){
-            velocity.x = 0;
-        }
-        if(m_dive_load_counter == 0){
-            m_state = State::DIVING;
-        }
-        else
-        {
-            m_dive_load_counter--;
-        }
-    }
-    if(m_state == State::DIVING){
-        if(m_onGround){
-            m_state = State::IDLE;
-        } else {
-            velocity.y = -30;
-            velocity.x = 0;
-        }
-    }
     
 
     // TODO : Rebond sur les ennemis
@@ -436,7 +393,7 @@ void Player::OnCollisionStay(GameCollision &collision)
         }
 
         // Le joueur glisse le long d'un mur
-        if (angleUp == 90.0f && m_onAirTimer > 0.5f)
+        if (angleUp == 90.0f && m_onAirTimer > 0.3f)
         {
             m_state = State::CLIMBBING;
         }
@@ -501,4 +458,34 @@ void Player::WakeUpSurroundings()
     );
     WakeUpCallback callback;
     world.QueryAABB(callback, aabb);
+}
+
+PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
+    m_onGround = false;
+    PE_Vec2 gndNormal = PE_Vec2::up;
+
+    // Lance deux rayons vers le bas ayant pour origines
+    // les coins gauche et droit du bas du collider du joueur
+    // Ces deux rayons sont dessin�s en jaune dans DrawGizmos()
+    PE_Vec2 originL = position + PE_Vec2(-0.35f, 0.0f);
+    PE_Vec2 originR = position + PE_Vec2(+0.35f, 0.0f);
+
+    // Les rayons ne touchent que des colliders solides (non trigger)
+    // ayant la cat�gorie FILTER_TERRAIN
+    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
+    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
+
+    if (hitL.collider != NULL)
+    {
+        // Le rayon gauche � touch� le sol
+        m_onGround = true;
+        gndNormal = hitL.normal;
+    }
+    if (hitR.collider != NULL)
+    {
+        // Le rayon droit � touch� le sol
+        m_onGround = true;
+        gndNormal = hitR.normal;
+    }
+    return gndNormal;
 }
