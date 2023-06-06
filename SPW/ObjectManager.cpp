@@ -117,7 +117,7 @@ void ObjectManager::ProcessObjects()
     std::list<GameObject *> toDelete;
     std::vector<GameObject *> toProcessCopy(m_toProcess.begin(), m_toProcess.end());
 
-    // Remet à zéro le conteneur
+    // Remet Ã  zÃ©ro le conteneur
     m_toProcess.clear();
     for (auto &gameObject : toProcessCopy)
     {
@@ -217,7 +217,7 @@ void ObjectManager::AddVisibleBodies(PE_World &world, PE_AABB &worldView)
 {
     VisibleCallback callback(*this);
 
-    // Ajoute chaque GameBody visible par la caméra
+    // Ajoute chaque GameBody visible par la camÃ©ra
     world.QueryAABB(callback, worldView);
 }
 

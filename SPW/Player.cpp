@@ -197,8 +197,7 @@ void Player::FixedUpdate()
     // Application des forces
     // D�finit la force d'acc�l�ration horizontale du joueur
     PE_Vec2 direction = PE_Vec2::right;
-
-    // TODO : Donner une valeur coh�rente au vecteur force
+    
     PE_Vec2 force = (15.0f * m_hDirection) * direction;
     body->ApplyForce(force);
 
@@ -216,7 +215,7 @@ void Player::FixedUpdate()
         velocity.y = -1.0f;
         m_climb = false;
     }
-    body->SetVelocity(velocity);
+    
 
     // TODO : Rebond sur les ennemis
 
@@ -227,7 +226,7 @@ void Player::FixedUpdate()
     // La physique peut �tre diff�rente si le joueur touche ou non le sol.
 
     // D�finit la nouvelle vitesse du corps
-    // TODO : Appliquer la nouvelle velocity au player
+    body->SetVelocity(velocity);
 }
 
 void Player::OnRespawn()
