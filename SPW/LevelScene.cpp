@@ -78,8 +78,8 @@ LevelScene::LevelScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelDa
     }
 
     
-    // Set la gravité
-    m_world.SetGravity(PE_Vec2(DEFAULT_WORLD_GRAVITY_X, DEFAULT_WORLD_GRAVITY_Y));
+    // CUSTOM GRAVITY
+    // m_world.SetGravity(PE_Vec2(DEFAULT_WORLD_GRAVITY_X, DEFAULT_WORLD_GRAVITY_Y));
     
 }
 

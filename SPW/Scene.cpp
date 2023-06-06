@@ -30,7 +30,7 @@ Scene::Scene(SDL_Renderer *renderer, RE_Timer &mainTime, ThemeID themeID) :
     m_makeStep(false), m_mode(UpdateMode::REALTIME),
     m_objectManager(), m_quit(false), m_renderer(renderer), m_timeStep(TIME_STEP),
     m_respawn(false), m_time(mainTime), m_assetManager(renderer, themeID),
-    m_collisionListener(), m_world(PE_Vec2(0.0f, -40.0f), TIME_STEP)
+    m_collisionListener(), m_world(PE_Vec2(DEFAULT_WORLD_GRAVITY_X, DEFAULT_WORLD_GRAVITY_Y), TIME_STEP)
 {
     m_world.SetCollisionListener(&m_collisionListener);
     m_activeCam = nullptr;
