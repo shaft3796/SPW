@@ -73,7 +73,6 @@ void Player::Start()
     // Cr�ation du collider
     PE_ColliderDef colliderDef;
 
-    // TODO : Donner une taille normale � la capsule
     PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
@@ -100,8 +99,10 @@ void Player::Render()
     // Met � jour les animations du joueur
     m_animator.Update(m_scene.GetTime());
 
+    PE_Vec2 velocity = GetVelocity();
+    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+
     float scale = camera->GetWorldToViewScale();
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
     SDL_FRect rect = { 0 };
 
     rect.h = 1.375f * scale;
@@ -188,7 +189,7 @@ void Player::FixedUpdate()
     // *  0.0f si le joueur n'acc�l�re pas ;
     // * +1.0f si le joueur acc�l�re vers la droite ;
     // * -1.0f si le joueur acc�l�re vers la gauche.
-    m_facingRight = true;
+    if (m_hDirection != 0.0f) m_facingRight = m_hDirection >= 0.0f;
 
     //--------------------------------------------------------------------------
     // Modification de la vitesse et application des forces
