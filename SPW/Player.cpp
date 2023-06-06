@@ -35,6 +35,15 @@ Player::Player(Scene &scene) :
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
 
+    // Animation "Running"
+    part = atlas->GetPart("Running");
+    AssertNew(part);
+    RE_TexAnim *running = new RE_TexAnim(
+            m_animator, "Running", part
+    );
+    running->SetCycleCount(-1);
+    running->SetCycleTime(0.15f);
+
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -157,9 +166,14 @@ void Player::FixedUpdate()
     // D�termine l'�tat du joueur et change l'animation si n�cessaire
 
     if (m_onGround){
-        if (m_state != State::IDLE) {
+        if (m_state != State::IDLE && velocity.x == 0.0f) {
             m_animator.PlayAnimation("Idle");
             m_state = State::IDLE;
+        }
+        else if (m_state != State::RUNNING && (velocity.x < -3 || velocity.x > 3))
+        {
+            m_animator.PlayAnimation("Running");
+            m_state = State::RUNNING;
         }
     }
     else {
