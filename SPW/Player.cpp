@@ -44,6 +44,14 @@ Player::Player(Scene &scene) :
     running->SetCycleCount(-1);
     running->SetCycleTime(0.15f);
 
+    // Animation "Dying"
+    part = atlas->GetPart("Dying");
+    AssertNew(part);
+    RE_TexAnim *dying = new RE_TexAnim(
+            m_animator, "Dying", part
+    );
+    running->SetCycleCount(0);
+
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -123,6 +131,19 @@ void Player::FixedUpdate()
 
     // R�veille les corps autour du joueur
     WakeUpSurroundings();
+
+    // Dying
+    if(m_state == State::DYING)
+    {
+        if(m_player_dying_counter == 0){
+            Kill();
+        }
+        else{
+            m_player_dying_counter--;
+            m_animator.PlayAnimation("Dying");
+        }
+        return;
+    }
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f)
@@ -364,8 +385,10 @@ void Player::AddHeart()
 
 void Player::Damage()
 {
+    // TODO: Gestion de la vie
     // M�thode appel�e par un ennemi qui touche le joueur
-    Kill();
+    m_state = State::DYING;
+    m_player_dying_counter = PLAYER_DYING_DURATION;
 }
 
 void Player::Kill()

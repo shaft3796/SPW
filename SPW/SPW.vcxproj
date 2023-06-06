@@ -187,6 +187,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Checkpoint.h" />
     <ClInclude Include="Collectable.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="ControlsInput.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DebugInput.h" />
