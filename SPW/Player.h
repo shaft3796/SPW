@@ -2,6 +2,7 @@
 
 #include "Settings.h"
 #include "GameBody.h"
+#include "Constants.h"
 
 #define PLAYER_DAMAGE_ANGLE 55.0f
 
@@ -51,6 +52,8 @@ private:
     int m_lifeCount;
     int m_heartCount;
     int m_fireflyCount;
+
+    int m_player_dying_counter;
 };
 
 
