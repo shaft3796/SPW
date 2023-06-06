@@ -8,7 +8,6 @@ ControlsInput::ControlsInput() :
 
 void ControlsInput::OnPreEventProcess()
 {
-    jumpPressed = false;
 }
 
 void ControlsInput::OnEventProcess(SDL_Event evt)
@@ -143,6 +142,7 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         case SDL_SCANCODE_UP:
             // Saut
             jumpDown = false;
+            jumpPressed = false;
             break;
 
         default:

@@ -35,7 +35,7 @@ private:
 
     enum class State
     {
-        IDLE, WALKING, RUNNING, SKIDDING, FALLING, DYING, DEAD
+        IDLE, WALKING, RUNNING, SKIDDING, FALLING, DYING, DEAD, CLIMBBING
     };
     State m_state;
 

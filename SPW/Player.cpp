@@ -7,7 +7,7 @@
 
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
-        m_jump(false), m_climb(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
+        m_jump(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
         m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
 {
     m_name = "Player";
@@ -88,7 +88,7 @@ void Player::Update()
     // sa physique au prochain FixedUpdate()
 
     m_hDirection = controls.hAxis;
-    if (controls.jumpPressed) m_jump = true;
+    if (controls.jumpPressed && (m_state != State::FALLING)) m_jump = true;
 }
 
 void Player::Render()
@@ -178,7 +178,7 @@ void Player::FixedUpdate()
         }
     }
     else {
-        if (m_state != State::FALLING) {
+        if (m_state != State::FALLING && m_state != State::CLIMBBING) {
             m_animator.PlayAnimation("Falling");
             m_state = State::FALLING;
         }
@@ -205,15 +205,17 @@ void Player::FixedUpdate()
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
     
-    if (m_jump && (m_state != State::FALLING || m_climb)) {
+    if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING)) {
         velocity.y = 20.0f;
-        m_jump = false;
-        m_climb = false;
+        if (m_state == State::CLIMBBING)
+        {
+            m_state = State::FALLING;
+        }
     }
-    if (m_climb && m_state == State::FALLING)
+    m_jump = false;
+    if (m_state == State::CLIMBBING)
     {
         velocity.y = -1.0f;
-        m_climb = false;
     }
     
 
@@ -243,7 +245,6 @@ void Player::OnRespawn()
     m_facingRight = true;
     m_bounce = false;
     m_jump = false;
-    m_climb = false;
 
     m_animator.StopAnimations();
     m_animator.PlayAnimation("Idle");
@@ -347,7 +348,7 @@ void Player::OnCollisionStay(GameCollision &collision)
         // Le joueur glisse le long d'un mur
         if (angleUp == 90.0f && velocity.y < 0.0f)
         {
-            m_climb = true;
+            m_state = State::CLIMBBING;
         }
     }
 }
