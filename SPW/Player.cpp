@@ -8,7 +8,7 @@
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
         m_jump(false), m_climb(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
-        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE), m_onGround(true)
+        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
 {
     m_name = "Player";
 
@@ -21,20 +21,30 @@ Player::Player(Scene &scene) :
     // Animation "Idle"
     part = atlas->GetPart("Idle");
     AssertNew(part);
-    auto *idleAnim = new RE_TexAnim(
+    RE_TexAnim *idleAnim = new RE_TexAnim(
         m_animator, "Idle", part
     );
     idleAnim->SetCycleCount(0);
 
-     // Animation "Falling"
+    // Animation "Falling"
     part = atlas->GetPart("Falling");
     AssertNew(part);
-    auto *fallingAnim = new RE_TexAnim(
-        m_animator, "Falling", part
+    RE_TexAnim *fallingAnim = new RE_TexAnim(
+            m_animator, "Falling", part
     );
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
-    
+
+    // Animation "Running"
+    part = atlas->GetPart("Running");
+    AssertNew(part);
+    RE_TexAnim *running = new RE_TexAnim(
+            m_animator, "Running", part
+    );
+    running->SetCycleCount(-1);
+    running->SetCycleTime(0.15f);
+
+
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 0;
@@ -62,14 +72,11 @@ void Player::Start()
 
     // Cr�ation du collider
     PE_ColliderDef colliderDef;
-    
-    PE_PolygonShape shape(-.5f, 0.f, .5f, 1.375f);
-    /*
-    PE_CapsuleShape shape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
-    */
+
+    PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
-    colliderDef.shape = &shape;
+    colliderDef.shape = &capsule;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 }
 
@@ -81,7 +88,7 @@ void Player::Update()
     // sa physique au prochain FixedUpdate()
 
     m_hDirection = controls.hAxis;
-    if (controls.jumpPressed && m_onGround) m_jump = true;
+    if (controls.jumpPressed) m_jump = true;
 }
 
 void Player::Render()
@@ -92,12 +99,14 @@ void Player::Render()
     // Met � jour les animations du joueur
     m_animator.Update(m_scene.GetTime());
 
+    PE_Vec2 velocity = GetVelocity();
+    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+
     float scale = camera->GetWorldToViewScale();
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
     SDL_FRect rect = { 0 };
-    
-    rect.h = 1.375f * scale; 
-    rect.w = 1.0f * scale; 
+
+    rect.h = 1.375f * scale;
+    rect.w = 1.0f * scale;
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     // Dessine l'animateur du joueur
@@ -125,7 +134,7 @@ void Player::FixedUpdate()
     //--------------------------------------------------------------------------
     // D�tection du sol
 
-    m_onGround = false;
+    bool m_onGround = false;
     PE_Vec2 gndNormal = PE_Vec2::up;
 
     // Lance deux rayons vers le bas ayant pour origines
@@ -158,9 +167,14 @@ void Player::FixedUpdate()
     // D�termine l'�tat du joueur et change l'animation si n�cessaire
 
     if (m_onGround){
-        if (m_state != State::IDLE) {
+        if (m_state != State::IDLE && velocity.x == 0.0f) {
             m_animator.PlayAnimation("Idle");
             m_state = State::IDLE;
+        }
+        else if (m_state != State::RUNNING && (velocity.x < -3 || velocity.x > 3))
+        {
+            m_animator.PlayAnimation("Running");
+            m_state = State::RUNNING;
         }
     }
     else {
@@ -175,7 +189,7 @@ void Player::FixedUpdate()
     // *  0.0f si le joueur n'acc�l�re pas ;
     // * +1.0f si le joueur acc�l�re vers la droite ;
     // * -1.0f si le joueur acc�l�re vers la gauche.
-    m_facingRight = true;
+    if (m_hDirection != 0.0f) m_facingRight = m_hDirection >= 0.0f;
 
     //--------------------------------------------------------------------------
     // Modification de la vitesse et application des forces
@@ -190,8 +204,8 @@ void Player::FixedUpdate()
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
-    // TODO: review cette partie, le check de l'état sur IDLE est-il vrmt requis ?
-    if (m_jump && (m_state == State::IDLE || m_climb)) {
+    
+    if (m_jump && (m_state != State::FALLING || m_climb)) {
         velocity.y = 20.0f;
         m_jump = false;
         m_climb = false;
@@ -375,8 +389,8 @@ void Player::WakeUpSurroundings()
     PE_World &world = m_scene.GetWorld();
     PE_Vec2 position = GetBody()->GetPosition();
     PE_AABB aabb(
-    position.x - 20.0f, position.y - 10.0f,
-    position.x + 20.0f, position.y + 10.0f
+            position.x - 20.0f, position.y - 10.0f,
+            position.x + 20.0f, position.y + 10.0f
     );
     WakeUpCallback callback;
     world.QueryAABB(callback, aabb);
