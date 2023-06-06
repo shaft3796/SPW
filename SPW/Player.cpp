@@ -7,7 +7,7 @@
 
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
-        m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_hDirection(0.0f),
+        m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_onWallTimer(-1.0f), m_hDirection(0.0f),
         m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
 {
     m_name = "Player";
@@ -132,6 +132,16 @@ void Player::FixedUpdate()
     // R�veille les corps autour du joueur
     WakeUpSurroundings();
 
+    if (m_onWallTimer >= 0)
+    {
+        m_onWallTimer += m_scene.GetFixedTimeStep();
+        if (m_onWallTimer > 0.5)
+        {
+            m_state = State::FALLING;
+            m_onWallTimer = -1.0f;
+        }
+    }
+
     // Dying
     if(m_state == State::DYING)
     {
@@ -213,7 +223,8 @@ void Player::FixedUpdate()
     // *  0.0f si le joueur n'acc�l�re pas ;
     // * +1.0f si le joueur acc�l�re vers la droite ;
     // * -1.0f si le joueur acc�l�re vers la gauche.
-    if (m_hDirection != 0.0f) m_facingRight = m_hDirection >= 0.0f;
+
+    if (m_hDirection != 0.0f && m_state != State::CLIMBBING) m_facingRight = m_hDirection >= 0.0f;
 
     //--------------------------------------------------------------------------
     // Modification de la vitesse et application des forces
@@ -226,7 +237,8 @@ void Player::FixedUpdate()
     body->ApplyForce(force);
 
     float maxHSpeed = 9.0f;
-    velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
+    if (m_state == State::CLIMBBING) velocity.x = 0;
+    else velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
     ControlsInput &controls = m_scene.GetInputManager().GetControls();
     
@@ -401,9 +413,9 @@ void Player::OnCollisionExit(GameCollision &collision)
     
 
     // Si le joueur quitte un bloc de terrain (un mur), il arrete de grimper
-    if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
+    if (otherCollider->CheckCategory(CATEGORY_TERRAIN) && m_state == State::CLIMBBING)
     {
-        m_state = State::FALLING;
+        m_onWallTimer = 0;
     }
 }
 

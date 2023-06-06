@@ -44,6 +44,7 @@ private:
     RE_Animator m_animator;
 
     float m_onAirTimer;
+    float m_onWallTimer;
     float m_hDirection;
     bool m_jump;
     bool m_onGround;
