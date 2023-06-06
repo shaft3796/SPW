@@ -36,7 +36,7 @@ private:
 
     enum class State
     {
-        IDLE, WALKING, RUNNING, SKIDDING, FALLING, DYING, DEAD, CLIMBBING
+        IDLE, WALKING, RUNNING, SKIDDING, FALLING, DYING, DEAD, CLIMBBING, DIVE_LOADING, DIVING
     };
     State m_state;
 
@@ -54,6 +54,10 @@ private:
     int m_fireflyCount;
 
     int m_player_dying_counter;
+
+    // Diving attack
+    bool m_dive;
+    int m_dive_load_counter;
 };
 
 

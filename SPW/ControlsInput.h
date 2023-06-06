@@ -15,5 +15,5 @@ public:
     float hAxis;
     bool jumpDown;
     bool jumpPressed;
-    bool goDownDown;
+    bool goDownDown;  // used for the dive
 };
