@@ -225,9 +225,18 @@ void Player::FixedUpdate()
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
+    ControlsInput &controls = m_scene.GetInputManager().GetControls();
     
+    // Le joueur reste appuyé sur sauter, en plein saut
+    if (controls.jumpPressed && m_state == State::FALLING)
+    {
+        float gravity = PE_Clamp(body->GetGravityScale()*0.95f, 0.4f, 1.0f);
+        body->SetGravityScale(gravity);
+    }
+
+    // Saute
     if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING)) {
-        velocity.y = 20.0f;
+        velocity.y = 13.0f;
         if (m_state == State::CLIMBBING)
         {
             m_state = State::FALLING;
@@ -296,6 +305,10 @@ void Player::OnCollisionEnter(GameCollision &collision)
 {
     const PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
+
+    // Réinitialisation de la gravité
+    PE_Body *body = GetBody();
+    body->SetGravityScale(1.0f);
 
     // Collision avec un ennemi
     if (otherCollider->CheckCategory(CATEGORY_ENEMY))
