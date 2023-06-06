@@ -428,8 +428,11 @@ void Player::Damage()
 {
     // TODO: Gestion de la vie
     // M�thode appel�e par un ennemi qui touche le joueur
-    m_state = State::DYING;
-    m_player_dying_counter = PLAYER_DYING_DURATION;
+    if(m_state != State::DYING){
+        m_state = State::DYING;
+        m_player_dying_counter = PLAYER_DYING_DURATION;
+    }
+    
 }
 
 void Player::Kill()
