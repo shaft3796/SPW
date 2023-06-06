@@ -90,13 +90,15 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         switch (scanCode)
         {
         case SDL_SCANCODE_RIGHT:
-            // Deplacement à droite
+            // Deplacement Ã  droite
             hAxis = 1.f;
+            goRightDown = true;
             break;
 
         case SDL_SCANCODE_LEFT:
-            // Deplacement à gauche
+            // Deplacement Ã  gauche
             hAxis = -1.f;
+            goLeftDown = true;
             break;
 
         case SDL_SCANCODE_DOWN:
@@ -109,6 +111,7 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             // Saut
             jumpDown = true;
             jumpPressed = true;
+            goUpDown = true;
             break;
 
         default:
@@ -122,15 +125,17 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         switch (scanCode)
         {
         case SDL_SCANCODE_RIGHT:
-            // Deplacement à droite
+            // Deplacement Ã  droite
             if (hAxis > 0.f)
                 hAxis = 0.f;
+            goRightDown = false;
             break;
 
         case SDL_SCANCODE_LEFT:
-            // Deplacement à gauche
+            // Deplacement Ã  gauche
             if (hAxis < 0.f)
                 hAxis = 0.f;
+            goLeftDown = false;
             break;
 
         case SDL_SCANCODE_DOWN:
@@ -143,6 +148,7 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             // Saut
             jumpDown = false;
             jumpPressed = false;
+            goUpDown = false;
             break;
 
         default:

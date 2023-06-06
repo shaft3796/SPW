@@ -158,7 +158,7 @@ void StaticMap::Start()
     PE_World &world = m_scene.GetWorld();
     PE_Body *body = NULL;
 
-    // Crée le corps
+    // CrÃ©e le corps
     PE_BodyDef bodyDef;
     bodyDef.type = PE_BodyType::STATIC;
     bodyDef.position.SetZero();
@@ -167,7 +167,7 @@ void StaticMap::Start()
     AssertNew(body);
     SetBody(body);
 
-    // Crée les colliders
+    // CrÃ©e les colliders
     PE_Vec2 vertices[3];
     PE_PolygonShape polygon;
     PE_ColliderDef colliderDef;
@@ -227,7 +227,7 @@ void StaticMap::Start()
         }
     }
 
-    // Limite à gauche du monde
+    // Limite Ã  gauche du monde
     polygon.SetAsBox(-1.0f, -2.0f, 0.0f, (float)m_height + 10.0f);
     colliderDef.SetDefault();
     colliderDef.friction = 0.0f;
@@ -235,7 +235,7 @@ void StaticMap::Start()
     colliderDef.shape = &polygon;
     body->CreateCollider(colliderDef);
 
-    // Limite à droite du monde
+    // Limite Ã  droite du monde
     polygon.SetAsBox((float)m_width, -2.0f, (float)m_width + 1.0f, (float)m_height + 10.0f);
     colliderDef.SetDefault();
     colliderDef.friction = 0.0f;
@@ -246,7 +246,7 @@ void StaticMap::Start()
 
 void StaticMap::OnCollisionStay(GameCollision &collision)
 {
-    // On vérifie que la collision concerne une pique
+    // On vÃ©rifie que la collision concerne une pique
     if (collision.collider->GetUserData().id != 1)
         return;
 

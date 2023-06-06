@@ -1,3 +1,4 @@
+#include "EditorScene.h"
 #include "Settings.h"
 #include "LevelScene.h"
 #include "TitleScene.h"
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
     Scene *scene = nullptr;
     bool quitGame = false;
     /* TODO: FOR EDITOR TESTING PURPOSES, RESET HERE TO MAIN_MENU */
-    GameState state = GameState::MAIN_MENU;
+    GameState state = GameState::EDITOR;
     const std::vector<LevelData> levels(LevelData::Init());
     int levelID = 0;
 
@@ -126,6 +127,7 @@ int main(int argc, char *argv[])
             scene = new LevelScene(renderer, time, levels[levelID]);
             break;
         case GameState::EDITOR:
+            scene = new EditorScene(renderer, time);
             break;
 
         case GameState::MAIN_MENU:
@@ -208,3 +210,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+// TODO: Fork le .h .cpp button en modifant la méthode de rendu et en faisant ce qu'il y a à faire.

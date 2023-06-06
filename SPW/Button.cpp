@@ -20,7 +20,7 @@ void Button::SetButtonEnabled(bool enabled)
 {
     if (enabled == (m_currState != State::DISABLED))
     {
-        // Le boutton est déjà dans l'état souhaité
+        // Le boutton est dÃ©jÃ  dans l'Ã©tat souhaitÃ©
         return;
     }
 
@@ -56,14 +56,14 @@ void Button::Update()
             {
                 if (m_listener)
                 {
-                    // Exécute l'action associée au bouton
+                    // ExÃ©cute l'action associÃ©e au bouton
                     m_listener->OnPress();
 
                     m_scene.GetAssetManager().PlaySound(
                         SoundID::SYSTEM_SELECT, ChannelID::SYSTEM_1
                     );
 
-                    // Evite le déclanchement de plusieurs boutons 
+                    // Evite le dÃ©clanchement de plusieurs boutons 
                     mouse.leftReleased = false;
                 }
 
@@ -93,7 +93,7 @@ void Button::Update()
         }
     }
 
-    // Met à jour les textes du bouton
+    // Met Ã  jour les textes du bouton
     for (int i = 0; i < 4; i++)
     {
         if (m_texts[i] == nullptr) continue;

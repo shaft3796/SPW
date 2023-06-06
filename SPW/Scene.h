@@ -128,7 +128,8 @@ protected:
     enum class UpdateMode
     {
         REALTIME,
-        STEP_BY_STEP
+        STEP_BY_STEP,
+        EDITOR
     };
     /// @brief Mode de mise à jour du moteur physique de la scène (temps réel ou pas-à-pas).
     UpdateMode m_mode;

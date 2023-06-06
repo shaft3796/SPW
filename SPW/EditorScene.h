@@ -6,11 +6,13 @@
 #include "EditorCanvas.h"
 #include "LevelData.h"
 #include "Constants.h"
+#include "EditorUi.h"
+#include "StaticMap.h"
 
 class EditorScene : public Scene{
 public:
     /* CONSTRUCTOR */
-    EditorScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelData &level);
+    EditorScene(SDL_Renderer *renderer, RE_Timer &mainTime);
     EditorScene(EditorScene const&) = delete;
     EditorScene& operator=(EditorScene const&) = delete;
     ~EditorScene() override;
@@ -21,9 +23,12 @@ public:
 private:
     std::array<Camera *, 2> m_cameras;
     EditorCanvas *m_canvas;
+    EditorUi *m_ui;
 
     PE_Vec2 m_startPos;
 
     int m_camIndex;
+
+    StaticMap m_staticMap;
     
 };

@@ -58,7 +58,7 @@ StartScreen::StartScreen(TitleScene &scene) :
     RE_Atlas *uiAtlas = assets.GetAtlas(AtlasID::UI);
     AssertNew(uiAtlas);
 
-    // Création du logo
+    // CrÃ©ation du logo
     RE_AtlasPart *logoPart = logoAtlas->GetPart("Logo");
     Image *logo = new Image(scene, logoPart, 0);
     float ratio = logo->GetNaturalRatio();
@@ -69,7 +69,7 @@ StartScreen::StartScreen(TitleScene &scene) :
     logo->GetLocalRect().offsetMax.Set(+0.5f * logoW, logoW / ratio);
     logo->SetParent(this);
 
-    // Création des boutons
+    // CrÃ©ation des boutons
     RE_AtlasPart *buttonPart = uiAtlas->GetPart("Button");
     AssertNew(buttonPart);
     SDL_Color colorUp = assets.GetColor(ColorID::NORMAL);
@@ -77,7 +77,7 @@ StartScreen::StartScreen(TitleScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     TTF_Font *font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[2] = { u8"Démarrer", u8"Quitter" };
+    const std::string texts[2] = { u8"DÃ©marrer", u8"Quitter" };
     ButtonListener *listener[2] = { 0 };
     listener[0] = new StartScreenNS::SelectionListener(scene, *this);
     listener[1] = new StartScreenNS::QuitListener(scene);

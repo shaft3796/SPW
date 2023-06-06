@@ -16,4 +16,7 @@ public:
     bool jumpDown;
     bool jumpPressed;
     bool goDownDown;  // used for the dive
+    bool goUpDown;
+    bool goRightDown;
+    bool goLeftDown;
 };

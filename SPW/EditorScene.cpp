@@ -2,30 +2,53 @@
 #include "MainCamera.h"
 #include "DebugCamera.h"
 #include "Background.h"
+#include "Button.h"
+#include "StaticMap.h"
 
-EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime, const LevelData& level):
-Scene(renderer, mainTime, level.themeID), m_camIndex(0), m_cameras()
+namespace EditorNS
 {
+    class QuitListener : public ButtonListener
+    {
+    public:
+        QuitListener(EditorScene &editorScene) : m_editorScene(editorScene) {}
+        virtual void OnPress()
+        {
+            printf("TRIGGERED\n");
+        }
+    private:
+        EditorScene &m_editorScene;
+    };
+}
+
+EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime):
+Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 100, 100)
+{
+    AssetManager &assets = this->GetAssetManager();
+    
     m_inputManager.GetApplication().SetEnabled(true);
     m_inputManager.GetMouse().SetEnabled(true);
     m_inputManager.GetControls().SetEnabled(true);
     m_inputManager.GetDebug().SetEnabled(true);
-
-    // TODO: créer un curseur ?
+    
 
     m_cameras[0] = new EditorCamera(*this);
     m_activeCam = m_cameras[m_camIndex];
-
-    // TODO: Parseur de niveau
+    
+    PE_AABB bounds(0.0f, 0.0f, (float)10, 24.0f * 9.0f / 16.0f);
+    Camera* camera = this->GetActiveCamera();
+    camera->SetWorldBounds(bounds);
 
     // Canvas
     m_canvas = new EditorCanvas(*this);
+
+    // Ui
+    m_ui = new EditorUi(*this);
 
     // Background
     Background* background = new Background(*this, Layer::BACKGROUND);
     std::vector<SDL_Texture*> m_textures = m_assetManager.GetBackgrounds();
     // TODO: customizable background
-    switch (level.themeID)
+    switch (ThemeID::SKY)
     {
     case ThemeID::LAKE:
         {
@@ -69,7 +92,6 @@ Scene(renderer, mainTime, level.themeID), m_camIndex(0), m_cameras()
             break;
         }
     }
-        
 }
 
 EditorScene::~EditorScene()
@@ -81,12 +103,51 @@ bool EditorScene::Update()
     bool quit = Scene::Update();
 
     ApplicationInput &appInput = m_inputManager.GetApplication();
+    MouseInput &mouseInput = m_inputManager.GetMouse();
+    PE_Vec2 viewPos {mouseInput.viewPos};
+    PE_Vec2 worldPos {}; m_activeCam->ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
     
     if (appInput.quitPressed)
     {
         return true;
     }
+
+    /* --- TILES PLACE --- */
+    if(mouseInput.leftDown)
+    {
+        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, Tile::Type::GROUND);
+    }
+    else if(mouseInput.rightDown)
+    {
+        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, Tile::Type::EMPTY);
+    }
+
+    /* --- CAMERA MOVE USING ARROWS --- */
+    PE_AABB worldView = m_activeCam->GetWorldView();
+    PE_AABB worldBounds = m_activeCam->GetWorldBounds();
+    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.1)
+    {
+        PE_Vec2 transl {0.0f, -0.1f};
+        m_activeCam->TranslateWorldView(transl);
+    }
+    if (m_inputManager.GetControls().goUpDown)
+    {
+        PE_Vec2 transl {0.0f, 0.1f};
+        m_activeCam->TranslateWorldView(transl);
+    }
+    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.1)
+    {
+        PE_Vec2 transl {-0.1f, 0.0f};
+        m_activeCam->TranslateWorldView(transl);
+    }
+    if (m_inputManager.GetControls().goRightDown)
+    {
+        PE_Vec2 transl {0.1f, 0.0f};
+        m_activeCam->TranslateWorldView(transl);
+    }
     
+    m_mode = UpdateMode::EDITOR;
+    return quit;
 }
 
 void EditorScene::OnRespawn()
