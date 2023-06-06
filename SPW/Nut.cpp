@@ -27,10 +27,10 @@ void Nut::Start()
 {
     SetToRespawn(true);
 
-    // Joue l'animation par dÈfaut
+    // Joue l'animation par dÔøΩfaut
     m_animator.PlayAnimation("Idle");
 
-    // CrÈe le corps
+    // CrÔøΩe le corps
     PE_World &world = m_scene.GetWorld();
     PE_BodyDef bodyDef;
     bodyDef.type = PE_BodyType::DYNAMIC;
@@ -40,7 +40,7 @@ void Nut::Start()
     PE_Body *body = world.CreateBody(bodyDef);
     SetBody(body);
 
-    // CrÈe le collider
+    // CrÔøΩe le collider
     PE_CircleShape circle(PE_Vec2(0.0f, 0.45f), 0.45f);
     PE_ColliderDef colliderDef;
     colliderDef.friction = 0.005f;
@@ -50,7 +50,7 @@ void Nut::Start()
 
     // Endort le corps
     // Permet d'optimiser le calcul de la physique,
-    // seuls les corps proches du joueur sont simulÈs
+    // seuls les corps proches du joueur sont simulÔøΩs
     body->SetAwake(false);
 }
 
@@ -70,8 +70,8 @@ void Nut::FixedUpdate()
 
     if (body->IsAwake() == false)
     {
-        // Ne met pas ‡ jour la noisette si elle est endormie
-        // Le joueur est loin d'elle et elle n'est plus visible par la camÈra.
+        // Ne met pas ÔøΩ jour la noisette si elle est endormie
+        // Le joueur est loin d'elle et elle n'est plus visible par la camÔøΩra.
         return;
     }
 
@@ -88,7 +88,7 @@ void Nut::FixedUpdate()
 
     if (dist > 24.0f)
     {
-        // La distance entre de joueur et la noisette vient de dÈpasser 24 tuiles.
+        // La distance entre de joueur et la noisette vient de dÔøΩpasser 24 tuiles.
         // On endort la noisette pour ne plus la simuler dans le moteur physique.
         body->SetAwake(false);
         return;
@@ -162,6 +162,7 @@ void Nut::OnCollisionStay(GameCollision &collision)
         Player *player = dynamic_cast<Player *>(collision.gameBody);
         if (player == nullptr)
         {
+            // TODO: Erreur lev√©e ici lors de la collision avec une noistte
             assert(false);
             return;
         }
