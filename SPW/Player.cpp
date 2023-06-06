@@ -236,11 +236,16 @@ void Player::FixedUpdate()
 
     // Saute
     if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING)) {
-        velocity.y = 13.0f;
         if (m_state == State::CLIMBBING)
         {
-            m_state = State::FALLING;
+                // Saute à gauche du mur
+                if (m_facingRight) velocity.x = -10.0f;
+                // Saute à gauche du mur
+                else velocity.x = 10.0f;
+                m_facingRight = !m_facingRight;
+                m_state = State::FALLING;
         }
+        velocity.y = 13.0f;
     }
     m_jump = false;
     if (m_state == State::CLIMBBING)
@@ -358,8 +363,6 @@ void Player::OnCollisionStay(GameCollision &collision)
     const PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
     
-    PE_Body *body = GetBody();
-    PE_Vec2 velocity = body->GetLocalVelocity();
     
 
     if (otherCollider->CheckCategory(CATEGORY_COLLECTABLE))
@@ -380,10 +383,24 @@ void Player::OnCollisionStay(GameCollision &collision)
         }
 
         // Le joueur glisse le long d'un mur
-        if (angleUp == 90.0f && velocity.y < 0.0f)
+        if (angleUp == 90.0f)
         {
             m_state = State::CLIMBBING;
         }
+    }
+}
+
+void Player::OnCollisionExit(GameCollision &collision)
+{
+    const PE_Manifold &manifold = collision.manifold;
+    PE_Collider *otherCollider = collision.otherCollider;
+    
+    
+
+    // Si le joueur quitte un bloc de terrain (un mur), il arrete de grimper
+    if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
+    {
+        m_state = State::FALLING;
     }
 }
 

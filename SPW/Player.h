@@ -21,6 +21,7 @@ public:
 
     virtual void OnCollisionEnter(GameCollision &collision) override;
     virtual void OnCollisionStay(GameCollision &collision) override;
+    virtual void OnCollisionExit(GameCollision &collision) override;
 
     int GetFireflyCount() const;
     int GetHeartCount() const;
