@@ -21,6 +21,7 @@ public:
 
     virtual void OnCollisionEnter(GameCollision &collision) override;
     virtual void OnCollisionStay(GameCollision &collision) override;
+    virtual void OnCollisionExit(GameCollision &collision) override;
 
     int GetFireflyCount() const;
     int GetHeartCount() const;
@@ -42,6 +43,8 @@ private:
 
     RE_Animator m_animator;
 
+    float m_onAirTimer;
+    float m_onWallTimer;
     float m_hDirection;
     bool m_jump;
     bool m_onGround;

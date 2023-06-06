@@ -7,7 +7,7 @@
 
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
-        m_jump(false), m_facingRight(true), m_bounce(false), m_hDirection(0.0f),
+        m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_onWallTimer(-1.0f), m_hDirection(0.0f),
         m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
 {
     m_name = "Player";
@@ -132,6 +132,16 @@ void Player::FixedUpdate()
     // R�veille les corps autour du joueur
     WakeUpSurroundings();
 
+    if (m_onWallTimer >= 0)
+    {
+        m_onWallTimer += m_scene.GetFixedTimeStep();
+        if (m_onWallTimer > 0.5)
+        {
+            m_state = State::FALLING;
+            m_onWallTimer = -1.0f;
+        }
+    }
+
     // Dying
     if(m_state == State::DYING)
     {
@@ -197,12 +207,15 @@ void Player::FixedUpdate()
             m_animator.PlayAnimation("Running");
             m_state = State::RUNNING;
         }
+        // Réinitialise le timer
+        m_onAirTimer = 0.0f;
     }
     else {
         if (m_state != State::FALLING && m_state != State::CLIMBBING) {
             m_animator.PlayAnimation("Falling");
             m_state = State::FALLING;
         }
+        m_onAirTimer += m_scene.GetFixedTimeStep();
     }
 
     // Orientation du joueur
@@ -210,7 +223,8 @@ void Player::FixedUpdate()
     // *  0.0f si le joueur n'acc�l�re pas ;
     // * +1.0f si le joueur acc�l�re vers la droite ;
     // * -1.0f si le joueur acc�l�re vers la gauche.
-    if (m_hDirection != 0.0f) m_facingRight = m_hDirection >= 0.0f;
+
+    if (m_hDirection != 0.0f && m_state != State::CLIMBBING) m_facingRight = m_hDirection >= 0.0f;
 
     //--------------------------------------------------------------------------
     // Modification de la vitesse et application des forces
@@ -223,7 +237,8 @@ void Player::FixedUpdate()
     body->ApplyForce(force);
 
     float maxHSpeed = 9.0f;
-    velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
+    if (m_state == State::CLIMBBING) velocity.x = 0;
+    else velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
     ControlsInput &controls = m_scene.GetInputManager().GetControls();
     
@@ -236,11 +251,16 @@ void Player::FixedUpdate()
 
     // Saute
     if (m_jump && (m_state != State::FALLING || m_state == State::CLIMBBING)) {
-        velocity.y = 13.0f;
         if (m_state == State::CLIMBBING)
         {
-            m_state = State::FALLING;
+                // Saute à gauche du mur
+                if (m_facingRight) velocity.x = -10.0f;
+                // Saute à gauche du mur
+                else velocity.x = 10.0f;
+                m_facingRight = !m_facingRight;
+                m_state = State::FALLING;
         }
+        velocity.y = 13.0f;
     }
     m_jump = false;
     if (m_state == State::CLIMBBING)
@@ -358,8 +378,6 @@ void Player::OnCollisionStay(GameCollision &collision)
     const PE_Manifold &manifold = collision.manifold;
     PE_Collider *otherCollider = collision.otherCollider;
     
-    PE_Body *body = GetBody();
-    PE_Vec2 velocity = body->GetLocalVelocity();
     
 
     if (otherCollider->CheckCategory(CATEGORY_COLLECTABLE))
@@ -380,10 +398,24 @@ void Player::OnCollisionStay(GameCollision &collision)
         }
 
         // Le joueur glisse le long d'un mur
-        if (angleUp == 90.0f && velocity.y < 0.0f)
+        if (angleUp == 90.0f && m_onAirTimer > 0.5f)
         {
             m_state = State::CLIMBBING;
         }
+    }
+}
+
+void Player::OnCollisionExit(GameCollision &collision)
+{
+    const PE_Manifold &manifold = collision.manifold;
+    PE_Collider *otherCollider = collision.otherCollider;
+    
+    
+
+    // Si le joueur quitte un bloc de terrain (un mur), il arrete de grimper
+    if (otherCollider->CheckCategory(CATEGORY_TERRAIN) && m_state == State::CLIMBBING)
+    {
+        m_onWallTimer = 0;
     }
 }
 
