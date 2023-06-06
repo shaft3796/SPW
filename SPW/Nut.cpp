@@ -44,7 +44,7 @@ void Nut::Start()
     PE_CircleShape circle(PE_Vec2(0.0f, 0.45f), 0.45f);
     PE_ColliderDef colliderDef;
     colliderDef.friction = 0.005f;
-    colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_PLAYER | CATEGORY_ENEMY;
+    colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_ENEMY;
     colliderDef.shape = &circle;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 
