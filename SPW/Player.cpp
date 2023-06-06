@@ -35,6 +35,15 @@ Player::Player(Scene &scene) :
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
 
+    // Animation "Diving"
+    part = atlas->GetPart("Diving");
+    AssertNew(part);
+    RE_TexAnim *divingAnim = new RE_TexAnim(
+            m_animator, "Diving", part
+    );
+    divingAnim->SetCycleCount(-1);
+    divingAnim->SetCycleTime(0.5f);
+
     // Animation "Running"
     part = atlas->GetPart("Running");
     AssertNew(part);
@@ -180,10 +189,6 @@ void Player::FixedUpdate()
         } break;
         
         case State::DIVE_LOADING:{
-            // TODO: Probably remove the condition
-            if(not m_onGround){
-                m_animator.PlayAnimation("Idle");
-            }
             velocity.y = -DEFAULT_WORLD_GRAVITY_Y/40.f;
             if(!DIVE_LOAD_MODE )velocity.x = 0;
             if(m_dive_load_counter == 0) m_state = State::DIVING;
@@ -214,6 +219,7 @@ void Player::FixedUpdate()
              if(m_dive){
                  m_state = State::DIVE_LOADING;
                  m_dive_load_counter = DIVE_LOAD_DURATION;
+                 m_animator.PlayAnimation("Diving");
                  m_dive = false;
              }
         } break;
@@ -225,6 +231,7 @@ void Player::FixedUpdate()
                  velocity.x = 0;
              }
              noJump = true;
+            m_animator.PlayAnimation("Idle");
         } break;
     }
 
