@@ -206,7 +206,7 @@ void Player::FixedUpdate()
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
 
     
-    if (m_jump && (m_state == State::IDLE || m_climb)) {
+    if (m_jump && (m_state != State::FALLING || m_climb)) {
         velocity.y = 20.0f;
         m_jump = false;
         m_climb = false;
