@@ -94,11 +94,19 @@ void Nut::FixedUpdate()
         return;
     }
 
-    if (dist < 5.0f && m_state == State::IDLE)
+    if (dist < 10.0f)
     {
         m_state = State::SPINNING;
-        velocity.x = -10.0f;
-        body->SetVelocity(velocity);
+        float xPLayer = player->GetPosition().x;
+        float yPLayer = player->GetPosition().y;
+        int coef = 0;
+        if (xPLayer > position.x) coef = 1;
+        if (xPLayer < position.x) coef = -1;
+
+        velocity.x = coef*3.0f;
+        
+        
+        if (abs(position.y - yPLayer) < 1.0f) body->SetVelocity(velocity);
     }
 }
 
