@@ -213,6 +213,12 @@ void LevelParser::InitScene(LevelScene &scene) const
                 checkpoint->SetStartPosition(position);
                 break;
             }
+            case 'b':
+            {
+                Brick *brick = new Brick(scene);
+                brick->SetStartPosition(position);
+                break;
+            }
             case 'o':
             {
                 Firefly *firefly = new Firefly(scene);
