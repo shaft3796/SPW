@@ -61,6 +61,15 @@ Player::Player(Scene &scene) :
     );
     running->SetCycleCount(0);
 
+    // Animation "Diving"
+    part = atlas->GetPart("Diving");
+    AssertNew(part);
+    RE_TexAnim *diving = new RE_TexAnim(
+            m_animator, "Diving", part
+    );
+    diving->SetCycleCount(0);
+    
+
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -121,6 +130,9 @@ void Player::Render()
 
     PE_Vec2 velocity = GetVelocity();
     SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+
+    // Diving
+    flip = m_state == State::DIVING ? SDL_FLIP_VERTICAL : flip;
 
     float scale = camera->GetWorldToViewScale();
     SDL_FRect rect = { 0 };
@@ -229,10 +241,15 @@ void Player::FixedUpdate()
              else {
                  velocity.y = -30;
                  velocity.x = 0;
+                 m_animator.PlayAnimation("Diving");
              }
              noJump = true;
             m_animator.PlayAnimation("Idle");
         } break;
+
+        case State::IDLE:{
+            m_animator.PlayAnimation("Idle");
+        }
     }
 
     // Jump Additional
