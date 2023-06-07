@@ -208,13 +208,13 @@ void Player::FixedUpdate()
     switch (m_state){
         case State::DYING:{
             if(m_player_dying_counter == 0){
-                if (m_heartCount >= 0) m_state = State::IDLE;
+                if (m_heartCount > 0) m_state = State::IDLE;
                 else Kill();
             }
             else{
                 if (m_player_dying_counter == PLAYER_DYING_DURATION)
                 {
-                    if (m_heartCount >= 0) m_animator.PlayAnimation("Invincible");
+                    if (m_heartCount > 0) m_animator.PlayAnimation("Invincible");
                     else m_animator.PlayAnimation("Dying");    
                 }
                 m_player_dying_counter -= m_scene.GetFixedTimeStep();
