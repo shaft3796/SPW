@@ -242,36 +242,42 @@ void StaticMap::Start()
                 vertices[1] = position + PE_Vec2(1.0f, 0.0f);
                 vertices[2] = position + PE_Vec2(1.0f, 0.5f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_R2:
                 vertices[0] = position + PE_Vec2(0.0f, 0.5f);
                 vertices[1] = position + PE_Vec2(1.0f, 0.5f);
                 vertices[2] = position + PE_Vec2(1.0f, 1.0f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_L1:
                 vertices[0] = position + PE_Vec2(0.0f, 0.0f);
                 vertices[1] = position + PE_Vec2(1.0f, 0.0f);
                 vertices[2] = position + PE_Vec2(0.0f, 0.5f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_L2:
                 vertices[0] = position + PE_Vec2(0.0f, 0.5f);
                 vertices[1] = position + PE_Vec2(1.0f, 0.5f);
                 vertices[2] = position + PE_Vec2(0.0f, 1.0f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::STEEP_SLOPE_L:
                 vertices[0] = position + PE_Vec2(0.0f, 0.0f);
                 vertices[1] = position + PE_Vec2(1.0f, 0.0f);
                 vertices[2] = position + PE_Vec2(0.0f, 1.0f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::STEEP_SLOPE_R:
                 vertices[0] = position + PE_Vec2(0.0f, 0.0f);
                 vertices[1] = position + PE_Vec2(1.0f, 0.0f);
                 vertices[2] = position + PE_Vec2(1.0f, 1.0f);
                 polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;  
            
 

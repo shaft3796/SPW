@@ -161,6 +161,7 @@ void Player::FixedUpdate()
     UpdateOnGround(position);
     UpdateOnSlope(position);
     if(m_onSlope) m_onGround = true;
+    printf("On Slope [%d] On Ground [%d]\n", m_onSlope, m_onGround);
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f){
@@ -523,10 +524,10 @@ void Player::UpdateOnSlope(PE_Vec2 position){
 
     PE_Vec2 origin = position + PE_Vec2(0.0f, 0.0f);
 
-    RayHit hit = m_scene.RayCast(origin, PE_Vec2::down, 0.2f, CATEGORY_TERRAIN, true);
+    RayHit hit = m_scene.RayCast(origin, PE_Vec2::down, 0.2f, CATEGORY_SLOPE, true);
 
     if (hit.collider != NULL)
     {
-        m_onGround = true;
+        m_onSlope = true;
     }
 }
