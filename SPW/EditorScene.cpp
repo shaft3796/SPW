@@ -5,23 +5,9 @@
 #include "Button.h"
 #include "StaticMap.h"
 
-namespace EditorNS
-{
-    class QuitListener : public ButtonListener
-    {
-    public:
-        QuitListener(EditorScene &editorScene) : m_editorScene(editorScene) {}
-        virtual void OnPress()
-        {
-            printf("TRIGGERED\n");
-        }
-    private:
-        EditorScene &m_editorScene;
-    };
-}
 
 EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime):
-Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 100, 100)
+Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 1000, 100)
 {
     AssetManager &assets = this->GetAssetManager();
     
