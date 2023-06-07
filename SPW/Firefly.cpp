@@ -35,7 +35,7 @@ void Firefly::Start()
     // Crée le corps
     PE_World &world = m_scene.GetWorld();
     PE_BodyDef bodyDef;
-    bodyDef.type = PE_BodyType::DYNAMIC;
+    bodyDef.type = PE_BodyType::STATIC;
     bodyDef.position = GetStartPosition() + PE_Vec2(0.5f, 0.0f);
     bodyDef.name = "Firefly";
     PE_Body *body = world.CreateBody(bodyDef);
