@@ -13,3 +13,7 @@
 #define DIVE_LOAD_MODE false
 
 #define MAX_HEART_COUNT 3
+
+// Ennemis
+#define FLAPPY_SPEED 2
+#define FLAPPY_DISTANCE 2

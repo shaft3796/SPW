@@ -8,6 +8,7 @@
 #include "Bonus.h"
 #include "Camera.h"
 #include "Firefly.h"
+#include "Flappy.h"
 #include "Oneway.h"
 
 
@@ -199,6 +200,12 @@ void LevelParser::InitScene(LevelScene &scene) const
             {
                 Nut *nut = new Nut(scene);
                 nut->SetStartPosition(position);
+                break;
+            }
+            case 'f':
+            {
+                Flappy *flappy = new Flappy(scene);
+                flappy->SetStartPosition(position);
                 break;
             }
             case '=':

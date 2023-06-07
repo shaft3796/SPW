@@ -147,6 +147,7 @@
     <ClCompile Include="DebugInput.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Firefly.cpp" />
+    <ClCompile Include="Flappy.cpp" />
     <ClCompile Include="GameBody.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="DebugInput.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Firefly.h" />
+    <ClInclude Include="Flappy.h" />
     <ClInclude Include="GameBody.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
