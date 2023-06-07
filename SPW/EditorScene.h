@@ -6,6 +6,7 @@
 #include "EditorCanvas.h"
 #include "LevelData.h"
 #include "Constants.h"
+#include "EditorMap.h"
 #include "EditorUi.h"
 #include "StaticMap.h"
 
@@ -29,6 +30,6 @@ private:
 
     int m_camIndex;
 
-    StaticMap m_staticMap;
+    EditorMap m_staticMap;
     
 };

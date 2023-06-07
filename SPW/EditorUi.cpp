@@ -10,7 +10,7 @@ namespace EditorUiNS
 {
     class NsEditorSelectorListener : public EditorSelectorListener{
     public:
-        NsEditorSelectorListener(EditorScene &editorScene, EditorUi &editorUi, Tile::Type tileType) : m_editorScene(editorScene), m_editorUi(editorUi), m_tileType(tileType){}
+        NsEditorSelectorListener(EditorScene &editorScene, EditorUi &editorUi, EditorTile::Type tileType) : m_editorScene(editorScene), m_editorUi(editorUi), m_tileType(tileType){}
         virtual ~NsEditorSelectorListener(){}
 
         virtual void OnSelect() override{
@@ -24,7 +24,7 @@ namespace EditorUiNS
     private:
         EditorScene &m_editorScene;
         EditorUi &m_editorUi;
-        Tile::Type m_tileType;
+        EditorTile::Type m_tileType;
     };
     
     class QuitListener : public ButtonListener
@@ -81,14 +81,15 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     // SELECTOR TEST
     std::vector<RE_AtlasPart*> selectorParts;
     std::vector<int> selectorIdxs;
-    std::vector<Tile::Type> selectorTypes;
+    std::vector<EditorTile::Type> selectorTypes;
     /* --- ADD PARTS --- */
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::GROUND);
-    selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::WOOD);
-    selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::SPIKE);
-    selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::ONE_WAY);
-    selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::FAKE_NUT);
-    selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::FAKE_FLAG);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::GROUND);
+    selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::WOOD);
+    selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPIKE);
+    selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::ONE_WAY);
+    selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_NUT);
+    selectorParts.push_back(uiAtlas->GetPart("Firefly")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FIREFLY);
+    selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAG);
     
     float originX = 30.0f;
     for(int i=0; i<selectorParts.size(); i++)

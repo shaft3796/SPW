@@ -3,6 +3,7 @@
 #include "DebugCamera.h"
 #include "Background.h"
 #include "Button.h"
+#include "EditorMap.h"
 #include "StaticMap.h"
 
 
@@ -105,7 +106,7 @@ bool EditorScene::Update()
     }
     else if(mouseInput.rightDown)
     {
-        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, Tile::Type::EMPTY);
+        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY);
     }
 
     /* --- CAMERA MOVE USING ARROWS --- */

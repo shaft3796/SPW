@@ -27,8 +27,6 @@ EditorHeader::EditorHeader(EditorScene &scene): UIObject(scene), m_editorScene(s
     float currX = 0.0f;
     float currY = 0.0f;
 
-    // TODO:
-    // Pour ajouter une image, se baser sur le code de LevelHeader.cpp
 }
 
 void EditorHeader::Update(){
