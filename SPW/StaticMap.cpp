@@ -21,6 +21,7 @@ StaticMap::StaticMap(Scene &scene, int width, int height) :
     }
 
     RE_Atlas *atlas = scene.GetAssetManager().GetAtlas(AtlasID::TERRAIN);
+    RE_Atlas *ennemyAtlas = scene.GetAssetManager().GetAtlas(AtlasID::ENEMY);
 
     m_woodPart = atlas->GetPart("Wood");
     AssertNew(m_woodPart);
@@ -33,6 +34,13 @@ StaticMap::StaticMap(Scene &scene, int width, int height) :
 
     m_spikePart = atlas->GetPart("Spike");
     AssertNew(m_spikePart);
+
+    //TODO: ADD FAKE TILES HERE
+    m_fakePart = atlas->GetPart("Fake");
+    AssertNew(m_fakePart);
+
+    m_fakeNutPart = ennemyAtlas->GetPart("NutIdle");
+    AssertNew(m_fakeNutPart);
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -136,6 +144,12 @@ void StaticMap::Render()
             case Tile::Type::GENTLE_SLOPE_R1:
             case Tile::Type::GENTLE_SLOPE_R2:
                 m_terrainPart->RenderCopyF(tile.partIdx, &dst, RE_Anchor::SOUTH_WEST);
+                break;
+            case Tile::Type::FAKE_FLAG:
+                m_fakePart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+                break;
+            case Tile::Type::FAKE_NUT:
+                m_fakeNutPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
             case Tile::Type::WOOD:
                 m_woodPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);

@@ -101,7 +101,7 @@ bool EditorScene::Update()
     /* --- TILES PLACE --- */
     if(mouseInput.leftDown)
     {
-        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, Tile::Type::GROUND);
+        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType());
     }
     else if(mouseInput.rightDown)
     {

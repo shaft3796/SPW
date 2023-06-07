@@ -60,6 +60,7 @@
         {"name": "CheckpointEmpty", "frames": [39]},
         {"name": "LevelEnd",        "frames": [40]},
         {"name": "Spike",           "frames": [41]},
-        {"name": "MovingPlatform",  "frames": [42]}
+        {"name": "MovingPlatform",  "frames": [42]},
+        {"name": "Fake", "frames": [40]}
     ]
 }

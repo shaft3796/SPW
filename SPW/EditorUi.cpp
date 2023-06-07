@@ -2,26 +2,31 @@
 
 #include "Button.h"
 #include "EditorScene.h"
+#include "EditorSelector.h"
+
+class EditorSelector;
 
 namespace EditorUiNS
 {
-    /*class SelectionListener : public ButtonListener
-    {
+    class NsEditorSelectorListener : public EditorSelectorListener{
     public:
-        SelectionListener(TitleScene &titleScene, StartScreen &startScreen) :
-            m_titleScene(titleScene), m_startScreen(startScreen)
-        {
+        NsEditorSelectorListener(EditorScene &editorScene, EditorUi &editorUi, Tile::Type tileType) : m_editorScene(editorScene), m_editorUi(editorUi), m_tileType(tileType){}
+        virtual ~NsEditorSelectorListener(){}
+
+        virtual void OnSelect() override{
+            m_editorUi.SetCurrentTileType(m_tileType);
         }
-        virtual void OnPress() override
-        {
-            LevelSelection *levelSelection = new LevelSelection(m_titleScene);
-            levelSelection->SetParent(m_startScreen.GetParent());
-            m_startScreen.Delete();
+
+        virtual void OnDeselect() override{
+            
         }
+
     private:
-        TitleScene &m_titleScene;
-        StartScreen &m_startScreen;
-    };*/
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+        Tile::Type m_tileType;
+    };
+    
     class QuitListener : public ButtonListener
     {
     public:
@@ -29,7 +34,6 @@ namespace EditorUiNS
 
         virtual void OnPress() override
         {
-            printf("TRIGGERED\n");
         }
 
     private:
@@ -42,8 +46,9 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
 {
     AssetManager& assets = scene.GetAssetManager();
     /* --- UI --- */
-    RE_Atlas *uiAtlas = assets.GetAtlas(AtlasID::UI);
-    AssertNew(uiAtlas);
+    RE_Atlas *uiAtlas = assets.GetAtlas(AtlasID::UI); AssertNew(uiAtlas);
+    RE_Atlas *terrainAtlas = assets.GetAtlas(AtlasID::TERRAIN); AssertNew(terrainAtlas);
+    RE_Atlas *enemyAtlas = assets.GetAtlas(AtlasID::ENEMY); AssertNew(enemyAtlas);
 
     // Bouton test
     RE_AtlasPart *buttonPart = uiAtlas->GetPart("Button");
@@ -72,4 +77,43 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
 
     buttonLabel = new Text(scene, texts[0], font, colorDown);
     button->SetText(buttonLabel, Button::State::DOWN);
+
+    // SELECTOR TEST
+    std::vector<RE_AtlasPart*> selectorParts;
+    std::vector<int> selectorIdxs;
+    std::vector<Tile::Type> selectorTypes;
+    /* --- ADD PARTS --- */
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::GROUND);
+    selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::WOOD);
+    selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::SPIKE);
+    selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::ONE_WAY);
+    selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::FAKE_NUT);
+    selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(Tile::Type::FAKE_FLAG);
+    
+    float originX = 30.0f;
+    for(int i=0; i<selectorParts.size(); i++)
+    {
+        RE_AtlasPart* part = selectorParts[i];
+        int idx = selectorIdxs[i];
+        EditorSelectorListener* listener = new EditorUiNS::NsEditorSelectorListener(scene, *this, selectorTypes[i]);
+        EditorSelector* selector = new EditorSelector(scene, this, part, idx); selector->SetListener(listener);
+        selector->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+        selector->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
+        selector->GetLocalRect().offsetMin.Set(originX, 25.0f);
+        originX += 50.0f;
+        selector->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f);
+        originX += 25.0f;
+        m_selectors.push_back(selector);
+    }
+    m_selectors[0]->Select();
+    
 }
+
+void EditorUi::DeselectAllSelectors()
+{
+    for(auto selector : m_selectors)
+    {
+        selector->Deselect();
+    }
+}
+

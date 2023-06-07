@@ -148,6 +148,7 @@
     <ClCompile Include="EditorCanvas.cpp" />
     <ClCompile Include="EditorHeader.cpp" />
     <ClCompile Include="EditorScene.cpp" />
+    <ClCompile Include="EditorSelector.cpp" />
     <ClCompile Include="EditorUi.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameBody.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="EditorCanvas.h" />
     <ClInclude Include="EditorHeader.h" />
     <ClInclude Include="EditorScene.h" />
+    <ClInclude Include="EditorSelector.h" />
     <ClInclude Include="EditorUi.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameBody.h" />

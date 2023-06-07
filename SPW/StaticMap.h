@@ -10,6 +10,7 @@ struct Tile
         EMPTY, GROUND, WOOD, ONE_WAY, SPIKE,
         STEEP_SLOPE_L, STEEP_SLOPE_R,
         GENTLE_SLOPE_L1, GENTLE_SLOPE_L2, GENTLE_SLOPE_R1, GENTLE_SLOPE_R2,
+        FAKE_FLAG, FAKE_NUT
     };
     Type type;
     int partIdx;
@@ -35,6 +36,8 @@ private:
     RE_AtlasPart *m_oneWayPart;
     RE_AtlasPart *m_terrainPart;
     RE_AtlasPart *m_spikePart;
+    RE_AtlasPart *m_fakePart;
+    RE_AtlasPart *m_fakeNutPart;
 
     Tile **m_tiles;
     int m_width;
