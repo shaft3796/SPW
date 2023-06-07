@@ -329,8 +329,7 @@ void StaticMap::OnCollisionStay(GameCollision &collision)
             return;
         }
 
-        player->Damage();
-        player->Bounce();
+        player->Kill();
     }
 }
 

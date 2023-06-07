@@ -209,7 +209,7 @@ void Player::FixedUpdate()
         case State::DYING:{
             if(m_player_dying_counter == 0){
                 if (m_heartCount > 0) m_state = State::IDLE;
-                else Kill();
+                else m_scene.Respawn();
             }
             else{
                 if (m_player_dying_counter == PLAYER_DYING_DURATION)
@@ -275,8 +275,9 @@ void Player::FixedUpdate()
     }
 
     // Jump Additional
-    if(m_jump && m_onGround && not noJump) velocity.y = 13.0f;
+    if((m_jump && m_onGround && not noJump) || m_bounce) velocity.y = 13.0f;
     m_jump = false;
+    m_bounce = false;
 
     // Additional
     if (m_onGround){
@@ -483,7 +484,12 @@ void Player::Damage()
 
 void Player::Kill()
 {
-    m_scene.Respawn();
+    // M�thode appel�e par un ennemi qui touche le joueur
+    if(m_state != State::DYING){
+        m_heartCount = 0;
+        m_state = State::DYING;
+        m_player_dying_counter = PLAYER_DYING_DURATION;
+    }
 }
 
 class WakeUpCallback : public PE_QueryCallback
