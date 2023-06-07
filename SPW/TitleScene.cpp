@@ -12,13 +12,13 @@ TitleScene::TitleScene(SDL_Renderer *renderer, RE_Timer &mainTime, const std::ve
     m_inputManager.GetControls().SetEnabled(false);
     m_inputManager.GetDebug().SetEnabled(false);
 
-    // Crée la caméra
+    // CrÃ©e la camÃ©ra
     m_activeCam = new TitleCamera(*this);
 
     // Canvas
     m_canvas = new TitleCanvas(*this);
 
-    // Crée le fond
+    // CrÃ©e le fond
     Background *background = new Background(*this, Layer::BACKGROUND);
     auto m_textures = m_assetManager.GetBackgrounds();
     PE_Vec2 worldDim(36.0f, 36.0f * 1080.0f / 2880.0f);

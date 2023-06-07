@@ -10,7 +10,7 @@ struct EditorTile
         EMPTY, GROUND, WOOD, ONE_WAY, SPIKE,
         STEEP_SLOPE_L, STEEP_SLOPE_R,
         GENTLE_SLOPE_L1, GENTLE_SLOPE_L2, GENTLE_SLOPE_R1, GENTLE_SLOPE_R2,
-        FAKE_FLAG, FAKE_NUT, FAKE_FIREFLY,
+        FAKE_FLAG, FAKE_NUT, FAKE_FIREFLY, SPAWN_POINT
     };
     Type type;
     int partIdx;
@@ -31,6 +31,11 @@ public:
     virtual void Start() override;
     virtual void OnCollisionStay(GameCollision &collision) override;
 
+    int GetRealWidth();
+    int GetRealHeight();
+
+    EditorTile::Type GetTileType(int x, int y) const;
+
 private:
 
     RE_AtlasPart *m_woodPart;
@@ -40,16 +45,28 @@ private:
     RE_AtlasPart *m_fakePart;
     RE_AtlasPart *m_fakeNutPart;
     RE_AtlasPart *m_fakeFireflyPart;
+    RE_AtlasPart *m_spawnPointPart;
 
     EditorTile **m_tiles;
     int m_width;
     int m_height;
-
-    EditorTile::Type GetTileType(int x, int y) const;
+    int m_realWidth;
+    int m_realHeight;
+    
     bool IsGround(int x, int y) const;
 };
 
 inline void EditorMap::Update()
 {
     SetVisible(true);
+}
+
+inline int EditorMap::GetRealWidth()
+{
+    return m_realWidth;
+}
+
+inline int EditorMap::GetRealHeight()
+{
+    return m_realHeight;
 }

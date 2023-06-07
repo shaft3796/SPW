@@ -7,8 +7,8 @@
 #include "StaticMap.h"
 
 
-EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime):
-Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 1000, 100)
+EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime, const LevelData& levelData):
+Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 2000, 2000), m_levelData(levelData)
 {
     AssetManager &assets = this->GetAssetManager();
     
@@ -34,8 +34,7 @@ Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap
     // Background
     Background* background = new Background(*this, Layer::BACKGROUND);
     std::vector<SDL_Texture*> m_textures = m_assetManager.GetBackgrounds();
-    // TODO: customizable background
-    switch (ThemeID::SKY)
+    switch (m_levelData.themeID)
     {
     case ThemeID::LAKE:
         {
@@ -79,6 +78,8 @@ Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap
             break;
         }
     }
+
+    m_editorSaver = new EditorSaver(*this, m_staticMap);
 }
 
 EditorScene::~EditorScene()
@@ -91,12 +92,20 @@ bool EditorScene::Update()
 
     ApplicationInput &appInput = m_inputManager.GetApplication();
     MouseInput &mouseInput = m_inputManager.GetMouse();
+    ControlsInput &controlsInput = m_inputManager.GetControls();
     PE_Vec2 viewPos {mouseInput.viewPos};
     PE_Vec2 worldPos {}; m_activeCam->ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
     
     if (appInput.quitPressed)
     {
         return true;
+    }
+
+    /* --- SAVE --- */
+    if(controlsInput.savePressed)
+    {
+        m_editorSaver->SaveMap(m_levelData.path);
+        controlsInput.savePressed = false;
     }
 
     /* --- TILES PLACE --- */

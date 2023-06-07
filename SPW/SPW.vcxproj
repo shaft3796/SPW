@@ -148,6 +148,8 @@
     <ClCompile Include="EditorCanvas.cpp" />
     <ClCompile Include="EditorHeader.cpp" />
     <ClCompile Include="EditorMap.cpp" />
+    <ClCompile Include="EditorParser.cpp" />
+    <ClCompile Include="EditorSaver.cpp" />
     <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="EditorSelector.cpp" />
     <ClCompile Include="EditorUi.cpp" />
@@ -200,6 +202,8 @@
     <ClInclude Include="EditorCanvas.h" />
     <ClInclude Include="EditorHeader.h" />
     <ClInclude Include="EditorMap.h" />
+    <ClInclude Include="EditorParser.h" />
+    <ClInclude Include="EditorSaver.h" />
     <ClInclude Include="EditorScene.h" />
     <ClInclude Include="EditorSelector.h" />
     <ClInclude Include="EditorUi.h" />

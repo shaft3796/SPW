@@ -19,4 +19,6 @@ public:
     bool goUpDown;
     bool goRightDown;
     bool goLeftDown;
+
+    bool savePressed;
 };

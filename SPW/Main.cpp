@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
             scene = new LevelScene(renderer, time, levels[levelID]);
             break;
         case GameState::EDITOR:
-            scene = new EditorScene(renderer, time);
+            scene = new EditorScene(renderer, time, levels[0]);
             break;
 
         case GameState::MAIN_MENU:
@@ -210,5 +210,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
-// TODO: Fork le .h .cpp button en modifant la méthode de rendu et en faisant ce qu'il y a à faire.

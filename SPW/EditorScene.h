@@ -9,11 +9,12 @@
 #include "EditorMap.h"
 #include "EditorUi.h"
 #include "StaticMap.h"
+#include "EditorSaver.h"
 
 class EditorScene : public Scene{
 public:
     /* CONSTRUCTOR */
-    EditorScene(SDL_Renderer *renderer, RE_Timer &mainTime);
+    EditorScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelData &levelData);
     EditorScene(EditorScene const&) = delete;
     EditorScene& operator=(EditorScene const&) = delete;
     ~EditorScene() override;
@@ -31,5 +32,8 @@ private:
     int m_camIndex;
 
     EditorMap m_staticMap;
+    EditorSaver* m_editorSaver;
+
+    const LevelData &m_levelData;
     
 };

@@ -3,7 +3,7 @@
 #include "Player.h"
 
 EditorMap::EditorMap(Scene &scene, int width, int height) :
-    GameBody(scene, Layer::TERRAIN_BACKGROUND), m_width(width), m_height(height)
+    GameBody(scene, Layer::TERRAIN_BACKGROUND), m_width(width), m_height(height), m_realWidth(1), m_realHeight(1)
 {
     m_name = "EditorMap";
 
@@ -46,6 +46,9 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     m_fakeFireflyPart = uiAtlas->GetPart("Firefly");
     AssertNew(m_fakeNutPart);
 
+    m_spawnPointPart = uiAtlas->GetPart("Life");
+    AssertNew(m_spawnPointPart);
+
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 200;
@@ -69,8 +72,13 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type)
     if (x < 0 || x >= m_width || y < 0 || y >= m_height)
     {
         assert(false);
-        return;
+        // TODO: EXTEND THE MATRIX HERE
     }
+
+    if(x >= m_realWidth)
+        m_realWidth = x + 1;
+    if(y >= m_realHeight)
+        m_realHeight = y + 1;
 
     EditorTile &tile = m_tiles[x][y];
     tile.partIdx = 0;
@@ -167,6 +175,9 @@ void EditorMap::Render()
             case EditorTile::Type::SPIKE:
                 m_spikePart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
+            case EditorTile::Type::SPAWN_POINT:
+                m_spawnPointPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+                break;
             default:
                 break;
             }
@@ -179,7 +190,7 @@ void EditorMap::Start()
     PE_World &world = m_scene.GetWorld();
     PE_Body *body = NULL;
 
-    // Crée le corps
+    // CrÃ©e le corps
     PE_BodyDef bodyDef;
     bodyDef.type = PE_BodyType::STATIC;
     bodyDef.position.SetZero();
@@ -188,7 +199,7 @@ void EditorMap::Start()
     AssertNew(body);
     SetBody(body);
 
-    // Crée les colliders
+    // CrÃ©e les colliders
     PE_Vec2 vertices[3];
     PE_PolygonShape polygon;
     PE_ColliderDef colliderDef;
@@ -248,7 +259,7 @@ void EditorMap::Start()
         }
     }
 
-    // Limite à gauche du monde
+    // Limite Ã  gauche du monde
     polygon.SetAsBox(-1.0f, -2.0f, 0.0f, (float)m_height + 10.0f);
     colliderDef.SetDefault();
     colliderDef.friction = 0.0f;
@@ -256,7 +267,7 @@ void EditorMap::Start()
     colliderDef.shape = &polygon;
     body->CreateCollider(colliderDef);
 
-    // Limite à droite du monde
+    // Limite Ã  droite du monde
     polygon.SetAsBox((float)m_width, -2.0f, (float)m_width + 1.0f, (float)m_height + 10.0f);
     colliderDef.SetDefault();
     colliderDef.friction = 0.0f;
@@ -267,7 +278,7 @@ void EditorMap::Start()
 
 void EditorMap::OnCollisionStay(GameCollision &collision)
 {
-    // On vérifie que la collision concerne une pique
+    // On vÃ©rifie que la collision concerne une pique
     if (collision.collider->GetUserData().id != 1)
         return;
 

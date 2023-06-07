@@ -150,6 +150,9 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             jumpPressed = false;
             goUpDown = false;
             break;
+        case SDL_SCANCODE_F1:
+            savePressed = true;
+            break;
 
         default:
             break;
@@ -167,4 +170,8 @@ void ControlsInput::Reset()
     jumpDown = false;
     jumpPressed = false;
     goDownDown = false;
+    goLeftDown = false;
+    goRightDown = false;
+    goUpDown = false;
+    savePressed = false;
 }
