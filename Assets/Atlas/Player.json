@@ -13,6 +13,7 @@
         {"name": "Idle",     "frames": [28]},
         {"name": "Dying",    "frames": [29]},
         {"name": "Skidding", "frames": [30]},
-        {"name": "Diving", "frames": [42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]}
+        {"name": "Diving", "frames": [18]},
+        {"name": "DiveLoading", "frames": [42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]}
     ]
 }

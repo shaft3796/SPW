@@ -36,6 +36,14 @@ Player::Player(Scene &scene) :
     fallingAnim->SetCycleTime(0.2f);
 
     // Animation "Diving"
+    part = atlas->GetPart("DiveLoading");
+    AssertNew(part);
+    RE_TexAnim *diveLoadingAnim = new RE_TexAnim(
+            m_animator, "DiveLoading", part
+    );
+    diveLoadingAnim->SetCycleCount(-1);
+    diveLoadingAnim->SetCycleTime(0.5f);
+
     part = atlas->GetPart("Diving");
     AssertNew(part);
     RE_TexAnim *divingAnim = new RE_TexAnim(
@@ -60,15 +68,6 @@ Player::Player(Scene &scene) :
             m_animator, "Dying", part
     );
     running->SetCycleCount(0);
-
-    // Animation "Diving"
-    part = atlas->GetPart("Diving");
-    AssertNew(part);
-    RE_TexAnim *diving = new RE_TexAnim(
-            m_animator, "Diving", part
-    );
-    diving->SetCycleCount(0);
-    
 
 
     // Couleur des colliders en debug
@@ -231,7 +230,7 @@ void Player::FixedUpdate()
              if(m_dive){
                  m_state = State::DIVE_LOADING;
                  m_dive_load_counter = DIVE_LOAD_DURATION;
-                 m_animator.PlayAnimation("Diving");
+                 m_animator.PlayAnimation("DiveLoading");
                  m_dive = false;
              }
         } break;
@@ -239,12 +238,12 @@ void Player::FixedUpdate()
         case State::DIVING:{
              if(m_onGround) m_state = State::IDLE;
              else {
-                 velocity.y = -30;
+                 velocity.y = -20;
                  velocity.x = 0;
                  m_animator.PlayAnimation("Diving");
              }
              noJump = true;
-            m_animator.PlayAnimation("Idle");
+             m_animator.PlayAnimation("Idle");
         } break;
 
         case State::IDLE:{
