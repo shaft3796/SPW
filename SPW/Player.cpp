@@ -8,7 +8,7 @@
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
         m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_onWallTimer(-1.0f), m_hDirection(0.0f),
-        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
+        m_lifeCount(5), m_fireflyCount(0), m_heartCount(MAX_HEART_COUNT), m_state(Player::State::IDLE)
 {
     m_name = "Player";
 
@@ -34,6 +34,15 @@ Player::Player(Scene &scene) :
     );
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
+
+    // Animation "Invincible"
+    part = atlas->GetPart("Invincible");
+    AssertNew(part);
+    RE_TexAnim *invincibleAnim = new RE_TexAnim(
+            m_animator, "Invincible", part
+    );
+    invincibleAnim->SetCycleCount(-1);
+    invincibleAnim->SetCycleTime(0.2f);
 
     // Animation "Diving"
     part = atlas->GetPart("DiveLoading");
@@ -161,7 +170,6 @@ void Player::FixedUpdate()
     UpdateOnGround(position);
     UpdateOnSlope(position);
     if(m_onSlope) m_onGround = true;
-    printf("On Slope [%d] On Ground [%d]\n", m_onSlope, m_onGround);
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f){
@@ -193,11 +201,16 @@ void Player::FixedUpdate()
     switch (m_state){
         case State::DYING:{
             if(m_player_dying_counter == 0){
-                Kill();
+                if (m_heartCount >= 0) m_state = State::IDLE;
+                else Kill();
             }
             else{
-                m_player_dying_counter--;
-                m_animator.PlayAnimation("Dying");
+                if (m_player_dying_counter == PLAYER_DYING_DURATION)
+                {
+                    if (m_heartCount >= 0) m_animator.PlayAnimation("Invincible");
+                    else m_animator.PlayAnimation("Dying");    
+                }
+                m_player_dying_counter -= m_scene.GetFixedTimeStep();
             }
             return;
         } break;
@@ -311,7 +324,7 @@ void Player::OnRespawn()
     body->SetPosition(GetStartPosition() + PE_Vec2(0.5f, 0.0f));
     body->SetVelocity(PE_Vec2::zero);
 
-    m_heartCount = 2;
+    m_heartCount = MAX_HEART_COUNT;
     m_state = State::IDLE;
     m_hDirection = 0.0f;
     m_facingRight = true;
@@ -452,9 +465,9 @@ void Player::AddHeart()
 
 void Player::Damage()
 {
-    // TODO: Gestion de la vie
     // M�thode appel�e par un ennemi qui touche le joueur
     if(m_state != State::DYING){
+        m_heartCount --;
         m_state = State::DYING;
         m_player_dying_counter = PLAYER_DYING_DURATION;
     }

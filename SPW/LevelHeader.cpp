@@ -3,7 +3,7 @@
 #include "Image.h"
 
 LevelHeader::LevelHeader(LevelScene &scene):
-    UIObject(scene), m_levelScene(scene), m_fireflyCount(nullptr)
+    UIObject(scene), m_levelScene(scene), m_fireflyCount(nullptr), m_heartCount(nullptr)
 {
     m_name = "LevelHeader";
 
@@ -30,8 +30,10 @@ LevelHeader::LevelHeader(LevelScene &scene):
     float currX = 0.0f;
     float currY = 0.0f;
 
+    RE_AtlasPart *part;
+    
     // Image du nombre de luciolles
-    RE_AtlasPart *part = atlas->GetPart("Firefly");
+    part = atlas->GetPart("Firefly");
     AssertNew(part);
     Image *fireflyImage = new Image(scene, part, 0);
     fireflyImage->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
@@ -50,10 +52,34 @@ LevelHeader::LevelHeader(LevelScene &scene):
     m_fireflyCount->GetLocalRect().offsetMin.Set(currX, currY);
     m_fireflyCount->GetLocalRect().offsetMax.Set(currX + numW, currY + imgH);
     m_fireflyCount->SetParent(this);
+
+    currX += imgW + sep;
+
+    // Image du nombre de coeurs
+    part = atlas->GetPart("Heart");
+    AssertNew(part);
+    Image *heartImage = new Image(scene, part, 0);
+    heartImage->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    heartImage->GetLocalRect().anchorMax.Set(0.0f, 0.0f);
+    heartImage->GetLocalRect().offsetMin.Set(currX, currY);
+    heartImage->GetLocalRect().offsetMax.Set(currX + imgW, currY + imgH);
+    heartImage->SetParent(this);
+
+    currX += imgW + sep;
+
+    // Compteur du nombre de coeurs
+    m_heartCount = new Text(scene, std::to_string(MAX_HEART_COUNT), font, color);
+    m_heartCount->SetAnchor(RE_Anchor::WEST);
+    m_heartCount->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    m_heartCount->GetLocalRect().anchorMax.Set(0.0f, 0.0f);
+    m_heartCount->GetLocalRect().offsetMin.Set(currX, currY);
+    m_heartCount->GetLocalRect().offsetMax.Set(currX + numW, currY + imgH);
+    m_heartCount->SetParent(this);    
 }
 
 void LevelHeader::Update()
 {
     Player *player = m_levelScene.GetPlayer();
     m_fireflyCount->SetString(std::to_string(player->GetFireflyCount()));
+    m_heartCount->SetString(std::to_string(player->GetHeartCount()));
 }

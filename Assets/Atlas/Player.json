@@ -8,12 +8,13 @@
         "border": 5
     },
     "parts": [
-        {"name": "Falling",  "frames": [14,15,16, 17, 18, 19, 20, 21]},
-        {"name": "Running",  "frames": [0,1,2,3,4,5]},
-        {"name": "Idle",     "frames": [28]},
-        {"name": "Dying",    "frames": [29]},
-        {"name": "Skidding", "frames": [30]},
-        {"name": "Diving", "frames": [18]},
+        {"name": "Falling",     "frames": [14,15,16, 17, 18, 19, 20, 21]},
+        {"name": "Running",     "frames": [0,1,2,3,4,5]},
+        {"name": "Idle",        "frames": [28]},
+        {"name": "Invincible",  "frames": [30, 31]},
+        {"name": "Dying",       "frames": [29]},
+        {"name": "Skidding",    "frames": [30]},
+        {"name": "Diving",      "frames": [18]},
         {"name": "DiveLoading", "frames": [42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]}
     ]
 }
