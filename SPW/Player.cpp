@@ -374,6 +374,14 @@ void Player::OnCollisionEnter(GameCollision &collision)
     PE_Body *body = GetBody();
     body->SetGravityScale(1.0f);
 
+    if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
+    {
+        if (collision.otherCollider->IsOneWay() && m_state == State::DIVING)
+        {
+            collision.gameBody->SetEnabled(false);
+        }
+    }
+
     // Collision avec un ennemi
     if (otherCollider->CheckCategory(CATEGORY_ENEMY))
     {
@@ -532,15 +540,27 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 
     if (hitL.collider != NULL)
     {
-        // Le rayon gauche � touch� le sol
-        m_onGround = true;
+        // Ne pas activer le "onground" si le joueur plonge sur une oneway
+        if (m_state != State::DIVING || (!hitL.collider->IsOneWay() && m_state != State::DIVING))
+            m_onGround = true;
         gndNormal = hitL.normal;
+
+        if (!hitL.collider->IsOneWay() && m_state == State::DIVING)
+        {
+            m_state = State::IDLE;
+        }
     }
     if (hitR.collider != NULL)
     {
-        // Le rayon droit � touch� le sol
-        m_onGround = true;
+        // Ne pas activer le "onground" si le joueur plonge sur une oneway
+        if (m_state != State::DIVING || (!hitR.collider->IsOneWay() && m_state != State::DIVING))
+            m_onGround = true;
         gndNormal = hitR.normal;
+
+        if (!hitR.collider->IsOneWay() && m_state == State::DIVING)
+        {
+            m_state = State::IDLE;
+        }
     }
     return gndNormal;
 }

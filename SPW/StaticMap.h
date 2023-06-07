@@ -32,7 +32,6 @@ public:
 private:
 
     RE_AtlasPart *m_woodPart;
-    RE_AtlasPart *m_oneWayPart;
     RE_AtlasPart *m_terrainPart;
     RE_AtlasPart *m_spikePart;
 

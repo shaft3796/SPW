@@ -25,8 +25,6 @@ StaticMap::StaticMap(Scene &scene, int width, int height) :
     m_woodPart = atlas->GetPart("Wood");
     AssertNew(m_woodPart);
 
-    m_oneWayPart = atlas->GetPart("OneWay");
-    AssertNew(m_oneWayPart);
 
     m_terrainPart = atlas->GetPart("Terrain");
     AssertNew(m_terrainPart);
@@ -166,9 +164,6 @@ void StaticMap::Render()
             case Tile::Type::WOOD:
                 m_woodPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
-            case Tile::Type::ONE_WAY:
-                m_oneWayPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
-                break;
             case Tile::Type::SPIKE:
                 m_spikePart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
@@ -218,11 +213,6 @@ void StaticMap::Start()
 
             switch (tile.type)
             {
-            case Tile::Type::ONE_WAY:
-                colliderDef.isOneWay = true;
-                polygon.SetAsBox(PE_AABB(position, position + PE_Vec2(1.0f, 1.0f)));
-                break;
-
             case Tile::Type::GROUND:
             case Tile::Type::WOOD:
                 polygon.SetAsBox(PE_AABB(position, position + PE_Vec2(1.0f, 1.0f)));
@@ -316,20 +306,21 @@ void StaticMap::Start()
 
 void StaticMap::OnCollisionStay(GameCollision &collision)
 {
-    // On vérifie que la collision concerne une pique
-    if (collision.collider->GetUserData().id != 1)
-        return;
-
-    if (collision.otherCollider->CheckCategory(CATEGORY_PLAYER))
+    
+    // On vérifie que la collision concerne un pique
+    if (collision.collider->GetUserData().id == 1)
     {
-        Player *player = dynamic_cast<Player *>(collision.gameBody);
-        if (player == nullptr)
+        if (collision.otherCollider->CheckCategory(CATEGORY_PLAYER))
         {
-            assert(false);
-            return;
-        }
+            Player *player = dynamic_cast<Player *>(collision.gameBody);
+            if (player == nullptr)
+            {
+                assert(false);
+                return;
+            }
 
-        player->Kill();
+            player->Kill();
+        }
     }
 }
 
