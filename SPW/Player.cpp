@@ -8,7 +8,7 @@
 Player::Player(Scene &scene) :
         GameBody(scene, Layer::PLAYER), m_animator(),
         m_jump(false), m_facingRight(true), m_bounce(false), m_onAirTimer(0.0f), m_onWallTimer(-1.0f), m_hDirection(0.0f),
-        m_lifeCount(5), m_fireflyCount(0), m_heartCount(2), m_state(Player::State::IDLE)
+        m_lifeCount(5), m_fireflyCount(0), m_heartCount(MAX_HEART_COUNT), m_state(Player::State::IDLE)
 {
     m_name = "Player";
 
@@ -34,6 +34,32 @@ Player::Player(Scene &scene) :
     );
     fallingAnim->SetCycleCount(-1);
     fallingAnim->SetCycleTime(0.2f);
+
+    // Animation "Invincible"
+    part = atlas->GetPart("Invincible");
+    AssertNew(part);
+    RE_TexAnim *invincibleAnim = new RE_TexAnim(
+            m_animator, "Invincible", part
+    );
+    invincibleAnim->SetCycleCount(-1);
+    invincibleAnim->SetCycleTime(0.2f);
+
+    // Animation "Diving"
+    part = atlas->GetPart("DiveLoading");
+    AssertNew(part);
+    RE_TexAnim *diveLoadingAnim = new RE_TexAnim(
+            m_animator, "DiveLoading", part
+    );
+    diveLoadingAnim->SetCycleCount(-1);
+    diveLoadingAnim->SetCycleTime(0.5f);
+
+    part = atlas->GetPart("Diving");
+    AssertNew(part);
+    RE_TexAnim *divingAnim = new RE_TexAnim(
+            m_animator, "Diving", part
+    );
+    divingAnim->SetCycleCount(-1);
+    divingAnim->SetCycleTime(0.5f);
 
     // Animation "Running"
     part = atlas->GetPart("Running");
@@ -120,9 +146,17 @@ void Player::Render()
     rect.w = 1.0f * scale;
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
+    double angle {0.0f};
+    if (m_state == State::DIVING) angle = 105;
+    else if(m_state == State::CLIMBBING) angle = m_facingRight ? -45 : 45;
+    else if(m_onSlope and m_slopeType == Tile::Type::GENTLE_SLOPE_R1) angle = -15;
+    else if(m_onSlope and m_slopeType == Tile::Type::STEEP_SLOPE_R) angle = -30;
+    else if(m_onSlope and m_slopeType == Tile::Type::GENTLE_SLOPE_L1) angle = 15;
+    else if(m_onSlope and m_slopeType == Tile::Type::STEEP_SLOPE_L) angle = 30;
+    
     // Dessine l'animateur du joueur
     m_animator.RenderCopyExF(
-            &rect, RE_Anchor::SOUTH , 0.0f, Vec2(0.5f, 0.5f), flip
+            &rect, RE_Anchor::SOUTH , angle, Vec2(0.5f, 0.5f), flip
     );
 }
 
@@ -139,6 +173,8 @@ void Player::FixedUpdate()
     WakeUpSurroundings();
     // Update
     UpdateOnGround(position);
+    UpdateOnSlope(position);
+    if(m_onSlope) m_onGround = true;
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f){
@@ -159,31 +195,34 @@ void Player::FixedUpdate()
 
     // FORCE ET DIRECTION
     PE_Vec2 direction = PE_Vec2::right;
+
     
     PE_Vec2 force = (15.0f * m_hDirection) * direction;
     body->ApplyForce(force);
 
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
-
+    if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::GENTLE_SLOPE_R1 or m_slopeType == Tile::Type::GENTLE_SLOPE_L1)) velocity.x /= 1.1f;
+    else if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::STEEP_SLOPE_R or m_slopeType == Tile::Type::STEEP_SLOPE_L)) velocity.x /= 1.2f;
     /* --- STATE --- */
     switch (m_state){
         case State::DYING:{
             if(m_player_dying_counter == 0){
-                Kill();
+                if (m_heartCount > 0) m_state = State::IDLE;
+                else m_scene.Respawn();
             }
             else{
-                m_player_dying_counter--;
-                m_animator.PlayAnimation("Dying");
+                if (m_player_dying_counter == PLAYER_DYING_DURATION)
+                {
+                    if (m_heartCount > 0) m_animator.PlayAnimation("Invincible");
+                    else m_animator.PlayAnimation("Dying");    
+                }
+                m_player_dying_counter -= m_scene.GetFixedTimeStep();
             }
             return;
         } break;
         
         case State::DIVE_LOADING:{
-            // TODO: Probably remove the condition
-            if(not m_onGround){
-                m_animator.PlayAnimation("Idle");
-            }
             velocity.y = -DEFAULT_WORLD_GRAVITY_Y/40.f;
             if(!DIVE_LOAD_MODE )velocity.x = 0;
             if(m_dive_load_counter == 0) m_state = State::DIVING;
@@ -214,6 +253,7 @@ void Player::FixedUpdate()
              if(m_dive){
                  m_state = State::DIVE_LOADING;
                  m_dive_load_counter = DIVE_LOAD_DURATION;
+                 m_animator.PlayAnimation("DiveLoading");
                  m_dive = false;
              }
         } break;
@@ -221,16 +261,23 @@ void Player::FixedUpdate()
         case State::DIVING:{
              if(m_onGround) m_state = State::IDLE;
              else {
-                 velocity.y = -30;
+                 velocity.y = -20;
                  velocity.x = 0;
+                 m_animator.PlayAnimation("Diving");
              }
              noJump = true;
+             m_animator.PlayAnimation("Idle");
         } break;
+
+        case State::IDLE:{
+            m_animator.PlayAnimation("Idle");
+        }
     }
 
     // Jump Additional
-    if(m_jump && m_onGround && not noJump) velocity.y = 13.0f;
+    if((m_jump && m_onGround && not noJump) || m_bounce) velocity.y = 13.0f;
     m_jump = false;
+    m_bounce = false;
 
     // Additional
     if (m_onGround){
@@ -285,7 +332,7 @@ void Player::OnRespawn()
     body->SetPosition(GetStartPosition() + PE_Vec2(0.5f, 0.0f));
     body->SetVelocity(PE_Vec2::zero);
 
-    m_heartCount = 2;
+    m_heartCount = MAX_HEART_COUNT;
     m_state = State::IDLE;
     m_hDirection = 0.0f;
     m_facingRight = true;
@@ -326,6 +373,14 @@ void Player::OnCollisionEnter(GameCollision &collision)
     // Réinitialisation de la gravité
     PE_Body *body = GetBody();
     body->SetGravityScale(1.0f);
+
+    if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
+    {
+        if (collision.otherCollider->IsOneWay() && m_state == State::DIVING)
+        {
+            collision.gameBody->SetEnabled(false);
+        }
+    }
 
     // Collision avec un ennemi
     if (otherCollider->CheckCategory(CATEGORY_ENEMY))
@@ -426,9 +481,9 @@ void Player::AddHeart()
 
 void Player::Damage()
 {
-    // TODO: Gestion de la vie
     // M�thode appel�e par un ennemi qui touche le joueur
     if(m_state != State::DYING){
+        m_heartCount --;
         m_state = State::DYING;
         m_player_dying_counter = PLAYER_DYING_DURATION;
     }
@@ -437,7 +492,12 @@ void Player::Damage()
 
 void Player::Kill()
 {
-    m_scene.Respawn();
+    // M�thode appel�e par un ennemi qui touche le joueur
+    if(m_state != State::DYING){
+        m_heartCount = 0;
+        m_state = State::DYING;
+        m_player_dying_counter = PLAYER_DYING_DURATION;
+    }
 }
 
 class WakeUpCallback : public PE_QueryCallback
@@ -475,20 +535,51 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 
     // Les rayons ne touchent que des colliders solides (non trigger)
     // ayant la cat�gorie FILTER_TERRAIN
-    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
-    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
+    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.3f, CATEGORY_TERRAIN, true);
+    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.3f, CATEGORY_TERRAIN, true);
 
     if (hitL.collider != NULL)
     {
-        // Le rayon gauche � touch� le sol
-        m_onGround = true;
+        // Ne pas activer le "onground" si le joueur plonge sur une oneway
+        if (m_state != State::DIVING || (!hitL.collider->IsOneWay() && m_state != State::DIVING))
+            m_onGround = true;
         gndNormal = hitL.normal;
+
+        if (!hitL.collider->IsOneWay() && m_state == State::DIVING)
+        {
+            m_state = State::IDLE;
+        }
     }
     if (hitR.collider != NULL)
     {
-        // Le rayon droit � touch� le sol
-        m_onGround = true;
+        // Ne pas activer le "onground" si le joueur plonge sur une oneway
+        if (m_state != State::DIVING || (!hitR.collider->IsOneWay() && m_state != State::DIVING))
+            m_onGround = true;
         gndNormal = hitR.normal;
+
+        if (!hitR.collider->IsOneWay() && m_state == State::DIVING)
+        {
+            m_state = State::IDLE;
+        }
     }
     return gndNormal;
+}
+
+void Player::UpdateOnSlope(PE_Vec2 position){
+    m_onSlope = false;
+
+    PE_Vec2 gndNormal = PE_Vec2::up;
+    PE_Vec2 origin = position + PE_Vec2(0.0f, 0.0f);
+
+    RayHit hit = m_scene.RayCast(origin, PE_Vec2::down, 0.2f, CATEGORY_SLOPE, true);
+
+    if (hit.collider != NULL)
+    {
+        m_onSlope = true;
+        gndNormal = hit.normal;
+    }
+    if(-0.45 < gndNormal.x and gndNormal.x < -0.44) m_slopeType = Tile::Type::GENTLE_SLOPE_R1;
+    else if(0.45 > gndNormal.x and gndNormal.x > 0.44) m_slopeType = Tile::Type::GENTLE_SLOPE_L1;
+    else if(-0.71 < gndNormal.x and gndNormal.x < -0.70) m_slopeType = Tile::Type::STEEP_SLOPE_R;
+    else if(0.71 > gndNormal.x and gndNormal.x > 0.70) m_slopeType = Tile::Type::STEEP_SLOPE_L;
 }

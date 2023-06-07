@@ -3,6 +3,7 @@
 #include "Settings.h"
 #include "GameBody.h"
 #include "Constants.h"
+#include "StaticMap.h"
 
 #define PLAYER_DAMAGE_ANGLE 55.0f
 
@@ -35,6 +36,7 @@ public:
 private:
     void WakeUpSurroundings();
     PE_Vec2 UpdateOnGround(PE_Vec2 position);
+    void UpdateOnSlope(PE_Vec2 position);
 
     enum class State
     {
@@ -49,6 +51,8 @@ private:
     float m_hDirection;
     bool m_jump;
     bool m_onGround;
+    bool m_onSlope;
+    Tile::Type m_slopeType;
     bool m_bounce;
     bool m_facingRight;
     bool m_climb;

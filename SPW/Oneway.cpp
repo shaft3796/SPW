@@ -1,23 +1,20 @@
-ï»¿#include "Firefly.h"
+#include "Oneway.h"
 #include "Scene.h"
 #include "Camera.h"
-#include "LevelScene.h"
 
-
-Firefly::Firefly(Scene &scene) :
-    Collectable(scene, Layer::COLLECTABLE), m_animator()
+Oneway::Oneway(Scene &scene) :
+    GameBody(scene, Layer::TERRAIN), m_animator()
 {
-    m_name = "Firefly";
-
-    RE_Atlas *atlas = scene.GetAssetManager().GetAtlas(AtlasID::COLLECTABLE);
+    m_name = "Oneway";
+    
+    RE_Atlas *atlas = scene.GetAssetManager().GetAtlas(AtlasID::TERRAIN);
     AssertNew(atlas);
 
     // Animation "Idle"
-    RE_AtlasPart *part = atlas->GetPart("Firefly");
+    RE_AtlasPart *part = atlas->GetPart("OneWay");
     AssertNew(part);
     RE_TexAnim *idleAnim = new RE_TexAnim(m_animator, "Idle", part);
-    idleAnim->SetCycleCount(-1);
-    idleAnim->SetCycleTime(0.3f);
+    idleAnim->SetCycleCount(0);
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -25,44 +22,39 @@ Firefly::Firefly(Scene &scene) :
     m_debugColor.b = 255;
 }
 
-void Firefly::Start()
+Oneway::~Oneway()
+{
+}
+
+void Oneway::Start()
 {
     SetToRespawn(true);
 
-    // Joue l'animation par dÃ©faut
+    // Joue l'animation par défaut
     m_animator.PlayAnimation("Idle");
 
-    // CrÃ©e le corps
-    PE_World &world = m_scene.GetWorld();
+    // Crée le corps
+PE_World &world = m_scene.GetWorld();
     PE_BodyDef bodyDef;
     bodyDef.type = PE_BodyType::STATIC;
     bodyDef.position = GetStartPosition() + PE_Vec2(0.5f, 0.0f);
-    bodyDef.name = "Firefly";
+    bodyDef.name = "Oneway";
+    bodyDef.damping.SetZero();
     PE_Body *body = world.CreateBody(bodyDef);
     SetBody(body);
 
-    // CrÃ©e le collider
-    PE_CircleShape circle(PE_Vec2(0.0f, 0.0f), 0.25f);
+    // Crée le collider
     PE_ColliderDef colliderDef;
-    colliderDef.filter.categoryBits = CATEGORY_COLLECTABLE;
-    colliderDef.shape = &circle;
+    
+    PE_PolygonShape polygon;
+    polygon.SetAsBox(PE_AABB(PE_Vec2(-0.5f, 0.0f), PE_Vec2(0.5f, 1.0f)));
+    colliderDef.filter.categoryBits = CATEGORY_TERRAIN;
+    colliderDef.shape = &polygon;
+    colliderDef.isOneWay = true;
     PE_Collider *collider = body->CreateCollider(colliderDef);
 }
 
-void Firefly::Collect(GameBody *collector)
-{
-    Player *player = dynamic_cast<Player *>(collector);
-    if (player == nullptr)
-    {
-        assert(false);
-        return;
-    }
-
-    SetEnabled(false);
-    player->AddFirefly(1);
-}
-
-void Firefly::Render()
+void Oneway::Render()
 {
     SDL_Renderer *renderer = m_scene.GetRenderer();
     Camera *camera = m_scene.GetActiveCamera();
@@ -74,10 +66,15 @@ void Firefly::Render()
     rect.h = 1.0f * scale;
     rect.w = 1.0f * scale;
     camera->WorldToView(GetPosition(), rect.x, rect.y);
-    m_animator.RenderCopyF(&rect, RE_Anchor::CENTER);
+    m_animator.RenderCopyF(&rect, RE_Anchor::SOUTH);
 }
 
-void Firefly::OnRespawn()
+void Oneway::OnCollisionEnter(GameCollision &collision)
+{
+    
+}
+
+void Oneway::OnRespawn()
 {
     SetBodyEnabled(true);
     SetEnabled(true);
@@ -85,4 +82,3 @@ void Firefly::OnRespawn()
     m_animator.StopAnimations();
     m_animator.PlayAnimation("Idle");
 }
-

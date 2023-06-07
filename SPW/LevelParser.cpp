@@ -8,6 +8,7 @@
 #include "Bonus.h"
 #include "Camera.h"
 #include "Firefly.h"
+#include "Oneway.h"
 
 
 LevelParser::LevelParser(const std::string &path)
@@ -161,9 +162,6 @@ void LevelParser::InitScene(LevelScene &scene) const
             case 'W':
                 map->SetTile(x, y, Tile::Type::WOOD);
                 break;
-            case '=':
-                map->SetTile(x, y, Tile::Type::ONE_WAY);
-                break;
             case 'A':
                 map->SetTile(x, y, Tile::Type::SPIKE);
                 break;
@@ -174,10 +172,10 @@ void LevelParser::InitScene(LevelScene &scene) const
                 map->SetTile(x, y, Tile::Type::STEEP_SLOPE_R);
                 break;
             case 'L':
-                map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_L1);
+                map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_L2);
                 break;
             case 'l':
-                map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_L2);
+                map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_L1);
                 break;
             case 'r':
                 map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_R1);
@@ -203,14 +201,30 @@ void LevelParser::InitScene(LevelScene &scene) const
                 nut->SetStartPosition(position);
                 break;
             }
-            /* TODO: Loevan ? Erreur ici 
+            case '=':
+            {
+                Oneway *oneway = new Oneway(scene);
+                oneway->SetStartPosition(position);
+                break;
+            }
+            case 'c':
+            {
+                Checkpoint *checkpoint = new Checkpoint(scene);
+                checkpoint->SetStartPosition(position);
+                break;
+            }
+            case 'b':
+            {
+                Brick *brick = new Brick(scene);
+                brick->SetStartPosition(position);
+                break;
+            }
             case 'o':
             {
                 Firefly *firefly = new Firefly(scene);
                 firefly->SetStartPosition(position);
                 break;
             }
-            */
             default:
                 break;
             }

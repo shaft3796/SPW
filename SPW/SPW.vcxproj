@@ -154,6 +154,7 @@
     <ClCompile Include="EditorSelector.cpp" />
     <ClCompile Include="EditorUi.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Firefly.cpp" />
     <ClCompile Include="GameBody.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="MouseInput.cpp" />
     <ClCompile Include="Nut.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="Oneway.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -208,6 +210,7 @@
     <ClInclude Include="EditorSelector.h" />
     <ClInclude Include="EditorUi.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Firefly.h" />
     <ClInclude Include="GameBody.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
@@ -226,6 +229,7 @@
     <ClInclude Include="MouseInput.h" />
     <ClInclude Include="Nut.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="Oneway.h" />
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />

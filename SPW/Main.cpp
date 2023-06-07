@@ -108,12 +108,10 @@ int main(int argc, char *argv[])
     const std::vector<LevelData> levels(LevelData::Init());
     int levelID = 0;
 
-    /*
 #ifdef SKIP_MENU
     state = GameState::LEVEL;
     levelID = DEFAUT_LEVEL;
 #endif
-*/
 
     while (quitGame == false)
     {

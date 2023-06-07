@@ -1,0 +1,13 @@
+{
+    "texture": "Lever.png",
+    "geometry": {
+        "rowCount": 1,
+        "colCount": 2,
+        "width": 133,
+        "height": 40
+    },
+    "parts": [
+        {"name": "LeverOff", "frames": [0]},
+        {"name": "LeverOn", "frames": [1]}
+    ]
+}

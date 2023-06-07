@@ -1,7 +1,7 @@
 #pragma once
 
 // Défini la durée de l'animation de la mort du player
-#define PLAYER_DYING_DURATION 30
+#define PLAYER_DYING_DURATION 60
 
 // Défini la gravité par défaut du monde
 #define DEFAULT_WORLD_GRAVITY_Y -40.f
@@ -12,3 +12,4 @@
 // Défini le mode du dive, false, lors du chargement la vélocité x sera nulle.
 #define DIVE_LOAD_MODE false
 
+#define MAX_HEART_COUNT 3
