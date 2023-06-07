@@ -3,6 +3,7 @@
 #include "Settings.h"
 #include "GameBody.h"
 #include "Constants.h"
+#include "StaticMap.h"
 
 #define PLAYER_DAMAGE_ANGLE 55.0f
 
@@ -51,6 +52,7 @@ private:
     bool m_jump;
     bool m_onGround;
     bool m_onSlope;
+    Tile::Type m_slopeType;
     bool m_bounce;
     bool m_facingRight;
     bool m_climb;

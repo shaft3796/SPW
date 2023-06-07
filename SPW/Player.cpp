@@ -130,9 +130,6 @@ void Player::Render()
     PE_Vec2 velocity = GetVelocity();
     SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 
-    // Diving
-    flip = m_state == State::DIVING ? SDL_FLIP_VERTICAL : flip;
-
     float scale = camera->GetWorldToViewScale();
     SDL_FRect rect = { 0 };
 
@@ -140,9 +137,17 @@ void Player::Render()
     rect.w = 1.0f * scale;
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
+    double angle {0.0f};
+    if (m_state == State::DIVING) angle = 105;
+    else if(m_state == State::CLIMBBING) angle = m_facingRight ? -45 : 45;
+    else if(m_onSlope and m_slopeType == Tile::Type::GENTLE_SLOPE_R1) angle = -15;
+    else if(m_onSlope and m_slopeType == Tile::Type::STEEP_SLOPE_R) angle = -30;
+    else if(m_onSlope and m_slopeType == Tile::Type::GENTLE_SLOPE_L1) angle = 15;
+    else if(m_onSlope and m_slopeType == Tile::Type::STEEP_SLOPE_L) angle = 30;
+    
     // Dessine l'animateur du joueur
     m_animator.RenderCopyExF(
-            &rect, RE_Anchor::SOUTH , 0.0f, Vec2(0.5f, 0.5f), flip
+            &rect, RE_Anchor::SOUTH , angle, Vec2(0.5f, 0.5f), flip
     );
 }
 
@@ -161,7 +166,6 @@ void Player::FixedUpdate()
     UpdateOnGround(position);
     UpdateOnSlope(position);
     if(m_onSlope) m_onGround = true;
-    printf("On Slope [%d] On Ground [%d]\n", m_onSlope, m_onGround);
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f){
@@ -182,13 +186,15 @@ void Player::FixedUpdate()
 
     // FORCE ET DIRECTION
     PE_Vec2 direction = PE_Vec2::right;
+
     
     PE_Vec2 force = (15.0f * m_hDirection) * direction;
     body->ApplyForce(force);
 
     float maxHSpeed = 9.0f;
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
-
+    if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::GENTLE_SLOPE_R1 or m_slopeType == Tile::Type::GENTLE_SLOPE_L1)) velocity.x /= 1.1f;
+    else if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::STEEP_SLOPE_R or m_slopeType == Tile::Type::STEEP_SLOPE_L)) velocity.x /= 1.2f;
     /* --- STATE --- */
     switch (m_state){
         case State::DYING:{
@@ -522,6 +528,7 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 void Player::UpdateOnSlope(PE_Vec2 position){
     m_onSlope = false;
 
+    PE_Vec2 gndNormal = PE_Vec2::up;
     PE_Vec2 origin = position + PE_Vec2(0.0f, 0.0f);
 
     RayHit hit = m_scene.RayCast(origin, PE_Vec2::down, 0.2f, CATEGORY_SLOPE, true);
@@ -529,5 +536,10 @@ void Player::UpdateOnSlope(PE_Vec2 position){
     if (hit.collider != NULL)
     {
         m_onSlope = true;
+        gndNormal = hit.normal;
     }
+    if(-0.45 < gndNormal.x and gndNormal.x < -0.44) m_slopeType = Tile::Type::GENTLE_SLOPE_R1;
+    else if(0.45 > gndNormal.x and gndNormal.x > 0.44) m_slopeType = Tile::Type::GENTLE_SLOPE_L1;
+    else if(-0.71 < gndNormal.x and gndNormal.x < -0.70) m_slopeType = Tile::Type::STEEP_SLOPE_R;
+    else if(0.71 > gndNormal.x and gndNormal.x > 0.70) m_slopeType = Tile::Type::STEEP_SLOPE_L;
 }
