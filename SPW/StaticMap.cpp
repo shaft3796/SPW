@@ -77,7 +77,15 @@ void StaticMap::InitTiles()
             switch (type)
             {
             case Tile::Type::GROUND:
-                if (IsGround(x, y + 1))
+                if(GetTileType(x, y + 1) == Tile::Type::STEEP_SLOPE_L or GetTileType(x, y + 1) == Tile::Type::GENTLE_SLOPE_L1)
+                {
+                    tile.partIdx = 14;
+                }
+                else if(GetTileType(x, y + 1) == Tile::Type::STEEP_SLOPE_R or GetTileType(x, y + 1) == Tile::Type::GENTLE_SLOPE_R1)
+                {
+                    tile.partIdx = 17;
+                }
+                else if (IsGround(x, y + 1))
                 {
                     tile.partIdx = 4;
                 }
@@ -86,6 +94,24 @@ void StaticMap::InitTiles()
                     tile.partIdx = 1;
                 }
                 break;
+            case Tile::Type::STEEP_SLOPE_L:
+                tile.partIdx = 9;
+                break;
+            case Tile::Type::STEEP_SLOPE_R:
+                tile.partIdx = 10;
+                break;
+            case Tile::Type::GENTLE_SLOPE_L1:
+                tile.partIdx = 13;
+                break;
+            case Tile::Type::GENTLE_SLOPE_L2:
+                tile.partIdx = 12;
+                break;
+            case Tile::Type::GENTLE_SLOPE_R1:
+                tile.partIdx = 15;
+                break;  
+            case Tile::Type::GENTLE_SLOPE_R2:
+                tile.partIdx = 16;
+                break;  
 
             default:
                 tile.partIdx = 0;
@@ -210,6 +236,44 @@ void StaticMap::Start()
                 vertices[2] = position + PE_Vec2(0.5f, 0.8f);
                 polygon.SetVertices(vertices, 3);
                 break;
+            /* SLOPES */
+            case Tile::Type::GENTLE_SLOPE_R1:
+                vertices[0] = position + PE_Vec2(0.0f, 0.0f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(1.0f, 0.5f);
+                polygon.SetVertices(vertices, 3);
+                break;
+            case Tile::Type::GENTLE_SLOPE_R2:
+                vertices[0] = position + PE_Vec2(0.0f, 0.5f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.5f);
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                break;
+            case Tile::Type::GENTLE_SLOPE_L1:
+                vertices[0] = position + PE_Vec2(0.0f, 0.0f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(0.0f, 0.5f);
+                polygon.SetVertices(vertices, 3);
+                break;
+            case Tile::Type::GENTLE_SLOPE_L2:
+                vertices[0] = position + PE_Vec2(0.0f, 0.5f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.5f);
+                vertices[2] = position + PE_Vec2(0.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                break;
+            case Tile::Type::STEEP_SLOPE_L:
+                vertices[0] = position + PE_Vec2(0.0f, 0.0f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(0.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                break;
+            case Tile::Type::STEEP_SLOPE_R:
+                vertices[0] = position + PE_Vec2(0.0f, 0.0f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                break;  
+           
 
             default:
                 newCollider = false;

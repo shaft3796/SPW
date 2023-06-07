@@ -159,6 +159,8 @@ void Player::FixedUpdate()
     WakeUpSurroundings();
     // Update
     UpdateOnGround(position);
+    UpdateOnSlope(position);
+    if(m_onSlope) m_onGround = true;
 
     // Tue le joueur s'il tombe dans un trou
     if (position.y < -2.0f){
@@ -498,8 +500,8 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 
     // Les rayons ne touchent que des colliders solides (non trigger)
     // ayant la cat�gorie FILTER_TERRAIN
-    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
-    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.1f, CATEGORY_TERRAIN, true);
+    RayHit hitL = m_scene.RayCast(originL, PE_Vec2::down, 0.3f, CATEGORY_TERRAIN, true);
+    RayHit hitR = m_scene.RayCast(originR, PE_Vec2::down, 0.3f, CATEGORY_TERRAIN, true);
 
     if (hitL.collider != NULL)
     {
@@ -514,4 +516,17 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
         gndNormal = hitR.normal;
     }
     return gndNormal;
+}
+
+void Player::UpdateOnSlope(PE_Vec2 position){
+    m_onSlope = false;
+
+    PE_Vec2 origin = position + PE_Vec2(0.0f, 0.0f);
+
+    RayHit hit = m_scene.RayCast(origin, PE_Vec2::down, 0.2f, CATEGORY_TERRAIN, true);
+
+    if (hit.collider != NULL)
+    {
+        m_onGround = true;
+    }
 }
