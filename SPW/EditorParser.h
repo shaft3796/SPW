@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-#include <complex.h>
-
+#include "EditorMap.h"
 #include "Settings.h"
 
 class EditorScene;
@@ -12,7 +11,7 @@ public:
     EditorParser(const std::string &path);
     ~EditorParser();
 
-    void InitScene(EditorScene &scene) const;
+    void InitScene(EditorScene &scene, EditorMap& editorMap) const;
 
 private:
     char**m_matrix;

@@ -22,6 +22,12 @@ public:
     bool Update() override;
     void OnRespawn() override;
 
+    EditorSaver* getSaver() { return m_editorSaver; }
+    const std::string& getPath() { return m_levelData.path; }
+
+    void SetNoSetTile(bool noSetTile) { m_noSetTile = noSetTile; }
+    void SetSpawnSet(bool spawnSet) { m_spawnSet = spawnSet; }
+
 private:
     std::array<Camera *, 2> m_cameras;
     EditorCanvas *m_canvas;
@@ -35,5 +41,9 @@ private:
     EditorSaver* m_editorSaver;
 
     const LevelData &m_levelData;
+
+    bool m_noSetTile {false};
+
+    bool m_spawnSet {false};
     
 };

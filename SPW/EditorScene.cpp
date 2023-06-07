@@ -5,6 +5,7 @@
 #include "Button.h"
 #include "EditorMap.h"
 #include "StaticMap.h"
+#include "EditorParser.h"
 
 
 EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime, const LevelData& levelData):
@@ -20,10 +21,9 @@ Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap
 
     m_cameras[0] = new EditorCamera(*this);
     m_activeCam = m_cameras[m_camIndex];
-    
-    PE_AABB bounds(0.0f, 0.0f, (float)10, 24.0f * 9.0f / 16.0f);
-    Camera* camera = this->GetActiveCamera();
-    camera->SetWorldBounds(bounds);
+
+    EditorParser parser(m_levelData.path);
+    parser.InitScene(*this, m_staticMap);
 
     // Canvas
     m_canvas = new EditorCanvas(*this);
@@ -107,15 +107,27 @@ bool EditorScene::Update()
         m_editorSaver->SaveMap(m_levelData.path);
         controlsInput.savePressed = false;
     }
-
+    
     /* --- TILES PLACE --- */
-    if(mouseInput.leftDown)
-    {
-        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType());
+    if(mouseInput.leftDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
+    {   if(m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet){
+            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx());
+            m_staticMap.InitTiles();
+        }
+        if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
+        {
+            m_spawnSet = true;
+        }
+        
     }
-    else if(mouseInput.rightDown)
+    else if(mouseInput.rightDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
     {
-        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY);
+        if(m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) == EditorTile::Type::SPAWN_POINT)
+        {
+            m_spawnSet = false;
+        }
+        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0);
+        m_staticMap.InitTiles();
     }
 
     /* --- CAMERA MOVE USING ARROWS --- */

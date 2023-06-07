@@ -23,6 +23,7 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     RE_Atlas *atlas = scene.GetAssetManager().GetAtlas(AtlasID::TERRAIN);
     RE_Atlas *ennemyAtlas = scene.GetAssetManager().GetAtlas(AtlasID::ENEMY);
     RE_Atlas *uiAtlas = scene.GetAssetManager().GetAtlas(AtlasID::UI);
+    RE_Atlas *leverAtlas = scene.GetAssetManager().GetAtlas(AtlasID::LEVER);
 
     m_woodPart = atlas->GetPart("Wood");
     AssertNew(m_woodPart);
@@ -49,6 +50,9 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     m_spawnPointPart = uiAtlas->GetPart("Life");
     AssertNew(m_spawnPointPart);
 
+    m_checkpointPart = leverAtlas->GetPart("LeverOff");
+    AssertNew(m_checkpointPart);
+
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 200;
@@ -67,7 +71,7 @@ EditorMap::~EditorMap()
     }
 }
 
-void EditorMap::SetTile(int x, int y, EditorTile::Type type)
+void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx)
 {
     if (x < 0 || x >= m_width || y < 0 || y >= m_height)
     {
@@ -81,7 +85,7 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type)
         m_realHeight = y + 1;
 
     EditorTile &tile = m_tiles[x][y];
-    tile.partIdx = 0;
+    tile.partIdx = partIdx;
     tile.type = type;
 }
 
@@ -97,7 +101,19 @@ void EditorMap::InitTiles()
             switch (type)
             {
             case EditorTile::Type::GROUND:
-                if (IsGround(x, y + 1))
+                if(GetTileType(x, y + 1) == EditorTile::Type::STEEP_SLOPE_L or GetTileType(x, y + 1) == EditorTile::Type::GENTLE_SLOPE_L1)
+                {
+                    tile.partIdx = 14;
+                }
+                else if(GetTileType(x, y + 1) == EditorTile::Type::STEEP_SLOPE_R or GetTileType(x, y + 1) == EditorTile::Type::GENTLE_SLOPE_R1)
+                {
+                    tile.partIdx = 17;
+                }
+                else if(GetTileType(x, y + 1) == EditorTile::Type::GENTLE_SLOPE_L2 or GetTileType(x, y + 1) == EditorTile::Type::GENTLE_SLOPE_R2)
+                {
+                    tile.partIdx = 4;
+                }
+                else if (IsGround(x, y + 1))
                 {
                     tile.partIdx = 4;
                 }
@@ -106,6 +122,24 @@ void EditorMap::InitTiles()
                     tile.partIdx = 1;
                 }
                 break;
+            case EditorTile::Type::STEEP_SLOPE_L:
+                tile.partIdx = 9;
+                break;
+            case EditorTile::Type::STEEP_SLOPE_R:
+                tile.partIdx = 10;
+                break;
+            case EditorTile::Type::GENTLE_SLOPE_L1:
+                tile.partIdx = 13;
+                break;
+            case EditorTile::Type::GENTLE_SLOPE_L2:
+                tile.partIdx = 12;
+                break;
+            case EditorTile::Type::GENTLE_SLOPE_R1:
+                tile.partIdx = 15;
+                break;  
+            case EditorTile::Type::GENTLE_SLOPE_R2:
+                tile.partIdx = 16;
+                break;  
 
             default:
                 tile.partIdx = 0;
@@ -178,6 +212,9 @@ void EditorMap::Render()
             case EditorTile::Type::SPAWN_POINT:
                 m_spawnPointPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
+            case EditorTile::Type::CHECKPOINT:
+                m_checkpointPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+                break;
             default:
                 break;
             }
@@ -187,113 +224,10 @@ void EditorMap::Render()
 
 void EditorMap::Start()
 {
-    PE_World &world = m_scene.GetWorld();
-    PE_Body *body = NULL;
-
-    // Crée le corps
-    PE_BodyDef bodyDef;
-    bodyDef.type = PE_BodyType::STATIC;
-    bodyDef.position.SetZero();
-    bodyDef.name = (char *)"EditorMap";
-    body = world.CreateBody(bodyDef);
-    AssertNew(body);
-    SetBody(body);
-
-    // Crée les colliders
-    PE_Vec2 vertices[3];
-    PE_PolygonShape polygon;
-    PE_ColliderDef colliderDef;
-
-    for (int x = 0; x < m_width; ++x)
-    {
-        for (int y = 0; y < m_height; ++y)
-        {
-            EditorTile &tile = m_tiles[x][y];
-            if (tile.type == EditorTile::Type::EMPTY)
-            {
-                continue;
-            }
-
-            PE_Vec2 position((float)x, (float)y);
-            bool newCollider = true;
-            colliderDef.SetDefault();
-            colliderDef.shape = &polygon;
-            colliderDef.friction = 0.5f;
-            colliderDef.filter.categoryBits = CATEGORY_TERRAIN;
-            colliderDef.userData.id = 0;
-
-            switch (tile.type)
-            {
-            case EditorTile::Type::ONE_WAY:
-                colliderDef.isOneWay = true;
-                polygon.SetAsBox(PE_AABB(position, position + PE_Vec2(1.0f, 1.0f)));
-                break;
-
-            case EditorTile::Type::GROUND:
-            case EditorTile::Type::WOOD:
-                polygon.SetAsBox(PE_AABB(position, position + PE_Vec2(1.0f, 1.0f)));
-                break;
-
-            case EditorTile::Type::SPIKE:
-                colliderDef.userData.id = 1;
-
-                vertices[0] = position + PE_Vec2(0.1f, 0.0f);
-                vertices[1] = position + PE_Vec2(0.9f, 0.0f);
-                vertices[2] = position + PE_Vec2(0.5f, 0.8f);
-                polygon.SetVertices(vertices, 3);
-                break;
-
-            default:
-                newCollider = false;
-                break;
-            }
-            if (newCollider)
-            {
-                tile.collider = body->CreateCollider(colliderDef);
-                AssertNew(tile.collider);
-            }
-            else
-            {
-                tile.collider = nullptr;
-            }
-        }
-    }
-
-    // Limite à gauche du monde
-    polygon.SetAsBox(-1.0f, -2.0f, 0.0f, (float)m_height + 10.0f);
-    colliderDef.SetDefault();
-    colliderDef.friction = 0.0f;
-    colliderDef.filter.categoryBits = CATEGORY_TERRAIN;
-    colliderDef.shape = &polygon;
-    body->CreateCollider(colliderDef);
-
-    // Limite à droite du monde
-    polygon.SetAsBox((float)m_width, -2.0f, (float)m_width + 1.0f, (float)m_height + 10.0f);
-    colliderDef.SetDefault();
-    colliderDef.friction = 0.0f;
-    colliderDef.filter.categoryBits = CATEGORY_TERRAIN;
-    colliderDef.shape = &polygon;
-    body->CreateCollider(colliderDef);
 }
 
 void EditorMap::OnCollisionStay(GameCollision &collision)
 {
-    // On vérifie que la collision concerne une pique
-    if (collision.collider->GetUserData().id != 1)
-        return;
-
-    if (collision.otherCollider->CheckCategory(CATEGORY_PLAYER))
-    {
-        Player *player = dynamic_cast<Player *>(collision.gameBody);
-        if (player == nullptr)
-        {
-            assert(false);
-            return;
-        }
-
-        player->Damage();
-        player->Bounce();
-    }
 }
 
 EditorTile::Type EditorMap::GetTileType(int x, int y) const

@@ -36,6 +36,7 @@ private:
     RE_AtlasPart *m_spikePart;
     RE_AtlasPart *m_fakePart;
     RE_AtlasPart *m_fakeNutPart;
+    RE_AtlasPart *m_oneWayPart;
 
     Tile **m_tiles;
     int m_width;

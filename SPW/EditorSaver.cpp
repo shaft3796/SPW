@@ -20,11 +20,30 @@ void EditorSaver::SaveMap(const std::string& path)
             EditorTile::Type type = m_map.GetTileType(x, y);
             switch(type)
             {
+                //TODO: HANDLE SLOPES
                 case EditorTile::Type::EMPTY:
                     fs << ".";
                     break;
                 case EditorTile::Type::GROUND:
                     fs << "#";
+                    break;
+                case EditorTile::Type::STEEP_SLOPE_L:
+                    fs << "\\";
+                    break;
+                case EditorTile::Type::STEEP_SLOPE_R:
+                    fs << "/";
+                    break;
+                case EditorTile::Type::GENTLE_SLOPE_L2:
+                    fs << "L";
+                    break;
+                case EditorTile::Type::GENTLE_SLOPE_L1:
+                    fs << "l";
+                    break;
+                case EditorTile::Type::GENTLE_SLOPE_R1:
+                    fs << "r";
+                    break;
+                case EditorTile::Type::GENTLE_SLOPE_R2:
+                    fs << "R";
                     break;
                 case EditorTile::Type::WOOD:
                     fs << "W";
@@ -46,6 +65,9 @@ void EditorSaver::SaveMap(const std::string& path)
                     break;
                 case EditorTile::Type::SPAWN_POINT:
                     fs << "S";
+                    break;
+                case EditorTile::Type::CHECKPOINT:
+                    fs << "C";
                     break;
                 
                 default:
