@@ -294,7 +294,6 @@ bool EditorMap::IsGround(int x, int y) const
 
 void EditorMap::Forward(int n)
 {
-    printf("FORWARD TRIGERED, commit size is %d, head is at %d, forwarding %d tiles\n", m_commits.size(), m_commit_head, n);
         
     for(int i=0; i<n; i++)
     {

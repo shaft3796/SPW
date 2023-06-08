@@ -218,7 +218,7 @@ void Player::FixedUpdate()
                     if (m_heartCount > 0) m_animator.PlayAnimation("Invincible");
                     else m_animator.PlayAnimation("Dying");    
                 }
-                m_player_dying_counter -= m_scene.GetFixedTimeStep();
+                m_player_dying_counter -= (int)m_scene.GetFixedTimeStep();
             }
             return;
         } break;
