@@ -234,12 +234,28 @@ void Player::FixedUpdate()
         case State::CLIMBBING:{
             velocity.x = 0;
             if(m_jump){
-                velocity.y = 13.0f;
+                bool climbJump = false;
+                
+                // Vérifie que le joueur va dans la direction opposée
                 // Saute à gauche du mur
-                if (m_facingRight) velocity.x = -10.0f;
+                if (m_facingRight && controls.hAxis < 0)
+                {
+                    velocity.x = -10.0f;
+                    climbJump = true;
+                }
                 // Saute à gauche du mur
-                else velocity.x = 10.0f;
-                m_state = State::FALLING;
+                if (!m_facingRight && controls.hAxis > 0)
+                {
+                    velocity.x = 10.0f;
+                    climbJump = true;
+                }
+
+                if (climbJump)
+                {
+                    velocity.y = 13.0f;
+                    m_state = State::FALLING;
+                }
+                else velocity.y = -1.0f;
             }
             else velocity.y = -1.0f;
         } break;
