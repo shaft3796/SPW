@@ -147,70 +147,71 @@ void EditorParser::InitScene(EditorScene& scene, EditorMap& editorMap) const
         for (int y = 0; y < m_height; ++y)
         {
             PE_Vec2 position((float)x, (float)y);
+            bool extend = (x!=0 || y!=0);
             switch (m_matrix[x][y])
             {
             case '#':
-                editorMap.SetTile(x, y, EditorTile::Type::GROUND, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::GROUND, 0, extend);
                 break;
             case 'W':
-                editorMap.SetTile(x, y, EditorTile::Type::WOOD, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::WOOD, 0, extend);
                 break;
             case 'A':
-                editorMap.SetTile(x, y, EditorTile::Type::SPIKE, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::SPIKE, 0, extend);
                 break;
             case '\\':
-                editorMap.SetTile(x, y, EditorTile::Type::STEEP_SLOPE_L, 9);
+                editorMap.SetTile(x, y, EditorTile::Type::STEEP_SLOPE_L, 9, extend);
                 break;
             case '/':
-                editorMap.SetTile(x, y, EditorTile::Type::STEEP_SLOPE_R, 10);
+                editorMap.SetTile(x, y, EditorTile::Type::STEEP_SLOPE_R, 10, extend);
                 break;
             case 'L':
-                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_L2, 12);
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_L2, 12, extend);
                 break;
             case 'l':
-                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_L1, 13);
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_L1, 13, extend);
                 break;
             case 'r':
-                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_R1, 15);
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_R1, 15, extend);
                 break;
             case 'R':
-                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_R2, 16);
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_R2, 16, extend);
                 break;
             case 'S':
             {
-                    editorMap.SetTile(x, y, EditorTile::Type::SPAWN_POINT, 0);
+                    editorMap.SetTile(x, y, EditorTile::Type::SPAWN_POINT, 0, extend);
                     scene.SetSpawnSet(true);
                     break;
             }
             case 'F':
             {
-                editorMap.SetTile(x, y, EditorTile::Type::FAKE_FLAG, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::FAKE_FLAG, 0, extend);
                 break;
             }
             case 'e':
             {
-                editorMap.SetTile(x, y, EditorTile::Type::FAKE_NUT, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::FAKE_NUT, 0, extend);
                 break;
             }
             case '=':
             {
-                editorMap.SetTile(x, y, EditorTile::Type::ONE_WAY, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::ONE_WAY, 0, extend);
                 break;
             }
             case 'c':
             {
-                editorMap.SetTile(x, y, EditorTile::Type::CHECKPOINT, 0);
+                editorMap.SetTile(x, y, EditorTile::Type::CHECKPOINT, 0, extend);
                 break;
             }
             case 'b':
             {
                     // TODO: BRICK  
-                    editorMap.SetTile(x, y, EditorTile::Type::GROUND, 0);
+                    editorMap.SetTile(x, y, EditorTile::Type::GROUND, 0, extend);
                     break;
             }
             case 'o':
             {
-                    editorMap.SetTile(x, y, EditorTile::Type::FAKE_FIREFLY, 0);
+                    editorMap.SetTile(x, y, EditorTile::Type::FAKE_FIREFLY, 0, extend);
                     break;
             }
             default:

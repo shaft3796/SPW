@@ -33,7 +33,7 @@ public:
     EditorMap(Scene &scene, int width, int height);
     virtual ~EditorMap();
 
-    void SetTile(int x, int y, EditorTile::Type type, int partIdx);
+    void SetTile(int x, int y, EditorTile::Type type, int partIdx, bool extendGroup=false);
     void InitTiles();
 
     virtual void Update() override;
@@ -47,6 +47,7 @@ public:
     EditorTile::Type GetTileType(int x, int y) const;
 
     void Rollback(int n);
+    void RollbackGroup();
 
 private:
 
@@ -67,6 +68,8 @@ private:
     int m_realHeight;
 
     std::vector<Commit> m_commits;
+
+    std::vector<int> m_commit_groups;
     
     bool IsGround(int x, int y) const;
 

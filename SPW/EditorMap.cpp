@@ -73,7 +73,7 @@ EditorMap::~EditorMap()
     }
 }
 
-void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx)
+void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx, bool extendGroup)
 {
     if (x < 0 || x >= m_width || y < 0 || y >= m_height)
     {
@@ -91,6 +91,8 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx)
     m_commits.push_back(commit);
     tile.partIdx = partIdx;
     tile.type = type;
+    if(extendGroup) m_commit_groups.back()+=1;
+    else m_commit_groups.push_back(1);
 }
 
 void EditorMap::InitTiles()
@@ -275,3 +277,11 @@ void EditorMap::Rollback(int n)
         m_commits.pop_back();
     }
 }
+
+void EditorMap::RollbackGroup()
+{
+    if(m_commit_groups.size() == 0) return;
+    int gs = m_commit_groups.back(); m_commit_groups.pop_back();
+    Rollback(gs);
+}
+
