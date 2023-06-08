@@ -137,7 +137,8 @@ void Player::Render()
     m_animator.Update(m_scene.GetTime());
 
     PE_Vec2 velocity = GetVelocity();
-    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : (m_state == State::DIVING ? SDL_FLIP_VERTICAL : SDL_FLIP_HORIZONTAL);
+    
 
     float scale = camera->GetWorldToViewScale();
     SDL_FRect rect = { 0 };
@@ -258,13 +259,20 @@ void Player::FixedUpdate()
         } break;
 
         case State::DIVING:{
-             if(m_onGround) m_state = State::IDLE;
-             else {
-                 velocity.y = -20;
-                 velocity.x = 0;
-                 m_animator.PlayAnimation("Diving");
-             }
-             noJump = true;
+            if (m_bounce)
+            {
+                velocity.y = 20.0f;
+                m_bounce = false;
+                m_onGround = true;
+                break;
+            }
+            if(m_onGround) m_state = State::IDLE;
+            else {
+                velocity.y = -20;
+                velocity.x = 0;
+                m_animator.PlayAnimation("Diving");
+            }
+            noJump = true;
              m_animator.PlayAnimation("Idle");
         } break;
 
@@ -542,10 +550,13 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 
     if (hitL.collider != NULL)
     {
+        gndNormal = hitL.normal;
+
+        if (hitL.collider->CheckCategory(CATEGORY_ENEMY)) return gndNormal;
+        
         // Ne pas activer le "onground" si le joueur plonge sur une oneway
         if (m_state != State::DIVING || (!hitL.collider->IsOneWay() && m_state != State::DIVING))
             m_onGround = true;
-        gndNormal = hitL.normal;
 
         if (!hitL.collider->IsOneWay() && m_state == State::DIVING)
         {
@@ -554,10 +565,13 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
     }
     if (hitR.collider != NULL)
     {
+        gndNormal = hitR.normal;
+
+        if (hitR.collider->CheckCategory(CATEGORY_ENEMY)) return gndNormal;
+        
         // Ne pas activer le "onground" si le joueur plonge sur une oneway
         if (m_state != State::DIVING || (!hitR.collider->IsOneWay() && m_state != State::DIVING))
             m_onGround = true;
-        gndNormal = hitR.normal;
 
         if (!hitR.collider->IsOneWay() && m_state == State::DIVING)
         {
