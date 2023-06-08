@@ -27,6 +27,7 @@ public:
     int GetFireflyCount() const;
     int GetHeartCount() const;
     int GetLifeCount() const;
+    int IsDead() const;
     void AddFirefly(int count);
     void AddHeart();
     void Damage();
@@ -77,6 +78,11 @@ inline void Player::Bounce()
 inline int Player::GetFireflyCount() const
 {
     return m_fireflyCount;
+}
+
+inline int Player::IsDead() const
+{
+    return m_state == State::DYING;
 }
 
 inline int Player::GetHeartCount() const

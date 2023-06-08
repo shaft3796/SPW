@@ -106,7 +106,7 @@ void Nut::FixedUpdate()
         velocity.x = coef*3.0f;
         
         
-        if (abs(position.y - yPLayer) < 1.0f) body->SetVelocity(velocity);
+        if (abs(position.y - yPLayer) < 1.0f && !player->IsDead()) body->SetVelocity(velocity);
     }
 }
 
