@@ -305,8 +305,7 @@ void EditorMap::Render()
                 break;
             }
             m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
-            m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
-            m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+
         }
     }
 }
