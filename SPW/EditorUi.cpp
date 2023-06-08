@@ -134,30 +134,35 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     std::vector<RE_AtlasPart*> selectorParts;
     std::vector<int> selectorIdxs;
     std::vector<EditorTile::Type> selectorTypes;
+    std::vector<bool> reverse;
     /* --- ADD PARTS --- */
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::GROUND);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::GROUND); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(10); selectorTypes.push_back(EditorTile::Type::STEEP_SLOPE_R); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(9); selectorTypes.push_back(EditorTile::Type::STEEP_SLOPE_L); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(15); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_R1); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(16); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_R2); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(12); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_L2); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(13); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_L1); reverse.push_back(false);
     
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(10); selectorTypes.push_back(EditorTile::Type::STEEP_SLOPE_R);
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(9); selectorTypes.push_back(EditorTile::Type::STEEP_SLOPE_L);
-
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(15); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_R1);
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(16); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_R2);
-
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(12); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_L2);
-    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(13); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_L1);
+    selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::WOOD); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Brick")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::BRICK); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPIKE); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::ONE_WAY); reverse.push_back(false);
+    selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_NUT); reverse.push_back(false);
+    selectorParts.push_back(uiAtlas->GetPart("Firefly")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FIREFLY); reverse.push_back(false);
+    selectorParts.push_back(leverAtlas->GetPart("LeverOff")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::CHECKPOINT); reverse.push_back(false);
+    selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAG); reverse.push_back(false);
     
-    selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::WOOD);
-    selectorParts.push_back(terrainAtlas->GetPart("Brick")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::BRICK);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::ROOF); reverse.push_back(true);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(10); selectorTypes.push_back(EditorTile::Type::STEEP_ROOF_R); reverse.push_back(true);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(9); selectorTypes.push_back(EditorTile::Type::STEEP_ROOF_L); reverse.push_back(true);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(15); selectorTypes.push_back(EditorTile::Type::GENTLE_ROOF_R1); reverse.push_back(true);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(16); selectorTypes.push_back(EditorTile::Type::GENTLE_ROOF_R2); reverse.push_back(true); 
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(12); selectorTypes.push_back(EditorTile::Type::GENTLE_ROOF_L2); reverse.push_back(true);
+    selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(13); selectorTypes.push_back(EditorTile::Type::GENTLE_ROOF_L1); reverse.push_back(true);
     
-    selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPIKE);
-    selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::ONE_WAY);
-    selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_NUT);
-    selectorParts.push_back(uiAtlas->GetPart("Firefly")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FIREFLY);
-    selectorParts.push_back(leverAtlas->GetPart("LeverOff")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::CHECKPOINT);
-    selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAG);
-    selectorParts.push_back(uiAtlas->GetPart("Life")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPAWN_POINT);
-    selectorParts.push_back(enemyAtlas->GetPart("FlappyIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAPPY);
-    
+    selectorParts.push_back(enemyAtlas->GetPart("FlappyIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAPPY); reverse.push_back(false);
+    selectorParts.push_back(uiAtlas->GetPart("Life")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPAWN_POINT); reverse.push_back(false);
     
     float originX = 30.0f;
     float originx = 30.0f;
@@ -177,6 +182,7 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
         selector->GetLocalRect().offsetMin.Set(originx, originY);
         originx += 50.0f;
         selector->GetLocalRect().offsetMax.Set(originx, originY + 50.0f);
+        if(reverse[i]) selector->Reverse();
         m_buttonPositions.push_back(selector->GetLocalRect());
         originx += 25.0f;
         m_selectors.push_back(selector);

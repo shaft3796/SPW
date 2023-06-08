@@ -71,7 +71,15 @@ void EditorSelector::Render(){
 
         srcRect = m_atlasPart->GetSrcRect(m_partIdx);
 
-        SDL_RenderCopyF(renderer, texture, srcRect, &dstRect);
+        if(m_reverse)
+        {
+            SDL_FPoint center = {0, 0};
+            SDL_RenderCopyExF(renderer, texture, srcRect, &dstRect, 0.0, &center, SDL_FLIP_VERTICAL);
+        } else
+        {
+            SDL_RenderCopyF(renderer, texture, srcRect, &dstRect); 
+        }
+        
     }
 }
 
