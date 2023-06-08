@@ -253,6 +253,7 @@ bool EditorUi::IsOverButtons(float x, float y) const
         }
         
     }
+    if((y<160.0f and x<710) or y<100.0f) return true;
     return false;
 }
 
