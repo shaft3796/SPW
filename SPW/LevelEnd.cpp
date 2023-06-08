@@ -58,6 +58,17 @@ void LevelEnd::OnCollisionEnter(GameCollision &collision)
 {
     if (collision.otherCollider->CheckCategory(CATEGORY_PLAYER))
     {
+        LevelScene *levelScene = dynamic_cast<LevelScene *>(&m_scene);
+        if (levelScene == nullptr)
+        {
+            assert(false);
+            return;
+        }
+
+        Player *player = levelScene->GetPlayer();
+
+        if (player->IsDead() && player->GetHeartCount() <= 0) return;
+
         m_scene.Quit();
     }
 }
