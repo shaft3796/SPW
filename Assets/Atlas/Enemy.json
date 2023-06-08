@@ -1,14 +1,15 @@
 {
     "texture": "Enemy.png",
     "geometry": {
-        "rowCount": 1,
-        "colCount": 5,
+        "rowCount": 2,
+        "colCount": 8,
         "width": 80,
         "height": 80
     },
     "parts": [
         {"name": "NutIdle", "frames": [0]},
         {"name": "NutSpinning", "frames": [0,1,2,3]},
-        {"name": "NutDying", "frames": [4]}
+        {"name": "NutDying", "frames": [4]},
+        {"name": "FlappyIdle", "frames":  [8, 9, 10, 11, 12, 13, 14, 15]}
     ]
 }
