@@ -55,6 +55,11 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     m_checkpointPart = leverAtlas->GetPart("LeverOff");
     AssertNew(m_checkpointPart);
 
+    m_fakeFlappyPart = ennemyAtlas->GetPart("FlappyIdle");
+    AssertNew(m_checkpointPart);
+    m_brickPart = atlas->GetPart("Brick");
+    AssertNew(m_checkpointPart);
+
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 200;
@@ -238,6 +243,12 @@ void EditorMap::Render()
                 break;
             case EditorTile::Type::CHECKPOINT:
                 m_checkpointPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+                break;
+            case EditorTile::Type::FAKE_FLAPPY:
+                m_fakeFlappyPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+                break;
+            case EditorTile::Type::BRICK:
+                m_brickPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
             default:
                 break;

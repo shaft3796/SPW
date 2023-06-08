@@ -126,9 +126,9 @@ bool EditorScene::Update()
         {
             m_spawnSet = false;
         }
-        if(m_ui->GetCurrentTileType() != EditorTile::Type::EMPTY)
+        if((m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) != EditorTile::Type::EMPTY))
         {
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0);
+            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0); 
             m_staticMap.InitTiles();
         }
     }
@@ -185,6 +185,7 @@ void EditorScene::ClearGameArea()
             EditorTile::Type from_type = m_staticMap.GetTileType(x, y);
             bool extend = (y!=0 || x!=0);
             if(from_type != EditorTile::Type::EMPTY) m_staticMap.SetTile(x, y, EditorTile::Type::EMPTY, 0, extend);
+            if(from_type == EditorTile::Type::SPAWN_POINT) SetSpawnSet(false);
         }
     }
 }
