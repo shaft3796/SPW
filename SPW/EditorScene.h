@@ -57,6 +57,13 @@ private:
     bool m_goToMainMenu {false};
 
     bool m_extending {false};
+
+    bool m_areaPlacing {false};
+
+    int m_areaOriginX {-1};
+    int m_areaOriginY {-1};
+
+    void PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx);
 };
 
 

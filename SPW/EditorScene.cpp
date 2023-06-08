@@ -107,60 +107,112 @@ bool EditorScene::Update()
         m_editorSaver->SaveMap(m_levelData.path);
         controlsInput.savePressed = false;
     }
-    
+
     /* --- TILES PLACE --- */
+    EditorTile::Type fromTile {m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)};
+    EditorTile::Type currentTile {m_ui->GetCurrentTileType()};
+    int currentPart {m_ui->GetCurrentPartIdx()};
+    
+    // Update Place mode
+    if(not m_areaPlacing and controlsInput.areaDown and currentTile!=EditorTile::Type::SPAWN_POINT) m_areaPlacing = true;
+    else if(m_areaPlacing and controlsInput.areaReleased){
+        controlsInput.areaReleased = false;
+        m_areaPlacing = false;
+        m_areaOriginX = -1; m_areaOriginY = -1;
+    }
+    
     if(mouseInput.leftDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
-    {   if((m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and m_ui->GetCurrentTileType() !=m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)){
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx(), m_extending);
-            m_extending = true;
-            m_staticMap.InitTiles();
-        }
-        if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
+    {
+        if(not m_areaPlacing)
         {
-            m_spawnSet = true;
+            if((currentTile != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and currentTile!=fromTile)
+            {
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, m_extending);
+                m_extending = true;
+                m_staticMap.InitTiles();
+                if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)  m_spawnSet = true;
+            }
+        }
+        else
+        {
+            // AREA PLACING INIT
+            if(m_areaOriginX == -1 and m_areaOriginY == -1)
+            {
+                m_areaOriginX = (int)worldPos.x;
+                m_areaOriginY = (int)worldPos.y;
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, false);
+            }
+            else
+            {
+                Rollback();
+                int lowerX = std::min(m_areaOriginX, (int)worldPos.x);
+                int lowerY = std::min(m_areaOriginY, (int)worldPos.y);
+                int upperX = std::max(m_areaOriginX, (int)worldPos.x);
+                int upperY = std::max(m_areaOriginY, (int)worldPos.y);
+                PlaceBox(lowerX, lowerY, upperX, upperY, currentTile, currentPart);
+                m_staticMap.InitTiles();
+            }
+        }
+    }
+    else if (mouseInput.rightDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
+    {
+        if(not m_areaPlacing)
+        {
+            if(fromTile != EditorTile::Type::EMPTY)
+            {
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, m_extending);
+                m_extending = true;
+                m_staticMap.InitTiles();
+                if(currentTile == EditorTile::Type::SPAWN_POINT) m_spawnSet = false;
+            }
+        }
+        else
+        {
+            // AREA PLACING INIT
+            if(m_areaOriginX == -1 and m_areaOriginY == -1)
+            {
+                m_areaOriginX = (int)worldPos.x;
+                m_areaOriginY = (int)worldPos.y;
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, false);
+            }
+            else
+            {
+                Rollback();
+                int lowerX = std::min(m_areaOriginX, (int)worldPos.x);
+                int lowerY = std::min(m_areaOriginY, (int)worldPos.y);
+                int upperX = std::max(m_areaOriginX, (int)worldPos.x);
+                int upperY = std::max(m_areaOriginY, (int)worldPos.y);
+                PlaceBox(lowerX, lowerY, upperX, upperY, EditorTile::Type::EMPTY, 0);
+                m_staticMap.InitTiles();
+            }
         }
         
     }
-    else if(mouseInput.rightDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
-    {
-        if(m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) == EditorTile::Type::SPAWN_POINT)
-        {
-            m_spawnSet = false;
-        }
-        if((m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) != EditorTile::Type::EMPTY))
-        {
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, m_extending);
-            m_extending = true;
-            
-            m_staticMap.InitTiles();
-        }
-    }
-    if(mouseInput.leftReleased || mouseInput.rightReleased)
-    {
-        m_extending = false;
-    }
+
+    // RELEASE EXTENDING
+    if(mouseInput.leftReleased || mouseInput.rightReleased) m_extending = false;
 
     /* --- CAMERA MOVE USING ARROWS --- */
     PE_AABB worldView = m_activeCam->GetWorldView();
     PE_AABB worldBounds = m_activeCam->GetWorldBounds();
-    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.1)
+    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.15)
     {
-        PE_Vec2 transl {0.0f, -0.1f};
+        PE_Vec2 transl {0.0f, -0.15f};
         m_activeCam->TranslateWorldView(transl);
     }
     if (m_inputManager.GetControls().goUpDown)
     {
-        PE_Vec2 transl {0.0f, 0.1f};
+        PE_Vec2 transl {0.0f, 0.15f};
         m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.1)
+    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.15)
     {
-        PE_Vec2 transl {-0.1f, 0.0f};
+        PE_Vec2 transl {-0.15f, 0.0f};
         m_activeCam->TranslateWorldView(transl);
     }
     if (m_inputManager.GetControls().goRightDown)
     {
-        PE_Vec2 transl {0.1f, 0.0f};
+        PE_Vec2 transl {0.15f, 0.0f};
         m_activeCam->TranslateWorldView(transl);
     }
     
@@ -211,4 +263,17 @@ void EditorScene::Forward()
 {
     m_staticMap.ForwardGroup();
 }
+
+void EditorScene::PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx)
+{
+    for(int x=lowerX; x<=upperX; x++)
+    {
+        for(int y=lowerY; y<=upperY; y++)
+        {
+            bool extend = x!=lowerX or y!=lowerY;
+            m_staticMap.SetTile(x, y, type, partIdx, extend);
+        }
+    }
+}
+
 
