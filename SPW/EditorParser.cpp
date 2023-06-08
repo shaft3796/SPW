@@ -215,6 +215,9 @@ void EditorParser::InitScene(EditorScene& scene, EditorMap& editorMap) const
                     break;
             }
             default:
+                printf("WARNING, UNHANDLED TILE.\n");
+                if(not extend) editorMap.SetTile(x, y, EditorTile::Type::EMPTY, 0, extend);
+                break;
                 break;
             }
         }
