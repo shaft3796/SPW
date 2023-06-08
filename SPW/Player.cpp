@@ -137,7 +137,8 @@ void Player::Render()
     m_animator.Update(m_scene.GetTime());
 
     PE_Vec2 velocity = GetVelocity();
-    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : (m_state == State::DIVING ? SDL_FLIP_VERTICAL : SDL_FLIP_HORIZONTAL);
+    
 
     float scale = camera->GetWorldToViewScale();
     SDL_FRect rect = { 0 };
