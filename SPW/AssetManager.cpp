@@ -108,6 +108,9 @@ RE_Atlas *AssetManager::GetAtlas(AtlasID atlasID)
         case AtlasID::UI:
             path.assign("../Assets/Atlas/UI.json");
             break;
+        case AtlasID::JB_LOGO:
+            path.assign("../Assets/Atlas/jb_logo.json");
+            break;
         default:
             assert(false);
             break;

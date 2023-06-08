@@ -1,0 +1,12 @@
+{
+  "texture": "jb_logo.png",
+  "geometry": {
+    "rowCount": 1,
+    "colCount": 1,
+    "width": 810,
+    "height": 456
+  },
+  "parts": [
+    {"name": "JbLogo", "frames": [0]}
+  ]
+}
