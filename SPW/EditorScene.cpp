@@ -111,7 +111,8 @@ bool EditorScene::Update()
     /* --- TILES PLACE --- */
     if(mouseInput.leftDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
     {   if((m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and m_ui->GetCurrentTileType() !=m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)){
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx());
+            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx(), m_extending);
+            m_extending = true;
             m_staticMap.InitTiles();
         }
         if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
@@ -128,9 +129,15 @@ bool EditorScene::Update()
         }
         if((m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) != EditorTile::Type::EMPTY))
         {
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0); 
+            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, m_extending);
+            m_extending = true;
+            
             m_staticMap.InitTiles();
         }
+    }
+    if(mouseInput.leftReleased || mouseInput.rightReleased)
+    {
+        m_extending = false;
     }
 
     /* --- CAMERA MOVE USING ARROWS --- */
