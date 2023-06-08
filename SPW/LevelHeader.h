@@ -18,4 +18,5 @@ private:
     LevelScene &m_levelScene;
     Text *m_fireflyCount;
     Text *m_heartCount;
+    Text *m_timer;
 };
