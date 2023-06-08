@@ -207,7 +207,7 @@ void Player::FixedUpdate()
     /* --- STATE --- */
     switch (m_state){
         case State::DYING:{
-            if(m_player_dying_counter == 0){
+            if(m_player_dying_counter <= 0){
                 if (m_heartCount > 0) m_state = State::IDLE;
                 else m_scene.Respawn();
             }
