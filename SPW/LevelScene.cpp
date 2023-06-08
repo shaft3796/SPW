@@ -26,6 +26,9 @@ LevelScene::LevelScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelDa
     LevelParser parser(level.path);
     parser.InitScene(*this);
 
+    this->m_spawnTime = this->GetTime().GetElapsed();
+    this->SetResetTimer(true);
+
     // Canvas
     m_canvas = new LevelCanvas(*this);
 

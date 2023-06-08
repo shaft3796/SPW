@@ -80,7 +80,7 @@ PauseMenu::PauseMenu(LevelScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[3] = { u8"Continuer", u8"Recommencer", u8"Quitter" };
+    const std::string texts[3] = { u8"Continuer", u8"Revenir au checkpoint", u8"Quitter" };
     ButtonListener *listener[3] = { 0 };
     listener[0] = new PauseMenuNS::ContinueListener(scene);
     listener[1] = new PauseMenuNS::RestartListener(scene);
