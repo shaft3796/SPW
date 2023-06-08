@@ -103,6 +103,21 @@ namespace EditorUiNS
         EditorScene &m_editorScene;
         EditorUi &m_editorUi;
     };
+
+    class ForwardListener : public ButtonListener
+    {
+    public:
+        ForwardListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            m_editorScene.Forward();
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
     
 }
 
@@ -165,24 +180,25 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     SDL_Color colorHover = assets.GetColor(ColorID::BLACK);
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     TTF_Font *font = assets.GetFont(FontID::NORMAL);
-    int size {5};
-    const std::string texts[5] = {"Sauvegarder", "Nettoyer", "Centrer", "Menu", "<"};
-    ButtonListener *listener[5] = { 0 };
+    int size {6};
+    const std::string texts[6] = {"Sauvegarder", "Nettoyer", "Centrer", "Menu", "<", ">"};
+    ButtonListener *listener[6] = { 0 };
     listener[0] = new EditorUiNS::SaveListener(scene, *this);
     listener[1] = new EditorUiNS::ClearListener(scene, *this);
     listener[2] = new EditorUiNS::CenterListener(scene, *this);
     listener[3] = new EditorUiNS::TitleListener(scene, *this);
     listener[4] = new EditorUiNS::RollbackListener(scene, *this);
+    listener[5] = new EditorUiNS::ForwardListener(scene, *this);
     
     for(int i=0; i<size; i++){
         Button *button = new Button(scene, buttonPart);
         button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
         button->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
         switch (i)
-        { case 0:  originX += 10.0f; break; case 1:  originX += 10.0f; break; case 2:  originX += 10.0f; break; case 3:  originX += 10.0f; break; case 4:  originX += 10.0f; break;}
+        { case 0:  originX += 10.0f; break; case 1:  originX += 10.0f; break; case 2:  originX += 10.0f; break; case 3:  originX += 10.0f; break; case 4:  originX += 10.0f; break; case 5:  originX += 0.0f; break;}
         button->GetLocalRect().offsetMin.Set(originX, 25.0f);
         switch (i)
-        { case 0:  originX += 190.0f; break; case 1:  originX += 140.0f; break; case 2:  originX += 120.0f; break; case 3:  originX += 100.0f; break; case 4:  originX += 50.0f; break;}
+        { case 0:  originX += 190.0f; break; case 1:  originX += 140.0f; break; case 2:  originX += 120.0f; break; case 3:  originX += 100.0f; break; case 4:  originX += 50.0f; break; case 5:  originX += 50.0f; break;}
         button->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f);
         originX += 10.0f;
         m_buttonPositions.push_back(button->GetLocalRect());

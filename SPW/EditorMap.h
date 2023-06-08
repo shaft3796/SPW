@@ -46,6 +46,8 @@ public:
 
     EditorTile::Type GetTileType(int x, int y) const;
 
+    void Forward(int n);
+    void ForwardGroup();
     void Rollback(int n);
     void RollbackGroup();
 
@@ -68,8 +70,10 @@ private:
     int m_realHeight;
 
     std::vector<Commit> m_commits;
+    int m_commit_head = {-1};
 
     std::vector<int> m_commit_groups;
+    int m_group_head = {-1};
     
     bool IsGround(int x, int y) const;
 

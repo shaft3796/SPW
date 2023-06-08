@@ -199,3 +199,8 @@ void EditorScene::Rollback()
     m_staticMap.RollbackGroup();
 }
 
+void EditorScene::Forward()
+{
+    m_staticMap.ForwardGroup();
+}
+

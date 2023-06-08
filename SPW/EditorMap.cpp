@@ -86,13 +86,31 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx, bool e
     if(y >= m_realHeight)
         m_realHeight = y + 1;
 
+    /* CHECK FOR DETACHED HEAD */
+    if(m_commit_head != (int)m_commits.size()-1)
+    {
+        while(m_commit_head != (int)m_commits.size()-1)
+        {
+            m_commits.pop_back();
+        }
+        while(m_group_head != (int)m_commit_groups.size()-1)
+        {
+            m_commit_groups.pop_back();
+        }
+    }
+
     EditorTile &tile = m_tiles[x][y];
     Commit commit {x, y, tile.type, type, tile.partIdx, partIdx};
-    m_commits.push_back(commit);
+    m_commits.push_back(commit); m_commit_head+=1;
     tile.partIdx = partIdx;
     tile.type = type;
     if(extendGroup) m_commit_groups.back()+=1;
-    else m_commit_groups.push_back(1);
+    else
+    {
+        m_commit_groups.push_back(1); m_group_head+=1;
+        // DEBUG
+         printf("EXTENDING GROUP HEAD TO %d\n", m_group_head);
+    }
 }
 
 void EditorMap::InitTiles()
@@ -263,6 +281,29 @@ bool EditorMap::IsGround(int x, int y) const
     }
 }
 
+void EditorMap::Forward(int n)
+{
+    printf("FORWARD TRIGERED, commit size is %d, head is at %d, forwarding %d tiles\n", m_commits.size(), m_commit_head, n);
+        
+    for(int i=0; i<n; i++)
+    {
+        m_commit_head++;
+        Commit &commit = m_commits[m_commit_head];
+        m_tiles[commit.x][commit.y].type = commit.toType;
+        m_tiles[commit.x][commit.y].partIdx = commit.toPartIdx;
+        if(commit.toType == EditorTile::Type::SPAWN_POINT) ((EditorScene&)m_editorScene).SetSpawnSet(true);
+    }
+}
+
+void EditorMap::ForwardGroup()
+{
+    if(m_group_head == (int)m_commit_groups.size()-1) return;
+    m_group_head++;
+    int gs = m_commit_groups[m_group_head];
+    Forward(gs);
+    InitTiles();
+}
+
 
 void EditorMap::Rollback(int n)
 {
@@ -270,18 +311,19 @@ void EditorMap::Rollback(int n)
         
     for(int i=0; i<n; i++)
     {
-        Commit &commit = m_commits.back();
+        Commit &commit = m_commits[m_commit_head];
         m_tiles[commit.x][commit.y].type = commit.fromType;
         m_tiles[commit.x][commit.y].partIdx = commit.fromPartIdx;
         if(commit.toType == EditorTile::Type::SPAWN_POINT) ((EditorScene&)m_editorScene).SetSpawnSet(false);
-        m_commits.pop_back();
+        m_commit_head--;
     }
 }
 
 void EditorMap::RollbackGroup()
 {
-    if(m_commit_groups.size() == 0) return;
-    int gs = m_commit_groups.back(); m_commit_groups.pop_back();
+    if(m_group_head == -1) return;
+    int gs = m_commit_groups[m_group_head]; m_group_head--;
     Rollback(gs);
+    InitTiles();
 }
 

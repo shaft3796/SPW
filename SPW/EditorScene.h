@@ -32,6 +32,7 @@ public:
     void ResetCamera();
     void GoToMainMenu();
     void Rollback();
+    void Forward();
 
 private:
     std::array<Camera *, 2> m_cameras;
