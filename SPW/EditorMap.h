@@ -17,6 +17,16 @@ struct EditorTile
     PE_Collider *collider;
 };
 
+struct Commit
+{
+    int x;
+    int y;
+    EditorTile::Type fromType;
+    EditorTile::Type toType;
+    int fromPartIdx;
+    int toPartIdx;
+};
+
 class EditorMap : public GameBody
 {
 public:
@@ -36,6 +46,8 @@ public:
 
     EditorTile::Type GetTileType(int x, int y) const;
 
+    void Rollback(int n);
+
 private:
 
     RE_AtlasPart *m_woodPart;
@@ -53,8 +65,12 @@ private:
     int m_height;
     int m_realWidth;
     int m_realHeight;
+
+    std::vector<Commit> m_commits;
     
     bool IsGround(int x, int y) const;
+
+    Scene &m_editorScene;
 };
 
 inline void EditorMap::Update()

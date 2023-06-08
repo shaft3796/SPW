@@ -28,6 +28,11 @@ public:
     void SetNoSetTile(bool noSetTile) { m_noSetTile = noSetTile; }
     void SetSpawnSet(bool spawnSet) { m_spawnSet = spawnSet; }
 
+    void ClearGameArea();
+    void ResetCamera();
+    void GoToMainMenu();
+    void Rollback();
+
 private:
     std::array<Camera *, 2> m_cameras;
     EditorCanvas *m_canvas;
@@ -45,5 +50,15 @@ private:
     bool m_noSetTile {false};
 
     bool m_spawnSet {false};
+
+    bool m_resetCamera {false};
+
+    bool m_goToMainMenu {false};
     
 };
+
+
+inline void EditorScene::GoToMainMenu()
+{
+    m_goToMainMenu = true;
+}

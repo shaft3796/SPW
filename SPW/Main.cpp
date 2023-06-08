@@ -3,6 +3,8 @@
 #include "LevelScene.h"
 #include "TitleScene.h"
 
+#define SKIP_MENU
+
 //#define FHD
 //#define FULLSCREEN
 #define DEFAUT_LEVEL 0
@@ -102,10 +104,10 @@ int main(int argc, char *argv[])
     // Boucle de jeu
     Scene *scene = nullptr;
     bool quitGame = false;
-    /* TODO: FOR EDITOR TESTING PURPOSES, RESET HERE TO MAIN_MENU */
-    GameState state = GameState::EDITOR;
+    GameState state = GameState::MAIN_MENU;
     const std::vector<LevelData> levels(LevelData::Init());
     int levelID = 0;
+    bool prevWasEditor {false};
 
 #ifdef SKIP_MENU
     state = GameState::LEVEL;
@@ -115,7 +117,8 @@ int main(int argc, char *argv[])
     while (quitGame == false)
     {
         time.SetTimeScale(1.0f);
-
+        prevWasEditor = false;
+        
         // Construction de la scène
         switch (state)
         {
@@ -124,7 +127,8 @@ int main(int argc, char *argv[])
             scene = new LevelScene(renderer, time, levels[levelID]);
             break;
         case GameState::EDITOR:
-            scene = new EditorScene(renderer, time, levels[0]);
+            scene = new EditorScene(renderer, time, levels[levelID]);
+            prevWasEditor = true;
             break;
 
         case GameState::MAIN_MENU:
@@ -132,6 +136,7 @@ int main(int argc, char *argv[])
             scene = new TitleScene(renderer, time, levels);
             break;
         }
+        
 
         // Boucle de rendu
         while (true)
@@ -162,9 +167,11 @@ int main(int argc, char *argv[])
             // Affiche le nouveau rendu
             SDL_RenderPresent(renderer);
         }
+        
 
         switch (state)
         {
+        case GameState::EDITOR:
         case GameState::LEVEL:
             state = GameState::MAIN_MENU;
             break;
@@ -176,12 +183,14 @@ int main(int argc, char *argv[])
             {
                 quitGame = true;
             }
-            state = GameState::LEVEL;
+            if(((TitleScene *)scene)->GetInEditor()) state = GameState::EDITOR;
+            else state = GameState::LEVEL;
             break;
         }
-
-        if (scene)
+        
+        if (scene and not prevWasEditor)
         {
+            // TODO, fix the delete crash for the editorScene
             delete scene;
             scene = nullptr;
         }

@@ -1,9 +1,11 @@
 #include "EditorMap.h"
 #include "Camera.h"
+#include "EditorScene.h"
 #include "Player.h"
 
+
 EditorMap::EditorMap(Scene &scene, int width, int height) :
-    GameBody(scene, Layer::TERRAIN_BACKGROUND), m_width(width), m_height(height), m_realWidth(1), m_realHeight(1)
+    GameBody(scene, Layer::TERRAIN_BACKGROUND), m_width(width), m_height(height), m_realWidth(1), m_realHeight(1), m_editorScene(scene)
 {
     m_name = "EditorMap";
 
@@ -85,6 +87,8 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx)
         m_realHeight = y + 1;
 
     EditorTile &tile = m_tiles[x][y];
+    Commit commit {x, y, tile.type, type, tile.partIdx, partIdx};
+    m_commits.push_back(commit);
     tile.partIdx = partIdx;
     tile.type = type;
 }
@@ -254,5 +258,20 @@ bool EditorMap::IsGround(int x, int y) const
         return true;
     default:
         return false;
+    }
+}
+
+
+void EditorMap::Rollback(int n)
+{
+    if(n>(int)m_commits.size())n=(int)m_commits.size();
+        
+    for(int i=0; i<n; i++)
+    {
+        Commit &commit = m_commits.back();
+        m_tiles[commit.x][commit.y].type = commit.fromType;
+        m_tiles[commit.x][commit.y].partIdx = commit.fromPartIdx;
+        if(commit.toType == EditorTile::Type::SPAWN_POINT) ((EditorScene&)m_editorScene).SetSpawnSet(false);
+        m_commits.pop_back();
     }
 }

@@ -110,7 +110,7 @@ bool EditorScene::Update()
     
     /* --- TILES PLACE --- */
     if(mouseInput.leftDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
-    {   if(m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet){
+    {   if((m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and m_ui->GetCurrentTileType() !=m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)){
             m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx());
             m_staticMap.InitTiles();
         }
@@ -126,8 +126,11 @@ bool EditorScene::Update()
         {
             m_spawnSet = false;
         }
-        m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0);
-        m_staticMap.InitTiles();
+        if(m_ui->GetCurrentTileType() != EditorTile::Type::EMPTY)
+        {
+            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0);
+            m_staticMap.InitTiles();
+        }
     }
 
     /* --- CAMERA MOVE USING ARROWS --- */
@@ -154,7 +157,18 @@ bool EditorScene::Update()
         m_activeCam->TranslateWorldView(transl);
     }
     
+    if(m_resetCamera)
+    {
+        PE_Vec2 transl {-worldView.lower.x, -worldView.lower.y};
+        m_activeCam->TranslateWorldView(transl);
+    }
+    if(worldView.lower.y <= 0.0f and worldView.lower.x <= 0.0f)
+    {
+        m_resetCamera = false;
+    }
+    
     m_mode = UpdateMode::EDITOR;
+    if(m_goToMainMenu) Quit();
     return quit;
 }
 
@@ -162,4 +176,24 @@ void EditorScene::OnRespawn()
 {
 }
 
+void EditorScene::ClearGameArea()
+{
+    for(int x=0; x<m_staticMap.GetRealWidth(); x++)
+    {
+        for(int y=0; y<m_staticMap.GetRealWidth(); y++)
+        {
+            m_staticMap.SetTile(x, y, EditorTile::Type::EMPTY, 0);
+        }
+    }
+}
+
+void EditorScene::ResetCamera()
+{
+    m_resetCamera = true;
+}
+
+void EditorScene::Rollback()
+{
+    m_staticMap.Rollback(1);
+}
 

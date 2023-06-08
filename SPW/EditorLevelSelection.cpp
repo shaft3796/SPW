@@ -1,52 +1,34 @@
-#include "PauseMenu.h"
+﻿#include "EditorLevelSelection.h"
+#include "TitleScene.h"
 #include "Button.h"
-#include "LevelScene.h"
 #include "Text.h"
 
-namespace PauseMenuNS
+namespace EditorLevelSelectionNS
 {
-    class QuitListener : public ButtonListener
+    class SelectionListener : public ButtonListener
     {
     public:
-        QuitListener(LevelScene &levelScene) : m_levelScene(levelScene) {}
-        virtual void OnPress()
+        SelectionListener(TitleScene &scene, int levelID) :
+            m_titleScene(scene), m_levelID(levelID)
         {
-            m_levelScene.Quit();
         }
-    private:
-        LevelScene &m_levelScene;
-    };
 
-    class ContinueListener : public ButtonListener
-    {
-    public:
-        ContinueListener(LevelScene &levelScene) : m_levelScene(levelScene) {}
         virtual void OnPress()
         {
-            m_levelScene.SetPaused(false);
+            m_titleScene.SetLevelID(m_levelID);
+            m_titleScene.SetInEditor(true);
+            m_titleScene.Quit();
         }
-    private:
-        LevelScene &m_levelScene;
-    };
 
-    class RestartListener : public ButtonListener
-    {
-    public:
-        RestartListener(LevelScene &levelScene) : m_levelScene(levelScene) {}
-        virtual void OnPress()
-        {
-            m_levelScene.Respawn();
-        }
     private:
-        LevelScene &m_levelScene;
+        TitleScene &m_titleScene;
+        int m_levelID;
     };
 }
 
-PauseMenu::PauseMenu(LevelScene &scene) :
+EditorLevelSelection::EditorLevelSelection(TitleScene &scene) :
     UIObject(scene)
 {
-    m_name = "PauseMenu";
-
     float buttonH = 55.0f;
     float topSkip = 100.0f;
     float sep = 10.0f;
@@ -64,7 +46,7 @@ PauseMenu::PauseMenu(LevelScene &scene) :
 
     // Création du titre
     TTF_Font *font = assets.GetFont(FontID::LARGE);
-    Text *title = new Text(scene, "Pause", font, assets.GetColor(ColorID::NORMAL));
+    Text *title = new Text(scene, u8"Sélection du niveau", font, assets.GetColor(ColorID::NORMAL));
     title->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
     title->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
     title->GetLocalRect().offsetMin.Set(0.0f, 0);
@@ -80,14 +62,10 @@ PauseMenu::PauseMenu(LevelScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[3] = { u8"Continuer", u8"Recommencer", u8"Quitter" };
-    ButtonListener *listener[3] = { 0 };
-    listener[0] = new PauseMenuNS::ContinueListener(scene);
-    listener[1] = new PauseMenuNS::RestartListener(scene);
-    listener[2] = new PauseMenuNS::QuitListener(scene);
+    const std::vector<LevelData> &levels = scene.GetLevels();
 
     float curY = topSkip;
-    for (int i = 0; i < 3; i++, curY += buttonH + sep)
+    for (int i = 0; i < levels.size(); i++, curY += buttonH + sep)
     {
         Button *button = new Button(scene, buttonPart);
         button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
@@ -96,15 +74,15 @@ PauseMenu::PauseMenu(LevelScene &scene) :
         button->GetLocalRect().offsetMax.Set(0.0f, curY + buttonH);
         button->SetParent(this);
         button->SetBorders(new UIBorders(25, 25, 25, 25));
-        button->SetListener(listener[i]);
+        button->SetListener(new EditorLevelSelectionNS::SelectionListener(scene, i));
 
-        Text *buttonLabel = new Text(scene, texts[i], font, colorUp);
+        Text *buttonLabel = new Text(scene, levels[i].name, font, colorUp);
         button->SetText(buttonLabel, Button::State::UP);
 
-        buttonLabel = new Text(scene, texts[i], font, colorHover);
+        buttonLabel = new Text(scene, levels[i].name, font, colorHover);
         button->SetText(buttonLabel, Button::State::HOVER);
 
-        buttonLabel = new Text(scene, texts[i], font, colorDown);
+        buttonLabel = new Text(scene, levels[i].name, font, colorDown);
         button->SetText(buttonLabel, Button::State::DOWN);
     }
 }

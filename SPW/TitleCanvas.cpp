@@ -18,7 +18,7 @@ TitleCanvas::TitleCanvas(TitleScene &scene) :
     m_rect.anchorMin.Set(0.0f, 0.0f);
     m_rect.anchorMax.Set(0.0f, 0.0f);
 
-    // Ouvre l'écran de démarrage
+    // Ouvre l'Ã©cran de dÃ©marrage
     StartScreen *startScreen = new StartScreen(scene);
     startScreen->SetParent(this);
 }

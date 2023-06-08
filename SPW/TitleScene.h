@@ -14,11 +14,14 @@ public:
     const std::vector<LevelData> &GetLevels() const;
     void SetLevelID(int levelID);
     int GetLevelID() const;
+    void SetInEditor(bool inEditor);
+    bool GetInEditor() const;
 
 private:
     TitleCanvas *m_canvas;
     const std::vector<LevelData> &m_levels;
     int m_selectedLevel;
+    bool m_inEditor {false};
 };
 
 inline const std::vector<LevelData>& TitleScene::GetLevels() const
@@ -34,4 +37,14 @@ inline void TitleScene::SetLevelID(int levelID)
 inline int TitleScene::GetLevelID() const
 {
     return m_selectedLevel;
+}
+
+inline void TitleScene::SetInEditor(bool inEditor)
+{
+    m_inEditor = inEditor;
+}
+
+inline bool TitleScene::GetInEditor() const
+{
+    return m_inEditor;
 }

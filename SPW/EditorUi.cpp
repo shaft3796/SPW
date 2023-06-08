@@ -28,20 +28,6 @@ namespace EditorUiNS
         EditorTile::Type m_tileType;
         int m_partIdx;
     };
-    
-    class QuitListener : public ButtonListener
-    {
-    public:
-        QuitListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
-
-        virtual void OnPress() override
-        {
-        }
-
-    private:
-        EditorScene &m_editorScene;
-        EditorUi &m_editorUi;
-    };
 
     class SaveListener : public ButtonListener
     {
@@ -52,13 +38,72 @@ namespace EditorUiNS
         {
             m_editorScene.getSaver()->SaveMap(m_editorScene.getPath());
             m_editorScene.SetNoSetTile(true);
-            printf("BUTTON SAVE\n");
         }
 
     private:
         EditorScene &m_editorScene;
         EditorUi &m_editorUi;
     };
+
+    class ClearListener : public ButtonListener
+    {
+    public:
+        ClearListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            m_editorScene.ClearGameArea();
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
+    class CenterListener : public ButtonListener
+    {
+    public:
+        CenterListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            m_editorScene.ResetCamera();
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
+
+    class TitleListener : public ButtonListener
+    {
+    public:
+        TitleListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            m_editorScene.GoToMainMenu();
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
+
+    class RollbackListener : public ButtonListener
+    {
+    public:
+        RollbackListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            m_editorScene.Rollback();
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
+    
 }
 
 EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
@@ -120,22 +165,26 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     SDL_Color colorHover = assets.GetColor(ColorID::BLACK);
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     TTF_Font *font = assets.GetFont(FontID::NORMAL);
-    int size {1};
-    const std::string texts[1] = {"Sauvegarder"};
-    ButtonListener *listener[1] = { 0 };
+    int size {5};
+    const std::string texts[5] = {"Sauvegarder", "Nettoyer", "Centrer", "Menu", "<"};
+    ButtonListener *listener[5] = { 0 };
     listener[0] = new EditorUiNS::SaveListener(scene, *this);
-
+    listener[1] = new EditorUiNS::ClearListener(scene, *this);
+    listener[2] = new EditorUiNS::CenterListener(scene, *this);
+    listener[3] = new EditorUiNS::TitleListener(scene, *this);
+    listener[4] = new EditorUiNS::RollbackListener(scene, *this);
+    
     for(int i=0; i<size; i++){
         Button *button = new Button(scene, buttonPart);
         button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
         button->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
         switch (i)
-        { case 0:  originX += 50.0f;}
+        { case 0:  originX += 10.0f; break; case 1:  originX += 10.0f; break; case 2:  originX += 10.0f; break; case 3:  originX += 10.0f; break; case 4:  originX += 10.0f; break;}
         button->GetLocalRect().offsetMin.Set(originX, 25.0f);
         switch (i)
-        { case 0:  originX += 200.0f;}
+        { case 0:  originX += 190.0f; break; case 1:  originX += 140.0f; break; case 2:  originX += 120.0f; break; case 3:  originX += 100.0f; break; case 4:  originX += 50.0f; break;}
         button->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f);
-        originX += 25.0f;
+        originX += 10.0f;
         m_buttonPositions.push_back(button->GetLocalRect());
         button->SetBorders(new UIBorders(25, 25, 25, 25));
         button->SetListener(listener[i]);

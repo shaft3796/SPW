@@ -43,9 +43,9 @@ LevelSelection::LevelSelection(TitleScene &scene) :
     RE_Atlas *atlas = assets.GetAtlas(AtlasID::UI);
     AssertNew(atlas);
 
-    // Création du titre
+    // CrÃ©ation du titre
     TTF_Font *font = assets.GetFont(FontID::LARGE);
-    Text *title = new Text(scene, u8"Sélection du niveau", font, assets.GetColor(ColorID::NORMAL));
+    Text *title = new Text(scene, u8"SÃ©lection du niveau", font, assets.GetColor(ColorID::NORMAL));
     title->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
     title->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
     title->GetLocalRect().offsetMin.Set(0.0f, 0);
@@ -53,7 +53,7 @@ LevelSelection::LevelSelection(TitleScene &scene) :
     title->SetAnchor(RE_Anchor::NORTH);
     title->SetParent(this);
 
-    // Création des boutons
+    // CrÃ©ation des boutons
     RE_AtlasPart *buttonPart = atlas->GetPart("Button");
     AssertNew(buttonPart);
     SDL_Color colorUp = assets.GetColor(ColorID::NORMAL);

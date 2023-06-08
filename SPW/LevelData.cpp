@@ -1,6 +1,18 @@
 #include "LevelData.h"
 #include <fstream>
 
+void initLevel(std::string path)
+{
+    std::fstream fs; fs.open(path, std::fstream::out);
+    // If the file is empty, we fill it
+    std::fstream rb; rb.open(path, std::fstream::in);
+    if (rb.peek() == std::fstream::traits_type::eof())
+    {
+        rb.close();
+        fs << ".S.\n###\n";
+    }
+}
+
 LevelData::LevelData(const std::string &nameIn, const std::string &pathIn, ThemeID themeIDIn) :
     name(nameIn), path(pathIn), themeID(themeIDIn)
 {
@@ -8,14 +20,12 @@ LevelData::LevelData(const std::string &nameIn, const std::string &pathIn, Theme
 
 std::vector<LevelData> LevelData::Init()
 {
-    std::fstream fs;
-    fs.open("../Assets/Level/Sky01.txt", std::fstream::out);
-    fs.open("../Assets/Level/Sky02.txt", std::fstream::out);
-    fs.open("../Assets/Level/Mountains01.txt", std::fstream::out);
-    fs.open("../Assets/Level/Mountains02.txt", std::fstream::out);
-    fs.open("../Assets/Level/Lake01.txt", std::fstream::out);
-    fs.open("../Assets/Level/Lake02.txt", std::fstream::out);
-
+    initLevel("../Assets/Level/Sky01.txt");
+    initLevel("../Assets/Level/Sky02.txt");
+    initLevel("../Assets/Level/Mountains01.txt");
+    initLevel("../Assets/Level/Mountains02.txt");
+    initLevel("../Assets/Level/Lake01.txt");
+    initLevel("../Assets/Level/Lake02.txt");
     
     std::vector<LevelData> data;
 
