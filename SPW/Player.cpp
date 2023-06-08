@@ -238,7 +238,6 @@ void Player::FixedUpdate()
                 if (m_facingRight) velocity.x = -10.0f;
                 // Saute à gauche du mur
                 else velocity.x = 10.0f;
-                m_facingRight = !m_facingRight;
                 m_state = State::FALLING;
             }
             else velocity.y = -1.0f;
@@ -440,6 +439,7 @@ void Player::OnCollisionStay(GameCollision &collision)
     else if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
     {
         float angleUp = PE_AngleDeg(manifold.normal, PE_Vec2::up);
+        float angleRight = PE_AngleDeg(manifold.normal, PE_Vec2::right);
         if (angleUp <= 55.0f)
         {
             // R�soud la collision en d�pla�ant le joueur vers le haut
@@ -451,6 +451,8 @@ void Player::OnCollisionStay(GameCollision &collision)
         if (angleUp == 90.0f && m_onAirTimer > 0.3f)
         {
             m_state = State::CLIMBBING;
+            if (angleRight == 0.0f) m_facingRight = false;
+            if (angleRight == 180.0f) m_facingRight = true;
         }
     }
 }
