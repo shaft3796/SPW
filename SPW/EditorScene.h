@@ -51,6 +51,8 @@ private:
     bool m_noSetTile {false};
 
     bool m_spawnSet {false};
+    int m_spawnX {-1};
+    int m_spawnY {-1};
 
     bool m_resetCamera {false};
 

@@ -130,7 +130,10 @@ bool EditorScene::Update()
                 m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, m_extending);
                 m_extending = true;
                 m_staticMap.InitTiles();
-                if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)  m_spawnSet = true;
+                if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
+                {
+                    m_spawnSet = true; m_spawnX = (int)worldPos.x; m_spawnY = (int)worldPos.y;
+                }
             }
         }
         else
@@ -266,6 +269,10 @@ void EditorScene::Forward()
 
 void EditorScene::PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx)
 {
+    if(m_spawnSet && lowerX <= m_spawnX && m_spawnX <= upperX && lowerY <= m_spawnY && m_spawnY <= upperY)
+    {
+        SetSpawnSet(false);
+    }
     for(int x=lowerX; x<=upperX; x++)
     {
         for(int y=lowerY; y<=upperY; y++)
