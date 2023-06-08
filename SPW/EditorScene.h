@@ -60,8 +60,8 @@ private:
 
     bool m_areaPlacing {false};
 
-    int m_areaOriginX {0};
-    int m_areaOriginY {0};
+    int m_areaOriginX {-1};
+    int m_areaOriginY {-1};
 
     void PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx);
 };
