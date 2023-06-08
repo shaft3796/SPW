@@ -68,6 +68,8 @@ private:
     RE_AtlasPart *m_fakeFlappyPart;
     RE_AtlasPart *m_brickPart;
 
+    RE_AtlasPart *m_gridPart;
+
     EditorTile **m_tiles;
     int m_width;
     int m_height;

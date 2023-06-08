@@ -1,0 +1,12 @@
+﻿{
+  "texture": "Grid.png",
+  "geometry": {
+    "rowCount": 1,
+    "colCount": 1,
+    "width": 446,
+    "height": 446
+  },
+  "parts": [
+    {"name": "Grid", "frames": [0]}
+  ]
+}

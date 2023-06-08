@@ -78,12 +78,12 @@ RE_Atlas *AssetManager::GetAtlas(AtlasID atlasID)
     auto it = m_atlases.find(atlasID);
     if (it != m_atlases.end())
     {
-        // L'asset est déjà chargé en mémoire
+        // L'asset est dï¿½jï¿½ chargï¿½ en mï¿½moire
         atlas = it->second;
     }
     else
     {
-        // L'asset n'est pas chargé en mémoire
+        // L'asset n'est pas chargï¿½ en mï¿½moire
         std::string path;
         switch (atlasID)
         {
@@ -111,6 +111,9 @@ RE_Atlas *AssetManager::GetAtlas(AtlasID atlasID)
         case AtlasID::JB_LOGO:
             path.assign("../Assets/Atlas/jb_logo.json");
             break;
+        case AtlasID::GRID:
+            path.assign("../Assets/Atlas/Grid.json");
+            break;
         default:
             assert(false);
             break;
@@ -128,12 +131,12 @@ TTF_Font *AssetManager::GetFont(FontID fontID)
     auto it = m_fonts.find(fontID);
     if (it != m_fonts.end())
     {
-        // L'asset est déjà chargé en mémoire
+        // L'asset est dï¿½jï¿½ chargï¿½ en mï¿½moire
         font = it->second;
     }
     else
     {
-        // L'asset n'est pas chargé en mémoire
+        // L'asset n'est pas chargï¿½ en mï¿½moire
         int size = 14;
         switch (fontID)
         {

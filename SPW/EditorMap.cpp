@@ -26,6 +26,7 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     RE_Atlas *ennemyAtlas = scene.GetAssetManager().GetAtlas(AtlasID::ENEMY);
     RE_Atlas *uiAtlas = scene.GetAssetManager().GetAtlas(AtlasID::UI);
     RE_Atlas *leverAtlas = scene.GetAssetManager().GetAtlas(AtlasID::LEVER);
+    RE_Atlas *gridAtlas = scene.GetAssetManager().GetAtlas(AtlasID::GRID);
 
     m_woodPart = atlas->GetPart("Wood");
     AssertNew(m_woodPart);
@@ -56,9 +57,13 @@ EditorMap::EditorMap(Scene &scene, int width, int height) :
     AssertNew(m_checkpointPart);
 
     m_fakeFlappyPart = ennemyAtlas->GetPart("FlappyIdle");
-    AssertNew(m_checkpointPart);
+    AssertNew(m_fakeFlappyPart);
     m_brickPart = atlas->GetPart("Brick");
-    AssertNew(m_checkpointPart);
+    AssertNew(m_brickPart);
+
+
+    m_gridPart = gridAtlas->GetPart("Grid");
+    AssertNew(m_gridPart);
 
     // Couleur des colliders en debug
     m_debugColor.r = 255;
@@ -299,6 +304,8 @@ void EditorMap::Render()
             default:
                 break;
             }
+
+            m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
         }
     }
 }
