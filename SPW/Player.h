@@ -46,6 +46,7 @@ private:
     State m_state;
 
     RE_Animator m_animator;
+    PE_Collider* m_collider {nullptr};
 
     float m_onAirTimer;
     float m_onWallTimer;
@@ -67,6 +68,9 @@ private:
     // Diving attack
     bool m_dive;
     int m_dive_load_counter;
+
+    // Crouching
+    bool m_crouching;
 };
 
 

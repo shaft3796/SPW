@@ -111,7 +111,7 @@ void Player::Start()
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
     colliderDef.shape = &capsule;
-    PE_Collider *collider = body->CreateCollider(colliderDef);
+    m_collider = body->CreateCollider(colliderDef);
 }
 
 void Player::Update()
@@ -126,6 +126,10 @@ void Player::Update()
 
     // Diving
     if (controls.goDownDown && (m_state == State::FALLING)) m_dive = true;
+
+    // Crouching
+    if(controls.crouchDown && (m_state == State::IDLE or m_state == State::FALLING or m_state == State::WALKING or m_state == State::RUNNING)) m_crouching = true;
+    else if(controls.crouchReleased &&  m_crouching) m_crouching = false;
 }
 
 void Player::Render()
@@ -145,6 +149,11 @@ void Player::Render()
 
     rect.h = 1.375f * scale;
     rect.w = 1.0f * scale;
+    if(m_crouching)
+    {
+        rect.h = 1.0f * scale;
+        rect.w = 1.0f * scale;
+    }
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     double angle {0.0f};
@@ -167,6 +176,15 @@ void Player::FixedUpdate()
     PE_Vec2 position = body->GetPosition();
     PE_Vec2 velocity = body->GetLocalVelocity();
     ControlsInput &controls = m_scene.GetInputManager().GetControls();
+
+    // Modifie le collider
+    PE_ColliderDef colliderDef;
+    PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
+    if(m_crouching) capsule = PE_CapsuleShape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.50f), 0.35f);
+    colliderDef.friction = 1.0f;
+    colliderDef.filter.categoryBits = CATEGORY_PLAYER;
+    colliderDef.shape = &capsule;
+    body->RemoveCollider(m_collider); m_collider = body->CreateCollider(colliderDef);
 
     bool noJump {false};
 
@@ -205,6 +223,7 @@ void Player::FixedUpdate()
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
     if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::GENTLE_SLOPE_R1 or m_slopeType == Tile::Type::GENTLE_SLOPE_L1)) velocity.x /= 1.1f;
     else if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::STEEP_SLOPE_R or m_slopeType == Tile::Type::STEEP_SLOPE_L)) velocity.x /= 1.2f;
+    if(m_crouching) velocity.x /= 1.1f;
     /* --- STATE --- */
     switch (m_state){
         case State::DYING:{
@@ -332,10 +351,7 @@ void Player::FixedUpdate()
     // * -1.0f si le joueur acc�l�re vers la gauche.
 
     if (m_hDirection != 0.0f && m_state != State::CLIMBBING) m_facingRight = m_hDirection >= 0.0f;
-
     
-
-    // TODO : Rebond sur les ennemis
 
     // Remarques :
     // Le facteur de gravit� peut �tre modifi� avec l'instruction

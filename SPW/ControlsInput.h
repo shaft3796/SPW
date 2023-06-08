@@ -23,4 +23,7 @@ public:
     bool savePressed;
     bool areaDown;
     bool areaReleased;
+
+    bool crouchDown;
+    bool crouchReleased;
 };
