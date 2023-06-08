@@ -10,6 +10,9 @@ struct EditorTile
         EMPTY, GROUND, WOOD, ONE_WAY, SPIKE, BRICK,
         STEEP_SLOPE_L, STEEP_SLOPE_R,
         GENTLE_SLOPE_L1, GENTLE_SLOPE_L2, GENTLE_SLOPE_R1, GENTLE_SLOPE_R2,
+        ROOF,
+        STEEP_ROOF_L, STEEP_ROOF_R,
+        GENTLE_ROOF_L1, GENTLE_ROOF_L2, GENTLE_ROOF_R1, GENTLE_ROOF_R2,
         FAKE_FLAG, FAKE_NUT, FAKE_FIREFLY, SPAWN_POINT, CHECKPOINT, FAKE_FLAPPY
     };
     Type type;
@@ -78,6 +81,8 @@ private:
     int m_group_head = {-1};
     
     bool IsGround(int x, int y) const;
+    bool IsRoof(int x, int y) const;
+    bool IsDirt(int x, int y) const;
 
     Scene &m_editorScene;
 };

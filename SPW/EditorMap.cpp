@@ -114,7 +114,7 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx, bool e
     {
         m_commit_groups.push_back(1); m_group_head+=1;
         // DEBUG
-         printf("EXTENDING GROUP HEAD TO %d\n", m_group_head);
+        // printf("EXTENDING GROUP HEAD TO %d\n", m_group_head);
     }
 }
 
@@ -168,7 +168,44 @@ void EditorMap::InitTiles()
                 break;  
             case EditorTile::Type::GENTLE_SLOPE_R2:
                 tile.partIdx = 16;
+                break;
+
+            case EditorTile::Type::ROOF:
+                if(GetTileType(x, y - 1) == EditorTile::Type::STEEP_ROOF_L or GetTileType(x, y - 1) == EditorTile::Type::GENTLE_ROOF_L1)
+                {
+                    tile.partIdx = 14;
+                }
+                else if(GetTileType(x, y - 1) == EditorTile::Type::STEEP_ROOF_R or GetTileType(x, y - 1) == EditorTile::Type::GENTLE_ROOF_R1)
+                {
+                    tile.partIdx = 17;
+                }
+                else if (IsDirt(x, y - 1))
+                {
+                    tile.partIdx = 4;
+                }
+                else
+                {
+                    tile.partIdx = 1;
+                }
+                break;
+            case EditorTile::Type::STEEP_ROOF_L:
+                tile.partIdx = 9;
+                break;
+            case EditorTile::Type::STEEP_ROOF_R:
+                tile.partIdx = 10;
+                break;
+            case EditorTile::Type::GENTLE_ROOF_L1:
+                tile.partIdx = 13;
+                break;
+            case EditorTile::Type::GENTLE_ROOF_L2:
+                tile.partIdx = 12;
+                break;
+            case EditorTile::Type::GENTLE_ROOF_R1:
+                tile.partIdx = 15;
                 break;  
+            case EditorTile::Type::GENTLE_ROOF_R2:
+                tile.partIdx = 16;
+                break;
 
             default:
                 tile.partIdx = 0;
@@ -219,6 +256,15 @@ void EditorMap::Render()
             case EditorTile::Type::GENTLE_SLOPE_R1:
             case EditorTile::Type::GENTLE_SLOPE_R2:
                 m_terrainPart->RenderCopyF(tile.partIdx, &dst, RE_Anchor::SOUTH_WEST);
+                break;
+            case EditorTile::Type::ROOF:
+            case EditorTile::Type::STEEP_ROOF_L:
+            case EditorTile::Type::STEEP_ROOF_R:
+            case EditorTile::Type::GENTLE_ROOF_L1:
+            case EditorTile::Type::GENTLE_ROOF_L2:
+            case EditorTile::Type::GENTLE_ROOF_R1:
+            case EditorTile::Type::GENTLE_ROOF_R2:
+                m_terrainPart->RenderCopyExF(tile.partIdx, &dst, RE_Anchor::SOUTH_WEST, 0.0, Vec2(0.0f, 0.0f), SDL_FLIP_VERTICAL);
                 break;
             case EditorTile::Type::FAKE_FLAG:
                 m_fakePart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
@@ -290,6 +336,28 @@ bool EditorMap::IsGround(int x, int y) const
     default:
         return false;
     }
+}
+
+bool EditorMap::IsRoof(int x, int y) const
+{
+    switch (GetTileType(x, y))
+    {
+    case EditorTile::Type::ROOF:
+    case EditorTile::Type::STEEP_ROOF_L:
+    case EditorTile::Type::STEEP_ROOF_R:
+    case EditorTile::Type::GENTLE_ROOF_L1:
+    case EditorTile::Type::GENTLE_ROOF_L2:
+    case EditorTile::Type::GENTLE_ROOF_R1:
+    case EditorTile::Type::GENTLE_ROOF_R2:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool EditorMap::IsDirt(int x, int y) const
+{
+    return IsGround(x, y) or IsRoof(x, y);
 }
 
 void EditorMap::Forward(int n)

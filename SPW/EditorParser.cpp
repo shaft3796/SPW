@@ -177,6 +177,27 @@ void EditorParser::InitScene(EditorScene& scene, EditorMap& editorMap) const
             case 'R':
                 editorMap.SetTile(x, y, EditorTile::Type::GENTLE_SLOPE_R2, 16, extend);
                 break;
+            case '*':
+                editorMap.SetTile(x, y, EditorTile::Type::ROOF, 0, extend);
+                break;
+            case ']':
+                editorMap.SetTile(x, y, EditorTile::Type::STEEP_ROOF_L, 9, extend);
+                break;
+            case '[':
+                editorMap.SetTile(x, y, EditorTile::Type::STEEP_ROOF_R, 10, extend);
+                break;
+            case '2':
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_ROOF_L2, 12, extend);
+                break;
+            case '1':
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_ROOF_L1, 13, extend);
+                break;
+            case '3':
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_ROOF_R1, 15, extend);
+                break;
+            case '4':
+                editorMap.SetTile(x, y, EditorTile::Type::GENTLE_ROOF_R2, 16, extend);
+                break;
             case 'S':
             {
                     editorMap.SetTile(x, y, EditorTile::Type::SPAWN_POINT, 0, extend);
