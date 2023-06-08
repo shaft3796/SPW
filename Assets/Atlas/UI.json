@@ -11,6 +11,7 @@
         {"name": "Firefly",     "frames": [0]},
         {"name": "Life",        "frames": [1]},
         {"name": "Heart",       "frames": [2]},
+        {"name": "Timer",       "frames": [3]},
         {"name": "Button",      "frames": [4,5,6,7]}
     ]
 }

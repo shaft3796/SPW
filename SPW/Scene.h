@@ -106,10 +106,14 @@ public:
 
     void Quit();
 
+    void SetResetTimer(bool value);
+
     float GetAlpha();
 
     float GetFixedTimeStep();
 
+    float GetSpawnTime();
+    
     Camera *GetActiveCamera();
 
     const RE_Timer &GetTime() const;
@@ -163,6 +167,9 @@ protected:
     /// @brief Paramètre d'interpolation pour les positions des corps physiques.
     float m_alpha;
 
+    /// @brief Paramètre du temps du dernier spawn
+    float m_spawnTime;
+
     /// @brief Booléen indiquant s'il faut afficher les "gizmos" (debug).
     bool m_drawGizmos;
 
@@ -179,6 +186,8 @@ protected:
 
     /// @brief Booléen indiquant s'il faut quitter la scène.
     bool m_quit;
+
+    bool m_resetTimer;
 
     SceneListener m_collisionListener;
 };
@@ -203,8 +212,15 @@ inline PE_World &Scene::GetWorld()
     return m_world;
 }
 
+inline void Scene::SetResetTimer(bool value)
+{
+    m_resetTimer = value;
+}
+
+
 inline void Scene::Respawn()
 {
+    if (m_resetTimer) m_spawnTime = GetTime().GetElapsed();
     m_respawn = true;
 }
 
@@ -221,6 +237,11 @@ inline float Scene::GetAlpha()
 inline float Scene::GetFixedTimeStep()
 {
     return m_timeStep;
+}
+
+inline float Scene::GetSpawnTime()
+{
+    return m_spawnTime;
 }
 
 inline Camera *Scene::GetActiveCamera()
