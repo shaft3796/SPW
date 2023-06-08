@@ -13,7 +13,7 @@ void EditorSaver::SaveMap(const std::string& path)
     std::fstream fs;
     fs.open(path, std::fstream::out);
     
-    for(int y=m_map.GetRealWidth(); y>=0; y--)
+    for(int y=m_map.GetRealHeight(); y>=0; y--)
     {
             for(int x=0; x<m_map.GetRealWidth(); x++)
         {
