@@ -184,6 +184,27 @@ void LevelParser::InitScene(LevelScene &scene) const
             case 'R':
                 map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_R2);
                 break;
+            case '*':
+                map->SetTile(x, y, Tile::Type::ROOF);
+                break;
+            case ']':
+                map->SetTile(x, y, Tile::Type::STEEP_ROOF_L);
+                break;
+            case '[':
+                map->SetTile(x, y, Tile::Type::STEEP_ROOF_R);
+                break;
+            case '2':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_L2);
+                break;
+            case '1':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_L1);
+                break;
+            case '3':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_R1);
+                break;
+            case '4':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_R2);
+                break;
             case 'S':
             {
                 Player *player = scene.GetPlayer();

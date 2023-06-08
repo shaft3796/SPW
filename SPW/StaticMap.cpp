@@ -35,13 +35,6 @@ StaticMap::StaticMap(Scene &scene, int width, int height) :
     m_spikePart = atlas->GetPart("Spike");
     AssertNew(m_spikePart);
 
-    //TODO: ADD FAKE TILES HERE
-    m_fakePart = atlas->GetPart("Fake");
-    AssertNew(m_fakePart);
-
-    m_fakeNutPart = ennemyAtlas->GetPart("NutIdle");
-    AssertNew(m_fakeNutPart);
-
     // Couleur des colliders en debug
     m_debugColor.r = 255;
     m_debugColor.g = 200;
@@ -93,7 +86,7 @@ void StaticMap::InitTiles()
                 {
                     tile.partIdx = 17;
                 }
-                else if (IsGround(x, y + 1))
+                else if (IsDirt(x, y + 1))
                 {
                     tile.partIdx = 4;
                 }
@@ -119,7 +112,46 @@ void StaticMap::InitTiles()
                 break;  
             case Tile::Type::GENTLE_SLOPE_R2:
                 tile.partIdx = 16;
+                break;
+
+            case Tile::Type::ROOF:
+                if(GetTileType(x, y - 1) == Tile::Type::STEEP_ROOF_L or GetTileType(x, y - 1) == Tile::Type::GENTLE_ROOF_L1)
+                {
+                    tile.partIdx = 14;
+                }
+                else if(GetTileType(x, y - 1) == Tile::Type::STEEP_ROOF_R or GetTileType(x, y - 1) == Tile::Type::GENTLE_ROOF_R1)
+                {
+                    tile.partIdx = 17;
+                }
+                else if (IsDirt(x, y - 1))
+                {
+                    tile.partIdx = 4;
+                }
+                else
+                {
+                    tile.partIdx = 1;
+                }
+                break;
+            case Tile::Type::STEEP_ROOF_L:
+                tile.partIdx = 9;
+                break;
+            case Tile::Type::STEEP_ROOF_R:
+                tile.partIdx = 10;
+                break;
+            case Tile::Type::GENTLE_ROOF_L1:
+                tile.partIdx = 13;
+                break;
+            case Tile::Type::GENTLE_ROOF_L2:
+                tile.partIdx = 12;
+                break;
+            case Tile::Type::GENTLE_ROOF_R1:
+                tile.partIdx = 15;
                 break;  
+            case Tile::Type::GENTLE_ROOF_R2:
+                tile.partIdx = 16;
+                break;
+
+                
 
             default:
                 tile.partIdx = 0;
@@ -171,6 +203,17 @@ void StaticMap::Render()
             case Tile::Type::GENTLE_SLOPE_R2:
                 m_terrainPart->RenderCopyF(tile.partIdx, &dst, RE_Anchor::SOUTH_WEST);
                 break;
+                
+            case Tile::Type::ROOF:
+            case Tile::Type::STEEP_ROOF_L:
+            case Tile::Type::STEEP_ROOF_R:
+            case Tile::Type::GENTLE_ROOF_L1:
+            case Tile::Type::GENTLE_ROOF_L2:
+            case Tile::Type::GENTLE_ROOF_R1:
+            case Tile::Type::GENTLE_ROOF_R2:
+                m_terrainPart->RenderCopyExF(tile.partIdx, &dst, RE_Anchor::SOUTH_WEST, 0.0, Vec2(0.0f, 0.0f), SDL_FLIP_VERTICAL);
+                break;
+                
             case Tile::Type::WOOD:
                 m_woodPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
                 break;
@@ -200,6 +243,7 @@ void StaticMap::Start()
 
     // Crée les colliders
     PE_Vec2 vertices[3];
+    PE_Vec2 lvertices[4];
     PE_PolygonShape polygon;
     PE_ColliderDef colliderDef;
 
@@ -224,6 +268,7 @@ void StaticMap::Start()
             switch (tile.type)
             {
             case Tile::Type::GROUND:
+            case Tile::Type::ROOF:
             case Tile::Type::WOOD:
                 polygon.SetAsBox(PE_AABB(position, position + PE_Vec2(1.0f, 1.0f)));
                 break;
@@ -245,10 +290,11 @@ void StaticMap::Start()
                 colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_R2:
-                vertices[0] = position + PE_Vec2(0.0f, 0.5f);
-                vertices[1] = position + PE_Vec2(1.0f, 0.5f);
-                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
-                polygon.SetVertices(vertices, 3);
+                lvertices[0] = position + PE_Vec2(0.0f, 0.5f);
+                lvertices[1] = position + PE_Vec2(0.0f, 0.0f);
+                lvertices[2] = position + PE_Vec2(1.0f, 0.0f);
+                lvertices[3] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(lvertices, 4);
                 colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_L1:
@@ -259,10 +305,11 @@ void StaticMap::Start()
                 colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::GENTLE_SLOPE_L2:
-                vertices[0] = position + PE_Vec2(0.0f, 0.5f);
-                vertices[1] = position + PE_Vec2(1.0f, 0.5f);
-                vertices[2] = position + PE_Vec2(0.0f, 1.0f);
-                polygon.SetVertices(vertices, 3);
+                lvertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                lvertices[1] = position + PE_Vec2(0.0f, 0.0f);
+                lvertices[2] = position + PE_Vec2(1.0f, 0.0f);
+                lvertices[3] = position + PE_Vec2(1.0f, 0.5f);
+                polygon.SetVertices(lvertices, 4);
                 colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
                 break;
             case Tile::Type::STEEP_SLOPE_L:
@@ -278,7 +325,52 @@ void StaticMap::Start()
                 vertices[2] = position + PE_Vec2(1.0f, 1.0f);
                 polygon.SetVertices(vertices, 3);
                 colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
-                break;  
+                break;
+            /* ROOFS */
+            case Tile::Type::GENTLE_ROOF_R1:
+                vertices[0] = position + PE_Vec2(0.0f, 1.0f);      // Bottom left vertex
+                vertices[1] = position + PE_Vec2(1.0f, 0.5f);      // Bottom right vertex
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);     // Top right vertex
+                polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
+            case Tile::Type::GENTLE_ROOF_R2:
+                lvertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                lvertices[1] = position + PE_Vec2(0.0f, 0.5f);
+                lvertices[2] = position + PE_Vec2(1.0f, 0.0f);
+                lvertices[3] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(lvertices, 4);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
+            case Tile::Type::GENTLE_ROOF_L1:
+                vertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                vertices[1] = position + PE_Vec2(0.0f, 0.5f);
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
+            case Tile::Type::GENTLE_ROOF_L2:
+                lvertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                lvertices[1] = position + PE_Vec2(0.0f, 0.0f);
+                lvertices[2] = position + PE_Vec2(1.0f, 0.5f);
+                lvertices[3] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(lvertices, 4);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
+            case Tile::Type::STEEP_ROOF_L:
+                vertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                vertices[1] = position + PE_Vec2(0.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
+            case Tile::Type::STEEP_ROOF_R:
+                vertices[0] = position + PE_Vec2(0.0f, 1.0f);
+                vertices[1] = position + PE_Vec2(1.0f, 0.0f);
+                vertices[2] = position + PE_Vec2(1.0f, 1.0f);
+                polygon.SetVertices(vertices, 3);
+                colliderDef.filter.categoryBits = CATEGORY_TERRAIN | CATEGORY_SLOPE;
+                break;
            
 
             default:
@@ -359,4 +451,26 @@ bool StaticMap::IsGround(int x, int y) const
     default:
         return false;
     }
+}
+
+bool StaticMap::IsRoof(int x, int y) const
+{
+    switch (GetTileType(x, y))
+    {
+    case Tile::Type::ROOF:
+    case Tile::Type::STEEP_ROOF_L:
+    case Tile::Type::STEEP_ROOF_R:
+    case Tile::Type::GENTLE_ROOF_L1:
+    case Tile::Type::GENTLE_ROOF_L2:
+    case Tile::Type::GENTLE_ROOF_R1:
+    case Tile::Type::GENTLE_ROOF_R2:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool StaticMap::IsDirt(int x, int y) const
+{
+    return IsGround(x, y) or IsRoof(x, y);
 }

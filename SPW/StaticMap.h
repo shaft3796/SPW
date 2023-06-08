@@ -10,6 +10,9 @@ struct Tile
         EMPTY, GROUND, WOOD, ONE_WAY, SPIKE,
         STEEP_SLOPE_L, STEEP_SLOPE_R,
         GENTLE_SLOPE_L1, GENTLE_SLOPE_L2, GENTLE_SLOPE_R1, GENTLE_SLOPE_R2,
+        ROOF,
+        STEEP_ROOF_L, STEEP_ROOF_R,
+        GENTLE_ROOF_L1, GENTLE_ROOF_L2, GENTLE_ROOF_R1, GENTLE_ROOF_R2,
     };
     Type type;
     int partIdx;
@@ -34,8 +37,6 @@ private:
     RE_AtlasPart *m_woodPart;
     RE_AtlasPart *m_terrainPart;
     RE_AtlasPart *m_spikePart;
-    RE_AtlasPart *m_fakePart;
-    RE_AtlasPart *m_fakeNutPart;
     RE_AtlasPart *m_oneWayPart;
 
     Tile **m_tiles;
@@ -44,4 +45,6 @@ private:
 
     Tile::Type GetTileType(int x, int y) const;
     bool IsGround(int x, int y) const;
+    bool IsRoof(int x, int y) const;
+    bool IsDirt(int x, int y) const;
 };
