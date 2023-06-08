@@ -205,8 +205,12 @@ void EditorParser::InitScene(EditorScene& scene, EditorMap& editorMap) const
             }
             case 'b':
             {
-                    // TODO: BRICK  
-                    editorMap.SetTile(x, y, EditorTile::Type::GROUND, 0, extend);
+                    editorMap.SetTile(x, y, EditorTile::Type::BRICK, 0, extend);
+                    break;
+            }
+            case 'f':
+            {
+                    editorMap.SetTile(x, y, EditorTile::Type::FAKE_FLAPPY, 0, extend);
                     break;
             }
             case 'o':

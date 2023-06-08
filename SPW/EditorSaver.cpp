@@ -69,6 +69,12 @@ void EditorSaver::SaveMap(const std::string& path)
                 case EditorTile::Type::CHECKPOINT:
                     fs << "c";
                     break;
+                case EditorTile::Type::FAKE_FLAPPY:
+                    fs << "f";
+                    break;
+                case EditorTile::Type::BRICK:
+                    fs << "b";
+                    break;
                 
                 default:
                     fs << ".";
