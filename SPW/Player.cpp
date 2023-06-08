@@ -304,7 +304,7 @@ void Player::FixedUpdate()
 
     // Orientation du joueur
     // Utilisez m_hDirection qui vaut :
-    // *  0.0f si le joueur n'acc�l�re pas ;
+    // *  0.0f si le joueur n'acc�l�re9 pas ;
     // * +1.0f si le joueur acc�l�re vers la droite ;
     // * -1.0f si le joueur acc�l�re vers la gauche.
 
