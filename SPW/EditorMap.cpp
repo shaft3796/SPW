@@ -304,7 +304,8 @@ void EditorMap::Render()
             default:
                 break;
             }
-
+            m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
+            m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
             m_gridPart->RenderCopyF(0, &dst, RE_Anchor::SOUTH_WEST);
         }
     }
