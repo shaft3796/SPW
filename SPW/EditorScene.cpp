@@ -9,10 +9,8 @@
 
 
 EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime, const LevelData& levelData):
-Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 2000, 2000), m_levelData(levelData)
+Scene(renderer, mainTime, levelData.themeID), m_camIndex(0), m_cameras(), m_staticMap(*this, 2000, 2000), m_levelData(levelData)
 {
-    AssetManager &assets = this->GetAssetManager();
-    
     m_inputManager.GetApplication().SetEnabled(true);
     m_inputManager.GetMouse().SetEnabled(true);
     m_inputManager.GetControls().SetEnabled(true);
