@@ -55,7 +55,8 @@ private:
     bool m_resetCamera {false};
 
     bool m_goToMainMenu {false};
-    
+
+    bool m_extending {false};
 };
 
 

@@ -7,10 +7,10 @@ struct EditorTile
 {
     enum class Type : int
     {
-        EMPTY, GROUND, WOOD, ONE_WAY, SPIKE,
+        EMPTY, GROUND, WOOD, ONE_WAY, SPIKE, BRICK,
         STEEP_SLOPE_L, STEEP_SLOPE_R,
         GENTLE_SLOPE_L1, GENTLE_SLOPE_L2, GENTLE_SLOPE_R1, GENTLE_SLOPE_R2,
-        FAKE_FLAG, FAKE_NUT, FAKE_FIREFLY, SPAWN_POINT, CHECKPOINT
+        FAKE_FLAG, FAKE_NUT, FAKE_FIREFLY, SPAWN_POINT, CHECKPOINT, FAKE_FLAPPY
     };
     Type type;
     int partIdx;
@@ -62,6 +62,8 @@ private:
     RE_AtlasPart *m_fakeFireflyPart;
     RE_AtlasPart *m_spawnPointPart;
     RE_AtlasPart *m_checkpointPart;
+    RE_AtlasPart *m_fakeFlappyPart;
+    RE_AtlasPart *m_brickPart;
 
     EditorTile **m_tiles;
     int m_width;

@@ -147,6 +147,8 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     selectorParts.push_back(terrainAtlas->GetPart("Terrain")); selectorIdxs.push_back(13); selectorTypes.push_back(EditorTile::Type::GENTLE_SLOPE_L1);
     
     selectorParts.push_back(terrainAtlas->GetPart("Wood")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::WOOD);
+    selectorParts.push_back(terrainAtlas->GetPart("Brick")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::BRICK);
+    
     selectorParts.push_back(terrainAtlas->GetPart("Spike")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPIKE);
     selectorParts.push_back(terrainAtlas->GetPart("OneWay")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::ONE_WAY);
     selectorParts.push_back(enemyAtlas->GetPart("NutIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_NUT);
@@ -154,22 +156,31 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     selectorParts.push_back(leverAtlas->GetPart("LeverOff")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::CHECKPOINT);
     selectorParts.push_back(terrainAtlas->GetPart("LevelEnd")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAG);
     selectorParts.push_back(uiAtlas->GetPart("Life")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::SPAWN_POINT);
+    selectorParts.push_back(enemyAtlas->GetPart("FlappyIdle")); selectorIdxs.push_back(0); selectorTypes.push_back(EditorTile::Type::FAKE_FLAPPY);
+    
     
     float originX = 30.0f;
+    float originx = 30.0f;
+    float originY = 25.0f;
     for(int i=0; i<selectorParts.size(); i++)
     {
+        if(i==15)
+        {
+            originY += 75.0f; originX = originx; originx=30.0f;
+        }
         RE_AtlasPart* part = selectorParts[i];
         int idx = selectorIdxs[i];
         EditorSelectorListener* listener = new EditorUiNS::NsEditorSelectorListener(scene, *this, selectorTypes[i], idx);
         EditorSelector* selector = new EditorSelector(scene, this, part, idx); selector->SetListener(listener);
         selector->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
         selector->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
-        selector->GetLocalRect().offsetMin.Set(originX, 25.0f);
-        originX += 50.0f;
-        selector->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f);
+        selector->GetLocalRect().offsetMin.Set(originx, originY);
+        originx += 50.0f;
+        selector->GetLocalRect().offsetMax.Set(originx, originY + 50.0f);
         m_buttonPositions.push_back(selector->GetLocalRect());
-        originX += 25.0f;
+        originx += 25.0f;
         m_selectors.push_back(selector);
+       
     }
     m_selectors[0]->Select();
 
