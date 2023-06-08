@@ -182,7 +182,8 @@ void EditorScene::ClearGameArea()
     {
         for(int y=0; y<m_staticMap.GetRealWidth(); y++)
         {
-            m_staticMap.SetTile(x, y, EditorTile::Type::EMPTY, 0);
+            EditorTile::Type from_type = m_staticMap.GetTileType(x, y);
+            if(from_type != EditorTile::Type::EMPTY) m_staticMap.SetTile(x, y, EditorTile::Type::EMPTY, 0);
         }
     }
 }

@@ -67,7 +67,7 @@ void EditorSaver::SaveMap(const std::string& path)
                     fs << "S";
                     break;
                 case EditorTile::Type::CHECKPOINT:
-                    fs << "C";
+                    fs << "c";
                     break;
                 
                 default:
