@@ -96,7 +96,7 @@ StartScreen::StartScreen(TitleScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     TTF_Font *font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[3] = { u8"Démarrer", u8"Editer", "Quitter" };
+    const std::string texts[3] = { "Démarrer", u8"Editer", "Quitter" };
     ButtonListener *listener[3] = { 0 };
     listener[0] = new StartScreenNS::SelectionListener(scene, *this);
     listener[1] = new StartScreenNS::EditorLevelSelectionListener(scene, *this);
