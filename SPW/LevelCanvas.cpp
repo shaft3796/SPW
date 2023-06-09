@@ -3,7 +3,7 @@
 #include "LevelHeader.h"
 
 LevelCanvas::LevelCanvas(LevelScene &scene) :
-    UIObject(scene), m_levelScene(scene), m_pauseMenu(nullptr)
+    UIObject(scene), m_levelScene(scene), m_pauseMenu(nullptr), m_endMenu(nullptr)
 {
     m_name = "LevelCanvas";
     SetToRespawn(true);
@@ -24,7 +24,7 @@ LevelCanvas::LevelCanvas(LevelScene &scene) :
 
 void LevelCanvas::Update()
 {
-    if (m_pauseMenu)
+    if (m_pauseMenu || m_endMenu)
     {
         SetVisible(true);
     }
@@ -38,7 +38,7 @@ void LevelCanvas::OnRespawn()
 
 void LevelCanvas::Render()
 {
-    if (m_pauseMenu == nullptr)
+    if (m_pauseMenu == nullptr && m_endMenu == nullptr)
         return;
 
     SDL_Renderer *renderer = m_scene.GetRenderer();
@@ -53,6 +53,15 @@ void LevelCanvas::OpenPauseMenu()
     {
         m_pauseMenu = new PauseMenu(m_levelScene);
         m_pauseMenu->SetParent(this);
+    }
+}
+
+void LevelCanvas::OpenEndMenu()
+{
+    if (m_endMenu == nullptr)
+    {
+        m_endMenu = new EndMenu(m_levelScene);
+        m_endMenu->SetParent(this);
     }
 }
 

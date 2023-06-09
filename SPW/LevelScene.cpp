@@ -90,7 +90,7 @@ LevelScene::~LevelScene()
 {
 }
 
-inline void LevelScene::SetPaused(bool isPaused)
+inline void LevelScene::SetPaused(bool isPaused , bool isEnd)
 {
     if (isPaused == m_paused)
         return;
@@ -100,7 +100,8 @@ inline void LevelScene::SetPaused(bool isPaused)
         m_time.SetTimeScale(0.0f);
         m_paused = true;
         m_inputManager.GetControls().SetEnabled(false);
-        m_canvas->OpenPauseMenu();
+        if (isEnd) m_canvas->OpenEndMenu();
+        else m_canvas->OpenPauseMenu();
     }
     else
     {
