@@ -111,7 +111,7 @@ void Player::Start()
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
     colliderDef.shape = &capsule;
-    PE_Collider *collider = body->CreateCollider(colliderDef);
+    m_collider = body->CreateCollider(colliderDef);
 }
 
 void Player::Update()
@@ -126,6 +126,10 @@ void Player::Update()
 
     // Diving
     if (controls.goDownDown && (m_state == State::FALLING)) m_dive = true;
+
+    // Crouching
+    if(controls.crouchDown && (m_state == State::IDLE or m_state == State::FALLING or m_state == State::WALKING or m_state == State::RUNNING)) m_crouching = true;
+    else if(controls.crouchReleased &&  m_crouching) m_crouching = false;
 }
 
 void Player::Render()
@@ -137,13 +141,19 @@ void Player::Render()
     m_animator.Update(m_scene.GetTime());
 
     PE_Vec2 velocity = GetVelocity();
-    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+    SDL_RendererFlip flip = m_facingRight ? SDL_FLIP_NONE : (m_state == State::DIVING ? SDL_FLIP_VERTICAL : SDL_FLIP_HORIZONTAL);
+    
 
     float scale = camera->GetWorldToViewScale();
     SDL_FRect rect = { 0 };
 
     rect.h = 1.375f * scale;
     rect.w = 1.0f * scale;
+    if(m_crouching)
+    {
+        rect.h = 1.0f * scale;
+        rect.w = 1.0f * scale;
+    }
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     double angle {0.0f};
@@ -166,6 +176,15 @@ void Player::FixedUpdate()
     PE_Vec2 position = body->GetPosition();
     PE_Vec2 velocity = body->GetLocalVelocity();
     ControlsInput &controls = m_scene.GetInputManager().GetControls();
+
+    // Modifie le collider
+    PE_ColliderDef colliderDef;
+    PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
+    if(m_crouching) capsule = PE_CapsuleShape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.50f), 0.35f);
+    colliderDef.friction = 1.0f;
+    colliderDef.filter.categoryBits = CATEGORY_PLAYER;
+    colliderDef.shape = &capsule;
+    body->RemoveCollider(m_collider); m_collider = body->CreateCollider(colliderDef);
 
     bool noJump {false};
 
@@ -204,10 +223,11 @@ void Player::FixedUpdate()
     velocity.x = PE_Clamp(velocity.x, -maxHSpeed, maxHSpeed);
     if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::GENTLE_SLOPE_R1 or m_slopeType == Tile::Type::GENTLE_SLOPE_L1)) velocity.x /= 1.1f;
     else if(m_onSlope and velocity.y > 0.0f and (m_slopeType == Tile::Type::STEEP_SLOPE_R or m_slopeType == Tile::Type::STEEP_SLOPE_L)) velocity.x /= 1.2f;
+    if(m_crouching) velocity.x /= 1.1f;
     /* --- STATE --- */
     switch (m_state){
         case State::DYING:{
-            if(m_player_dying_counter == 0){
+            if(m_player_dying_counter <= 0){
                 if (m_heartCount > 0) m_state = State::IDLE;
                 else m_scene.Respawn();
             }
@@ -217,7 +237,7 @@ void Player::FixedUpdate()
                     if (m_heartCount > 0) m_animator.PlayAnimation("Invincible");
                     else m_animator.PlayAnimation("Dying");    
                 }
-                m_player_dying_counter -= m_scene.GetFixedTimeStep();
+                m_player_dying_counter -= (int)m_scene.GetFixedTimeStep();
             }
             return;
         } break;
@@ -233,13 +253,28 @@ void Player::FixedUpdate()
         case State::CLIMBBING:{
             velocity.x = 0;
             if(m_jump){
-                velocity.y = 13.0f;
+                bool climbJump = false;
+                
+                // Vérifie que le joueur va dans la direction opposée
                 // Saute à gauche du mur
-                if (m_facingRight) velocity.x = -10.0f;
+                if (m_facingRight && controls.hAxis < 0)
+                {
+                    velocity.x = -10.0f;
+                    climbJump = true;
+                }
                 // Saute à gauche du mur
-                else velocity.x = 10.0f;
-                m_facingRight = !m_facingRight;
-                m_state = State::FALLING;
+                if (!m_facingRight && controls.hAxis > 0)
+                {
+                    velocity.x = 10.0f;
+                    climbJump = true;
+                }
+
+                if (climbJump)
+                {
+                    velocity.y = 13.0f;
+                    m_state = State::FALLING;
+                }
+                else velocity.y = -1.0f;
             }
             else velocity.y = -1.0f;
         } break;
@@ -259,13 +294,20 @@ void Player::FixedUpdate()
         } break;
 
         case State::DIVING:{
-             if(m_onGround) m_state = State::IDLE;
-             else {
-                 velocity.y = -20;
-                 velocity.x = 0;
-                 m_animator.PlayAnimation("Diving");
-             }
-             noJump = true;
+            if (m_bounce)
+            {
+                velocity.y = 20.0f;
+                m_bounce = false;
+                m_onGround = true;
+                break;
+            }
+            if(m_onGround) m_state = State::IDLE;
+            else {
+                velocity.y = -20;
+                velocity.x = 0;
+                m_animator.PlayAnimation("Diving");
+            }
+            noJump = true;
              m_animator.PlayAnimation("Idle");
         } break;
 
@@ -309,10 +351,7 @@ void Player::FixedUpdate()
     // * -1.0f si le joueur acc�l�re vers la gauche.
 
     if (m_hDirection != 0.0f && m_state != State::CLIMBBING) m_facingRight = m_hDirection >= 0.0f;
-
     
-
-    // TODO : Rebond sur les ennemis
 
     // Remarques :
     // Le facteur de gravit� peut �tre modifi� avec l'instruction
@@ -440,6 +479,7 @@ void Player::OnCollisionStay(GameCollision &collision)
     else if (otherCollider->CheckCategory(CATEGORY_TERRAIN))
     {
         float angleUp = PE_AngleDeg(manifold.normal, PE_Vec2::up);
+        float angleRight = PE_AngleDeg(manifold.normal, PE_Vec2::right);
         if (angleUp <= 55.0f)
         {
             // R�soud la collision en d�pla�ant le joueur vers le haut
@@ -451,6 +491,8 @@ void Player::OnCollisionStay(GameCollision &collision)
         if (angleUp == 90.0f && m_onAirTimer > 0.3f)
         {
             m_state = State::CLIMBBING;
+            if (angleRight == 0.0f) m_facingRight = false;
+            if (angleRight == 180.0f) m_facingRight = true;
         }
     }
 }
@@ -540,10 +582,13 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
 
     if (hitL.collider != NULL)
     {
+        gndNormal = hitL.normal;
+
+        if (hitL.collider->CheckCategory(CATEGORY_ENEMY)) return gndNormal;
+        
         // Ne pas activer le "onground" si le joueur plonge sur une oneway
         if (m_state != State::DIVING || (!hitL.collider->IsOneWay() && m_state != State::DIVING))
             m_onGround = true;
-        gndNormal = hitL.normal;
 
         if (!hitL.collider->IsOneWay() && m_state == State::DIVING)
         {
@@ -552,10 +597,13 @@ PE_Vec2 Player::UpdateOnGround(PE_Vec2 position){
     }
     if (hitR.collider != NULL)
     {
+        gndNormal = hitR.normal;
+
+        if (hitR.collider->CheckCategory(CATEGORY_ENEMY)) return gndNormal;
+        
         // Ne pas activer le "onground" si le joueur plonge sur une oneway
         if (m_state != State::DIVING || (!hitR.collider->IsOneWay() && m_state != State::DIVING))
             m_onGround = true;
-        gndNormal = hitR.normal;
 
         if (!hitR.collider->IsOneWay() && m_state == State::DIVING)
         {

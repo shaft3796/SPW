@@ -154,6 +154,7 @@
     <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="EditorSelector.cpp" />
     <ClCompile Include="EditorUi.cpp" />
+    <ClCompile Include="EndMenu.cpp"/>
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Firefly.cpp" />
     <ClCompile Include="Flappy.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="EditorScene.h" />
     <ClInclude Include="EditorSelector.h" />
     <ClInclude Include="EditorUi.h" />
+    <ClInclude Include="EndMenu.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Firefly.h" />
     <ClInclude Include="Flappy.h" />

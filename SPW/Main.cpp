@@ -166,12 +166,21 @@ int main(int argc, char *argv[])
             SDL_RenderPresent(renderer);
         }
         
-
         switch (state)
         {
         case GameState::EDITOR:
+            state = GameState::MAIN_MENU;
+            if(((EditorScene*)scene)->GetGoPlay())
+            {
+                state = GameState::LEVEL;
+            }
+            break;
         case GameState::LEVEL:
             state = GameState::MAIN_MENU;
+            if(((LevelScene*)scene)->DoWeGoEdit())
+            {
+                state = GameState::EDITOR;
+            }
             break;
 
         case GameState::MAIN_MENU:

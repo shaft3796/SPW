@@ -74,7 +74,30 @@ LevelHeader::LevelHeader(LevelScene &scene):
     m_heartCount->GetLocalRect().anchorMax.Set(0.0f, 0.0f);
     m_heartCount->GetLocalRect().offsetMin.Set(currX, currY);
     m_heartCount->GetLocalRect().offsetMax.Set(currX + numW, currY + imgH);
-    m_heartCount->SetParent(this);    
+    m_heartCount->SetParent(this);
+
+    currX += imgW + sep;
+
+    // Image du nombre de coeurs
+    part = atlas->GetPart("Timer");
+    AssertNew(part);
+    Image *timerImage = new Image(scene, part, 0);
+    timerImage->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    timerImage->GetLocalRect().anchorMax.Set(0.0f, 0.0f);
+    timerImage->GetLocalRect().offsetMin.Set(currX, currY);
+    timerImage->GetLocalRect().offsetMax.Set(currX + imgW, currY + imgH);
+    timerImage->SetParent(this);
+    
+    currX += imgW + sep;
+
+    // Timer
+    m_timer = new Text(scene, "0.0", font, color);
+    m_timer->SetAnchor(RE_Anchor::WEST);
+    m_timer->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    m_timer->GetLocalRect().anchorMax.Set(0.0f, 0.0f);
+    m_timer->GetLocalRect().offsetMin.Set(currX, currY);
+    m_timer->GetLocalRect().offsetMax.Set(currX + numW, currY + imgH);
+    m_timer->SetParent(this);    
 }
 
 void LevelHeader::Update()
@@ -82,4 +105,5 @@ void LevelHeader::Update()
     Player *player = m_levelScene.GetPlayer();
     m_fireflyCount->SetString(std::to_string(player->GetFireflyCount()));
     m_heartCount->SetString(std::to_string(player->GetHeartCount()));
-}
+    std::string timer = std::to_string(m_scene.GetTime().GetElapsed() - m_scene.GetSpawnTime());
+    m_timer->SetString(timer.substr(0, timer.find(".")+3));}

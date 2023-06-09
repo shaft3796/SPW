@@ -33,6 +33,10 @@ public:
     void GoToMainMenu();
     void Rollback();
     void Forward();
+    void mZoomIn();
+    void mZoomOut();
+    void SetGoPlay(bool goPlay) { m_goPlay = goPlay; }
+    bool GetGoPlay() { return m_goPlay; }
 
 private:
     std::array<Camera *, 2> m_cameras;
@@ -51,12 +55,26 @@ private:
     bool m_noSetTile {false};
 
     bool m_spawnSet {false};
+    int m_spawnX {-1};
+    int m_spawnY {-1};
 
     bool m_resetCamera {false};
 
     bool m_goToMainMenu {false};
 
     bool m_extending {false};
+
+    bool m_areaPlacing {false};
+
+    int m_areaOriginX {-1};
+    int m_areaOriginY {-1};
+
+    int m_currentRecDepth {0};
+
+    void PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx);
+    void Fill(int x, int y, EditorTile::Type type, int partIdx, bool origin);
+
+    bool m_goPlay;
 };
 
 

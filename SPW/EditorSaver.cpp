@@ -13,7 +13,7 @@ void EditorSaver::SaveMap(const std::string& path)
     std::fstream fs;
     fs.open(path, std::fstream::out);
     
-    for(int y=m_map.GetRealWidth(); y>=0; y--)
+    for(int y=m_map.GetRealHeight(); y>=0; y--)
     {
             for(int x=0; x<m_map.GetRealWidth(); x++)
         {
@@ -44,6 +44,27 @@ void EditorSaver::SaveMap(const std::string& path)
                     break;
                 case EditorTile::Type::GENTLE_SLOPE_R2:
                     fs << "R";
+                    break;
+                case EditorTile::Type::ROOF:
+                    fs << "*";
+                    break;
+                case EditorTile::Type::STEEP_ROOF_L:
+                    fs << "]";
+                    break;
+                case EditorTile::Type::STEEP_ROOF_R:
+                    fs << "[";
+                    break;
+                case EditorTile::Type::GENTLE_ROOF_L2:
+                    fs << "2";
+                    break;
+                case EditorTile::Type::GENTLE_ROOF_L1:
+                    fs << "1";
+                    break;
+                case EditorTile::Type::GENTLE_ROOF_R1:
+                    fs << "3";
+                    break;
+                case EditorTile::Type::GENTLE_ROOF_R2:
+                    fs << "4";
                     break;
                 case EditorTile::Type::WOOD:
                     fs << "W";

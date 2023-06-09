@@ -92,6 +92,7 @@ void Checkpoint::OnCollisionEnter(GameCollision &collision)
         PE_Vec2 position = collision.gameBody->GetPosition();
         position.x -= 1.0f;
         player->SetStartPosition(position);
+        levelScene->SetResetTimer(false);
         m_isActive = false;
     }
 }

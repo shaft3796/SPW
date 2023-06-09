@@ -27,6 +27,7 @@ public:
     int GetFireflyCount() const;
     int GetHeartCount() const;
     int GetLifeCount() const;
+    int IsDead() const;
     void AddFirefly(int count);
     void AddHeart();
     void Damage();
@@ -45,6 +46,7 @@ private:
     State m_state;
 
     RE_Animator m_animator;
+    PE_Collider* m_collider {nullptr};
 
     float m_onAirTimer;
     float m_onWallTimer;
@@ -66,6 +68,9 @@ private:
     // Diving attack
     bool m_dive;
     int m_dive_load_counter;
+
+    // Crouching
+    bool m_crouching;
 };
 
 
@@ -77,6 +82,11 @@ inline void Player::Bounce()
 inline int Player::GetFireflyCount() const
 {
     return m_fireflyCount;
+}
+
+inline int Player::IsDead() const
+{
+    return m_state == State::DYING;
 }
 
 inline int Player::GetHeartCount() const

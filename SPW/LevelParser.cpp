@@ -89,10 +89,6 @@ LevelParser::LevelParser(const std::string &path)
                 w++;
             }
         }
-        else
-        {
-            printf("INFO - Invalid char (%c)\n", c);
-        }
     }
 
     // Initialisation du parser
@@ -183,6 +179,27 @@ void LevelParser::InitScene(LevelScene &scene) const
                 break;
             case 'R':
                 map->SetTile(x, y, Tile::Type::GENTLE_SLOPE_R2);
+                break;
+            case '*':
+                map->SetTile(x, y, Tile::Type::ROOF);
+                break;
+            case ']':
+                map->SetTile(x, y, Tile::Type::STEEP_ROOF_L);
+                break;
+            case '[':
+                map->SetTile(x, y, Tile::Type::STEEP_ROOF_R);
+                break;
+            case '2':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_L2);
+                break;
+            case '1':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_L1);
+                break;
+            case '3':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_R1);
+                break;
+            case '4':
+                map->SetTile(x, y, Tile::Type::GENTLE_ROOF_R2);
                 break;
             case 'S':
             {

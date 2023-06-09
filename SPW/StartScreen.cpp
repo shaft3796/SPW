@@ -62,7 +62,7 @@ StartScreen::StartScreen(TitleScene &scene) :
     AssetManager &assets = scene.GetAssetManager();
 
     float buttonH = 55.0f;
-    float topSkip = 400.0f;
+    float topSkip = 150.0f;
     float sep = 10.0f;
     float panelW = 350.0f;
     float panelH = topSkip + 4.0f * buttonH + 3.0f * sep;
@@ -74,6 +74,8 @@ StartScreen::StartScreen(TitleScene &scene) :
 
     RE_Atlas *logoAtlas = assets.GetAtlas(AtlasID::LOGO);
     AssertNew(logoAtlas);
+    RE_Atlas *jblogoAtlas = assets.GetAtlas(AtlasID::JB_LOGO);
+    AssertNew(jblogoAtlas);
     RE_Atlas *uiAtlas = assets.GetAtlas(AtlasID::UI);
     AssertNew(uiAtlas);
 
@@ -84,9 +86,20 @@ StartScreen::StartScreen(TitleScene &scene) :
     float logoW = 700.0f;
     logo->GetLocalRect().anchorMin.Set(0.5f, 0.0f);
     logo->GetLocalRect().anchorMax.Set(0.5f, 0.0f);
-    logo->GetLocalRect().offsetMin.Set(-0.5f * logoW, 0.0f);
-    logo->GetLocalRect().offsetMax.Set(+0.5f * logoW, logoW / ratio);
+    logo->GetLocalRect().offsetMin.Set(-0.5f * logoW, -225.0f);
+    logo->GetLocalRect().offsetMax.Set(+0.5f * logoW, logoW / ratio + -225.0f);
     logo->SetParent(this);
+
+    // Meilleur logo
+    RE_AtlasPart *jblogoPart = jblogoAtlas->GetPart("JbLogo");
+    Image *jblogo = new Image(scene, jblogoPart, 0);
+    float jbratio = jblogo->GetNaturalRatio();
+    float jblogoW = 500.0f;
+    jblogo->GetLocalRect().anchorMin.Set(0.5f, 0.0f);
+    jblogo->GetLocalRect().anchorMax.Set(0.5f, 0.0f);
+    jblogo->GetLocalRect().offsetMin.Set(-0.5f * jblogoW, 400.f);
+    jblogo->GetLocalRect().offsetMax.Set(+0.5f * jblogoW, jblogoW / jbratio +400.f);
+    jblogo->SetParent(this);
 
     // Création des boutons
     RE_AtlasPart *buttonPart = uiAtlas->GetPart("Button");

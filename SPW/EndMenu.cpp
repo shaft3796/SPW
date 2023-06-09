@@ -1,9 +1,9 @@
-#include "PauseMenu.h"
+#include "EndMenu.h"
 #include "Button.h"
 #include "LevelScene.h"
 #include "Text.h"
 
-namespace PauseMenuNS
+namespace EndMenuNS
 {
     class QuitListener : public ButtonListener
     {
@@ -40,25 +40,12 @@ namespace PauseMenuNS
     private:
         LevelScene &m_levelScene;
     };
-
-    class EditListener : public ButtonListener
-    {
-    public:
-        EditListener(LevelScene &levelScene) : m_levelScene(levelScene) {}
-        virtual void OnPress()
-        {
-            m_levelScene.GoEdit();
-            m_levelScene.Quit();
-        }
-    private:
-        LevelScene &m_levelScene;
-    };
 }
 
-PauseMenu::PauseMenu(LevelScene &scene) :
+EndMenu::EndMenu(LevelScene &scene) :
     UIObject(scene)
 {
-    m_name = "PauseMenu";
+    m_name = "EndMenu";
 
     float buttonH = 55.0f;
     float topSkip = 100.0f;
@@ -77,13 +64,25 @@ PauseMenu::PauseMenu(LevelScene &scene) :
 
     // Création du titre
     TTF_Font *font = assets.GetFont(FontID::LARGE);
-    Text *title = new Text(scene, "Pause", font, assets.GetColor(ColorID::NORMAL));
+    Text *title = new Text(scene, "Félicitation !", font, assets.GetColor(ColorID::NORMAL));
     title->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
     title->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
     title->GetLocalRect().offsetMin.Set(0.0f, 0);
     title->GetLocalRect().offsetMax.Set(0.0f, topSkip);
     title->SetAnchor(RE_Anchor::NORTH);
     title->SetParent(this);
+
+
+    std::string timer = std::to_string(m_scene.GetTime().GetElapsed() - m_scene.GetSpawnTime());
+    timer = timer.substr(0, timer.find(".")+3);
+    
+    Text *subtitle = new Text(scene, "Vous avez terminé le niveau en : "+timer+" secondes", font, assets.GetColor(ColorID::NORMAL));
+    subtitle->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    subtitle->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
+    subtitle->GetLocalRect().offsetMin.Set(0.0f, topSkip);
+    subtitle->GetLocalRect().offsetMax.Set(0.0f, 2*topSkip);
+    subtitle->SetAnchor(RE_Anchor::NORTH);
+    subtitle->SetParent(this);
 
     // Création des boutons
     RE_AtlasPart *buttonPart = atlas->GetPart("Button");
@@ -93,32 +92,25 @@ PauseMenu::PauseMenu(LevelScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[4] = { u8"Continuer", u8"Revenir au checkpoint", u8"Quitter", "Editer"};
-    ButtonListener *listener[4] = { 0 };
-    listener[0] = new PauseMenuNS::ContinueListener(scene);
-    listener[1] = new PauseMenuNS::RestartListener(scene);
-    listener[2] = new PauseMenuNS::QuitListener(scene);
-    listener[3] = new PauseMenuNS::EditListener(scene);
+    const std::string texts = u8"Quitter";
+    ButtonListener *listener = new EndMenuNS::QuitListener(scene);
 
-    float curY = topSkip;
-    for (int i = 0; i < 4; i++, curY += buttonH + sep)
-    {
-        Button *button = new Button(scene, buttonPart);
-        button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
-        button->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
-        button->GetLocalRect().offsetMin.Set(0.0f, curY);
-        button->GetLocalRect().offsetMax.Set(0.0f, curY + buttonH);
-        button->SetParent(this);
-        button->SetBorders(new UIBorders(25, 25, 25, 25));
-        button->SetListener(listener[i]);
+    float curY = 2*topSkip;
+    Button *button = new Button(scene, buttonPart);
+    button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
+    button->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
+    button->GetLocalRect().offsetMin.Set(0.0f, curY);
+    button->GetLocalRect().offsetMax.Set(0.0f, curY + buttonH);
+    button->SetParent(this);
+    button->SetBorders(new UIBorders(25, 25, 25, 25));
+    button->SetListener(listener);
 
-        Text *buttonLabel = new Text(scene, texts[i], font, colorUp);
-        button->SetText(buttonLabel, Button::State::UP);
+    Text *buttonLabel = new Text(scene, texts, font, colorUp);
+    button->SetText(buttonLabel, Button::State::UP);
 
-        buttonLabel = new Text(scene, texts[i], font, colorHover);
-        button->SetText(buttonLabel, Button::State::HOVER);
+    buttonLabel = new Text(scene, texts, font, colorHover);
+    button->SetText(buttonLabel, Button::State::HOVER);
 
-        buttonLabel = new Text(scene, texts[i], font, colorDown);
-        button->SetText(buttonLabel, Button::State::DOWN);
-    }
+    buttonLabel = new Text(scene, texts, font, colorDown);
+    button->SetText(buttonLabel, Button::State::DOWN);
 }

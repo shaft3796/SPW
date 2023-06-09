@@ -20,7 +20,10 @@ public:
 
     Player *GetPlayer() const;
     bool IsPaused() const;
-    void SetPaused(bool isPaused);
+    void SetPaused(bool isPaused, bool isEnd = false);
+    void GoEdit();
+    bool DoWeGoEdit();
+    
 
 private:
     std::array<Camera *, 2> m_cameras;
@@ -32,6 +35,8 @@ private:
     bool m_paused;
     int m_camIndex;
     float m_stepDelay;
+
+    bool m_go_edit {false};
 };
 
 inline Player *LevelScene::GetPlayer() const
@@ -42,4 +47,14 @@ inline Player *LevelScene::GetPlayer() const
 inline bool LevelScene::IsPaused() const
 {
     return m_paused;
+}
+
+inline void LevelScene::GoEdit()
+{
+    m_go_edit = true;
+}
+
+inline bool LevelScene::DoWeGoEdit()
+{
+    return m_go_edit;
 }

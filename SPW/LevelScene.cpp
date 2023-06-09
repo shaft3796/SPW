@@ -26,6 +26,9 @@ LevelScene::LevelScene(SDL_Renderer *renderer, RE_Timer &mainTime, const LevelDa
     LevelParser parser(level.path);
     parser.InitScene(*this);
 
+    this->m_spawnTime = this->GetTime().GetElapsed();
+    this->SetResetTimer(true);
+
     // Canvas
     m_canvas = new LevelCanvas(*this);
 
@@ -87,7 +90,7 @@ LevelScene::~LevelScene()
 {
 }
 
-inline void LevelScene::SetPaused(bool isPaused)
+inline void LevelScene::SetPaused(bool isPaused , bool isEnd)
 {
     if (isPaused == m_paused)
         return;
@@ -97,7 +100,8 @@ inline void LevelScene::SetPaused(bool isPaused)
         m_time.SetTimeScale(0.0f);
         m_paused = true;
         m_inputManager.GetControls().SetEnabled(false);
-        m_canvas->OpenPauseMenu();
+        if (isEnd) m_canvas->OpenEndMenu();
+        else m_canvas->OpenPauseMenu();
     }
     else
     {

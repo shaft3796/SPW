@@ -21,4 +21,11 @@ public:
     bool goLeftDown;
 
     bool savePressed;
+    bool areaDown;
+    bool areaReleased;
+
+    bool fillDown;
+
+    bool crouchDown;
+    bool crouchReleased;
 };

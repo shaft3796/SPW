@@ -19,10 +19,10 @@ void Camera::WorldToView(PE_Vec2 position, float &x, float &y) const
 void Camera::ViewToWorld(float x, float y, PE_Vec2 &position) const
 {
     y = m_height - y;
-    float ratioX = x / (float)m_width;
-    float ratioY = y / (float)m_height;
     float w = m_worldView.GetWidth();
     float h = m_worldView.GetHeight();
+    float ratioX = x / (float)m_width;
+    float ratioY = y / (float)m_height;
     position.x = m_worldView.lower.x + ratioX * w;
     position.y = m_worldView.lower.y + ratioY * h;
 }

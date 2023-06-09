@@ -25,6 +25,8 @@ public:
     void Deselect();
     void Select();
 
+    void Reverse();
+
 protected:
     EditorSelectorListener *m_listener;
     RE_AtlasPart *m_atlasPart;
@@ -33,6 +35,8 @@ protected:
 
     State m_currState;
     State m_prevState;
+
+    bool m_reverse = {false};
 
 };
 
@@ -59,4 +63,8 @@ inline void EditorSelector::Deselect(){
 inline void EditorSelector::Select(){
     m_currState = State::SELECTED;
     if(m_listener) m_listener->OnSelect();
+}
+
+inline void EditorSelector::Reverse(){
+    m_reverse = true;
 }

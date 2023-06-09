@@ -9,14 +9,14 @@
 
 
 EditorScene::EditorScene(SDL_Renderer* renderer, RE_Timer& mainTime, const LevelData& levelData):
-Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap(*this, 2000, 2000), m_levelData(levelData)
+Scene(renderer, mainTime, levelData.themeID), m_camIndex(0), m_cameras(), m_staticMap(*this, 2000, 2000), m_levelData(levelData)
 {
-    AssetManager &assets = this->GetAssetManager();
-    
     m_inputManager.GetApplication().SetEnabled(true);
     m_inputManager.GetMouse().SetEnabled(true);
     m_inputManager.GetControls().SetEnabled(true);
     m_inputManager.GetDebug().SetEnabled(true);
+
+    m_staticMap.SetFactor(1.0f);
     
 
     m_cameras[0] = new EditorCamera(*this);
@@ -33,6 +33,7 @@ Scene(renderer, mainTime, ThemeID::SKY), m_camIndex(0), m_cameras(), m_staticMap
 
     // Background
     Background* background = new Background(*this, Layer::BACKGROUND);
+    background->SetEditorMap(&m_staticMap);
     std::vector<SDL_Texture*> m_textures = m_assetManager.GetBackgrounds();
     switch (m_levelData.themeID)
     {
@@ -94,7 +95,18 @@ bool EditorScene::Update()
     MouseInput &mouseInput = m_inputManager.GetMouse();
     ControlsInput &controlsInput = m_inputManager.GetControls();
     PE_Vec2 viewPos {mouseInput.viewPos};
-    PE_Vec2 worldPos {}; m_activeCam->ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
+    PE_Vec2 worldPos {}; m_staticMap.ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
+
+    if(mouseInput.wheel >= 1)
+    {
+        mZoomOut();
+    }
+    else if(mouseInput.wheel <= -1)
+    {
+        mZoomIn();
+    }
+    
+    
     
     if (appInput.quitPressed)
     {
@@ -107,72 +119,152 @@ bool EditorScene::Update()
         m_editorSaver->SaveMap(m_levelData.path);
         controlsInput.savePressed = false;
     }
-    
+
     /* --- TILES PLACE --- */
+    EditorTile::Type fromTile {m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)};
+    EditorTile::Type currentTile {m_ui->GetCurrentTileType()};
+    int currentPart {m_ui->GetCurrentPartIdx()};
+    
+    // Update Place mode
+    if(not m_areaPlacing and controlsInput.areaDown and currentTile!=EditorTile::Type::SPAWN_POINT) m_areaPlacing = true;
+    else if(m_areaPlacing and controlsInput.areaReleased){
+        controlsInput.areaReleased = false;
+        m_areaPlacing = false;
+        m_areaOriginX = -1; m_areaOriginY = -1;
+    }
+    
     if(mouseInput.leftDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
-    {   if((m_ui->GetCurrentTileType() != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and m_ui->GetCurrentTileType() !=m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)){
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, m_ui->GetCurrentTileType(), m_ui->GetCurrentPartIdx(), m_extending);
-            m_extending = true;
+    {
+        if(not m_areaPlacing and not controlsInput.fillDown)
+        {
+            if((currentTile != EditorTile::Type::SPAWN_POINT or not m_spawnSet) and currentTile!=fromTile)
+            {
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, m_extending);
+                m_extending = true;
+                m_staticMap.InitTiles();
+                if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
+                {
+                    m_spawnSet = true; m_spawnX = (int)worldPos.x; m_spawnY = (int)worldPos.y;
+                }
+            }
+        }
+        else if(m_areaPlacing)
+        {
+            // AREA PLACING INIT
+            if(m_areaOriginX == -1 and m_areaOriginY == -1)
+            {
+                m_areaOriginX = (int)worldPos.x;
+                m_areaOriginY = (int)worldPos.y;
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, false);
+            }
+            else
+            {
+                Rollback();
+                int lowerX = std::min(m_areaOriginX, (int)worldPos.x);
+                int lowerY = std::min(m_areaOriginY, (int)worldPos.y);
+                int upperX = std::max(m_areaOriginX, (int)worldPos.x);
+                int upperY = std::max(m_areaOriginY, (int)worldPos.y);
+                PlaceBox(lowerX, lowerY, upperX, upperY, currentTile, currentPart);
+                m_staticMap.InitTiles();
+            }
+        }
+        else if(controlsInput.fillDown)
+        {
+            Fill((int)worldPos.x, (int)worldPos.y, currentTile, currentPart, true);
             m_staticMap.InitTiles();
         }
-        if(m_ui->GetCurrentTileType() == EditorTile::Type::SPAWN_POINT)
+    }
+    else if (mouseInput.rightDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
+    {
+        if(not m_areaPlacing and not controlsInput.fillDown)
         {
-            m_spawnSet = true;
+            if(fromTile != EditorTile::Type::EMPTY)
+            {
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, m_extending);
+                m_extending = true;
+                m_staticMap.InitTiles();
+                if(currentTile == EditorTile::Type::SPAWN_POINT) m_spawnSet = false;
+            }
+        }
+        else if (m_areaPlacing)
+        {
+            // AREA PLACING INIT
+            if(m_areaOriginX == -1 and m_areaOriginY == -1)
+            {
+                m_areaOriginX = (int)worldPos.x;
+                m_areaOriginY = (int)worldPos.y;
+                m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, false);
+            }
+            else
+            {
+                Rollback();
+                int lowerX = std::min(m_areaOriginX, (int)worldPos.x);
+                int lowerY = std::min(m_areaOriginY, (int)worldPos.y);
+                int upperX = std::max(m_areaOriginX, (int)worldPos.x);
+                int upperY = std::max(m_areaOriginY, (int)worldPos.y);
+                PlaceBox(lowerX, lowerY, upperX, upperY, EditorTile::Type::EMPTY, 0);
+                m_staticMap.InitTiles();
+            }
+        }
+        else if (controlsInput.fillDown)
+        {
+            Fill((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, true);
+            m_staticMap.InitTiles();
         }
         
     }
-    else if(mouseInput.rightDown and not m_ui->IsOverButtons(viewPos.x, viewPos.y))
-    {
-        if(m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) == EditorTile::Type::SPAWN_POINT)
-        {
-            m_spawnSet = false;
-        }
-        if((m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y) != EditorTile::Type::EMPTY))
-        {
-            m_staticMap.SetTile((int)worldPos.x, (int)worldPos.y, EditorTile::Type::EMPTY, 0, m_extending);
-            m_extending = true;
-            
-            m_staticMap.InitTiles();
-        }
-    }
-    if(mouseInput.leftReleased || mouseInput.rightReleased)
-    {
-        m_extending = false;
-    }
+    
+    // RELEASE EXTENDING
+    if(mouseInput.leftReleased || mouseInput.rightReleased) m_extending = false;
 
     /* --- CAMERA MOVE USING ARROWS --- */
-    PE_AABB worldView = m_activeCam->GetWorldView();
-    PE_AABB worldBounds = m_activeCam->GetWorldBounds();
-    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.1)
+    float move = 0.15f/m_staticMap.getFactor();
+    PE_Vec2 position {0, 0};
+    m_staticMap.ViewToWorld(0, 0, position);
+    float x0 = position.x;
+    float y1 = position.y;
+    m_staticMap.ViewToWorld((float)GetActiveCamera()->GetWidth(), (float)GetActiveCamera()->GetHeight(), position);
+    float x1 = position.x;
+    float y0 = position.y;
+    
+    PE_Vec2 transl {0.0f, 0.0f};
+    if (m_inputManager.GetControls().goDownDown)
     {
-        PE_Vec2 transl {0.0f, -0.1f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.y = -move;
     }
     if (m_inputManager.GetControls().goUpDown)
     {
-        PE_Vec2 transl {0.0f, 0.1f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.y = move;
     }
-    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.1)
+    if (m_inputManager.GetControls().goLeftDown)
     {
-        PE_Vec2 transl {-0.1f, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = -move;
     }
     if (m_inputManager.GetControls().goRightDown)
     {
-        PE_Vec2 transl {0.1f, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = move;
+        
     }
+    if(transl.y != 0.0f or transl.x != 0.0f)
+    {
+        // Bottom and left bounds
+        if(!(x0+transl.x+0.01f < 0) and !(y0+transl.y+0.01f < 0)){
+            // Top and right bounds
+            if(!(x1+transl.x-0.01 > m_staticMap.GetWidth()) and !(y1+transl.y-0.01 > m_staticMap.GetHeight())){
+                m_activeCam->TranslateWorldView(transl);
+            }
+        }
+        
+    }
+
     
     if(m_resetCamera)
     {
-        PE_Vec2 transl {-worldView.lower.x, -worldView.lower.y};
+        PE_Vec2 transl {-x0, -y0};
         m_activeCam->TranslateWorldView(transl);
-    }
-    if(worldView.lower.y <= 0.0f and worldView.lower.x <= 0.0f)
-    {
         m_resetCamera = false;
     }
+    
     
     m_mode = UpdateMode::EDITOR;
     if(m_goToMainMenu) Quit();
@@ -210,5 +302,63 @@ void EditorScene::Rollback()
 void EditorScene::Forward()
 {
     m_staticMap.ForwardGroup();
+}
+
+void EditorScene::PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx)
+{
+    if(m_spawnSet && lowerX <= m_spawnX && m_spawnX <= upperX && lowerY <= m_spawnY && m_spawnY <= upperY)
+    {
+        SetSpawnSet(false);
+    }
+    for(int x=lowerX; x<=upperX; x++)
+    {
+        for(int y=lowerY; y<=upperY; y++)
+        {
+            bool extend = x!=lowerX or y!=lowerY;
+            m_staticMap.SetTile(x, y, type, partIdx, extend);
+        }
+    }
+}
+
+void EditorScene::Fill(int x, int y, EditorTile::Type type, int partIdx, bool origin)
+{
+    if(origin) m_currentRecDepth = 0;
+    m_currentRecDepth++;
+    if(m_currentRecDepth > 2000) return;
+    if(m_staticMap.GetTileType(x, y) == type) return;
+    m_staticMap.SetTile(x, y, type, partIdx, !origin);
+    if(x > 0) Fill(x-1, y, type, partIdx, false);
+    if(x < m_staticMap.GetRealWidth()-1) Fill(x+1, y, type, partIdx, false);
+    if(y > 0) Fill(x, y-1, type, partIdx, false);
+    if(y < m_staticMap.GetRealHeight()-1) Fill(x, y+1, type, partIdx, false);
+    
+}
+
+void EditorScene::mZoomIn()
+{
+    float factor = m_staticMap.getFactor();
+    factor -= 0.05f;
+    if(factor < 0.1f) factor = 0.1f;
+    // Test if the camera is not out of the map
+    PE_Vec2 position {0, 0};
+    m_staticMap.ViewToWorld(0, 0, position);
+    float x0 = position.x;
+    float y1 = position.y;
+    m_staticMap.ViewToWorld((float)GetActiveCamera()->GetWidth(), (float)GetActiveCamera()->GetHeight(), position);
+    float x1 = position.x;
+    float y0 = position.y;
+    y1/=factor;
+    x1/=factor;
+    if(y1 > (float)m_staticMap.GetWidth()) return;
+    if(x1 > (float)m_staticMap.GetHeight()) return;
+    m_staticMap.SetFactor(factor);
+}
+
+void EditorScene::mZoomOut()
+{
+    float factor = m_staticMap.getFactor();
+    factor += 0.05f;
+    if(factor > 1.0f) factor = 1.0f;
+    m_staticMap.SetFactor(factor);
 }
 
