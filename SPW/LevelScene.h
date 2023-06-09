@@ -23,6 +23,7 @@ public:
     void SetPaused(bool isPaused, bool isEnd = false);
     void GoEdit();
     bool DoWeGoEdit();
+    
 
 private:
     std::array<Camera *, 2> m_cameras;
