@@ -67,27 +67,14 @@ private:
     int m_areaOriginX {-1};
     int m_areaOriginY {-1};
 
+    int m_currentRecDepth {0};
+
     void PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx);
+    void Fill(int x, int y, EditorTile::Type type, int partIdx, bool origin);
 };
 
 
 inline void EditorScene::GoToMainMenu()
 {
     m_goToMainMenu = true;
-}
-
-inline void EditorScene::mZoomIn()
-{
-    float factor = m_staticMap.getFactor();
-    factor -= 0.1f;
-    if(factor < 0.1f) factor = 0.1f;
-    m_staticMap.SetFactor(factor);
-}
-
-inline void EditorScene::mZoomOut()
-{
-    float factor = m_staticMap.getFactor();
-    factor += 0.1f;
-    if(factor > 1.0f) factor = 1.0f;
-    m_staticMap.SetFactor(factor);
 }

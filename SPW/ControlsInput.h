@@ -24,6 +24,8 @@ public:
     bool areaDown;
     bool areaReleased;
 
+    bool fillDown;
+
     bool crouchDown;
     bool crouchReleased;
 };

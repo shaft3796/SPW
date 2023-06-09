@@ -59,6 +59,9 @@ public:
     void SetFactor(float factor);
     float getFactor();
 
+    int GetWidth() const;
+    int GetHeight() const;
+
 private:
     float m_viewFactor {1.0f};
 
@@ -118,4 +121,14 @@ inline void EditorMap::SetFactor(float factor)
 inline float EditorMap::getFactor()
 {
     return m_viewFactor;
+}
+
+inline int EditorMap::GetWidth() const
+{
+    return m_width;
+}
+
+inline int EditorMap::GetHeight() const
+{
+    return m_height;
 }

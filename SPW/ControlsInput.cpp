@@ -113,10 +113,12 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             jumpPressed = true;
             goUpDown = true;
             break;
-
-        case SDL_SCANCODE_LALT:
+        
         case SDL_SCANCODE_LCTRL:
             areaDown = true;
+
+        case SDL_SCANCODE_LALT:
+            fillDown = true;
         
         case SDL_SCANCODE_LSHIFT:
             crouchDown = true;
@@ -161,10 +163,12 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         case SDL_SCANCODE_F1:
             savePressed = true;
             break;
-        case SDL_SCANCODE_LALT:
         case SDL_SCANCODE_LCTRL:
             areaDown = false;
             areaReleased = true;
+            break;
+        case SDL_SCANCODE_LALT:
+            fillDown = false;
             break;
 
         case SDL_SCANCODE_LSHIFT:
@@ -196,4 +200,5 @@ void ControlsInput::Reset()
     areaReleased = false;
     crouchDown = false;
     crouchReleased = false;
+    fillDown = false;
 }
