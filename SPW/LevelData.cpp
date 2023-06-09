@@ -20,18 +20,17 @@ LevelData::LevelData(const std::string &nameIn, const std::string &pathIn, Theme
 
 std::vector<LevelData> LevelData::Init()
 {
-    initLevel("../Assets/Level/Sky01.txt");
-    initLevel("../Assets/Level/Sky02.txt");
-    initLevel("../Assets/Level/Mountains01.txt");
-    initLevel("../Assets/Level/Mountains02.txt");
-    initLevel("../Assets/Level/Lake01.txt");
-    initLevel("../Assets/Level/Lake02.txt");
+    initLevel("../Assets/Level/Le Tronc.txt");
+    initLevel("../Assets/Level/LevelDemo.txt");
+    initLevel("../Assets/Level/Bac à sable (Ciel).txt");
+    initLevel("../Assets/Level/Bac à sable (Montagnes).txt");
+    initLevel("../Assets/Level/Bac à sable (Lac).txt");
     
     std::vector<LevelData> data;
 
     data.push_back(LevelData(
-        u8"Montagnes",
-        u8"../Assets/Level/Level01.txt",
+        u8"Le Tronc",
+        u8"../Assets/Level/Le Tronc.txt",
         ThemeID::MOUNTAINS
     ));
     data.push_back(LevelData(
@@ -40,35 +39,21 @@ std::vector<LevelData> LevelData::Init()
         ThemeID::SKY
     ));
     data.push_back(LevelData(
-        u8"Sky01",
-        u8"../Assets/Level/Sky01.txt",
+        "Bac à sable (Ciel)",
+        "../Assets/Level/Bac à sable (Ciel).txt",
         ThemeID::SKY
     ));
     data.push_back(LevelData(
-        u8"Sky02",
-        u8"../Assets/Level/Sky02.txt",
-        ThemeID::SKY
-    ));
-    data.push_back(LevelData(
-        u8"Montagnes01",
-        u8"../Assets/Level/Mountains01.txt",
+        "Bac à sable (Montagnes)",
+        "../Assets/Level/Bac à sable (Montagnes).txt",
         ThemeID::MOUNTAINS
     ));
     data.push_back(LevelData(
-        u8"Montagnes02",
-        u8"../Assets/Level/Mountains02.txt",
-        ThemeID::MOUNTAINS
-    ));
-    data.push_back(LevelData(
-        u8"Lac01",
-        u8"../Assets/Level/Lake01.txt",
+        "Bac à sable (Lac)",
+        "../Assets/Level/Bac à sable (Lac).txt",
         ThemeID::LAKE
     ));
-    data.push_back(LevelData(
-        u8"Lac02",
-        u8"../Assets/Level/Lake02.txt",
-        ThemeID::LAKE
-    ));
+        
     
     return data;
 }
