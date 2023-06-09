@@ -183,6 +183,15 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         case SDL_SCANCODE_V:
             pastePressed = true;
             break;
+        case SDL_SCANCODE_R:
+            rotatePressed = true;
+            break;
+        case SDL_SCANCODE_F:
+            flipVPressed = true;
+            break;
+        case SDL_SCANCODE_G:
+            flipHPressed = true;
+            break;
 
         default:
             break;

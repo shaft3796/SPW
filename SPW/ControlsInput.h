@@ -31,4 +31,8 @@ public:
 
     bool copyPressed;
     bool pastePressed;
+
+    bool rotatePressed;
+    bool flipVPressed;
+    bool flipHPressed;
 };
