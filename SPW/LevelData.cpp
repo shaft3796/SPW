@@ -49,7 +49,7 @@ std::vector<LevelData> LevelData::Init()
     data.push_back(LevelData(
         "La Grotte",
         u8"../Assets/Level/La Grotte.txt",
-        ThemeID::SKY
+        ThemeID::MOUNTAINS
     ));
     data.push_back(LevelData(
         "Bac à sable (Ciel)",
