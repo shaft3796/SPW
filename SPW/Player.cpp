@@ -547,7 +547,7 @@ void Player::Damage()
 {
     // M�thode appel�e par un ennemi qui touche le joueur
     if(m_state != State::DYING){
-        m_heartCount --;
+        if (m_player_dying_counter != PLAYER_DYING_DURATION) m_heartCount --;
         m_state = State::DYING;
         m_player_dying_counter = PLAYER_DYING_DURATION;
     }
