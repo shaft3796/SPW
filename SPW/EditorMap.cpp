@@ -227,20 +227,23 @@ void EditorMap::Render()
     
     float scale = camera->GetWorldToViewScale();
     scale*=m_viewFactor;
+    
+    PE_Vec2 position {0, 0};
+    ViewToWorld(0, 0, position);
+    int x0 = (int)position.x;
+    int y1 = (int)position.y;
+    ViewToWorld((float)camera->GetWidth(), (float)camera->GetHeight(), position);
+    int x1 = (int)position.x + 1;
+    int y0 = (int)position.y + 1;
 
-    PE_AABB view = camera->GetWorldView();
-    int x0 = (int)view.lower.x - 1;
-    int y0 = (int)view.lower.y - 1;
-    int x1 = (int)view.upper.x + 2;
-    int y1 = (int)view.upper.y + 2;
-
+    x0-=2;
+    y0-=2;
+    x1+=2;
+    y1+=2;
     x0 = PE_Max(x0, 0);
     y0 = PE_Max(y0, 0);
     x1 = PE_Min(x1, m_width);
-    y1 = PE_Min(y1, m_height);
-
-    x1 = (int)((float)x1/(m_viewFactor));
-    y1 = (int)((float)y1/(m_viewFactor));
+    y1 = PE_Min(y1, m_width);
     
     for (int x = x0; x < x1; ++x)
     {

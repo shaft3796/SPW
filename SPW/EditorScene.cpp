@@ -219,51 +219,31 @@ bool EditorScene::Update()
 
     /* --- CAMERA MOVE USING ARROWS --- */
     PE_AABB worldView = m_activeCam->GetWorldView();
-    float worldViewLowerX = worldView.lower.x/m_staticMap.getFactor();
-    float worldViewLowerY = worldView.lower.y/m_staticMap.getFactor();
-    float worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
-    float worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
-    float move = 0.15f/m_staticMap.getFactor();
-    bool moved {false};
-    PE_Vec2 transl {0.0f, 0.0f};
-    if (m_inputManager.GetControls().goDownDown and 0 < worldViewLowerY - move)
+    PE_AABB worldBounds = m_activeCam->GetWorldBounds();
+    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.15)
     {
-        transl.x = 0.0f; transl.y = -move;
-        moved = true;
+        PE_Vec2 transl {0.0f, -0.15f};
+        m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goUpDown and worldViewUpperY + move < (float)m_staticMap.GetHeight()-10)
+    if (m_inputManager.GetControls().goUpDown)
     {
-        transl.x = 0.0f; transl.y = move;
-        moved = true;
+        PE_Vec2 transl {0.0f, 0.15f};
+        m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goLeftDown and 0 < worldViewLowerX - move)
+    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.15)
     {
-        transl.x = -move; transl.y = 0.0f;
-        moved = true;
+        PE_Vec2 transl {-0.15f, 0.0f};
+        m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goRightDown and worldViewUpperX + move < (float)m_staticMap.GetWidth()-10)
+    if (m_inputManager.GetControls().goRightDown)
     {
-        transl.x = move; transl.y = 0.0f;
-        moved = true;
+        PE_Vec2 transl {0.15f, 0.0f};
+        m_activeCam->TranslateWorldView(transl);
     }
-    
-    // Post check to address potting camera out of bounds
-    worldView = m_activeCam->GetWorldView();
-    worldViewLowerX = worldView.lower.x/m_staticMap.getFactor();
-    worldViewLowerY = worldView.lower.y/m_staticMap.getFactor();
-    worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
-    worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
-    if(worldViewLowerY < 0.0f or worldViewLowerX < 0.0f)
-    {
-        moved = false;
-        m_resetCamera = true;
-    }
-    
-    if(moved) m_activeCam->TranslateWorldView(transl);
     
     if(m_resetCamera)
     {
-        transl.x = -worldView.lower.x; transl.y = -worldView.lower.y;
+        PE_Vec2 transl {-worldView.lower.x, -worldView.lower.y};
         m_activeCam->TranslateWorldView(transl);
     }
     if(worldView.lower.y <= 0.0f and worldView.lower.x <= 0.0f)
