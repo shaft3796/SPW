@@ -102,6 +102,7 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             break;
 
         case SDL_SCANCODE_DOWN:
+            crouchDown = true;
             // Descente d'une plateforme
             goDownDown = true;
             break;
@@ -151,6 +152,8 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             break;
 
         case SDL_SCANCODE_DOWN:
+            crouchDown = false;
+            crouchReleased = true;
             // Descente d'une plateforme
             goDownDown = false;
             break;
@@ -176,6 +179,21 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         case SDL_SCANCODE_LSHIFT:
             crouchDown = false;
             crouchReleased = true;
+            break;
+        case SDL_SCANCODE_C:
+            copyPressed = true;
+            break;
+        case SDL_SCANCODE_V:
+            pastePressed = true;
+            break;
+        case SDL_SCANCODE_R:
+            rotatePressed = true;
+            break;
+        case SDL_SCANCODE_F:
+            flipVPressed = true;
+            break;
+        case SDL_SCANCODE_G:
+            flipHPressed = true;
             break;
 
         default:
@@ -203,4 +221,6 @@ void ControlsInput::Reset()
     crouchDown = false;
     crouchReleased = false;
     fillDown = false;
+    copyPressed = false;
+    pastePressed = false;
 }
