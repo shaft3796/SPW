@@ -89,10 +89,6 @@ LevelParser::LevelParser(const std::string &path)
                 w++;
             }
         }
-        else
-        {
-            printf("INFO - Invalid char (%c)\n", c);
-        }
     }
 
     // Initialisation du parser

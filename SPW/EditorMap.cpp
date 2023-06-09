@@ -151,6 +151,14 @@ void EditorMap::InitTiles()
                 {
                     tile.partIdx = 4;
                 }
+                else if (GetTileType(x-1, y) == EditorTile::Type::EMPTY)
+                {
+                    tile.partIdx = 0;
+                }
+                else if (GetTileType(x+1, y) == EditorTile::Type::EMPTY)
+                {
+                    tile.partIdx = 2;
+                }
                 else
                 {
                     tile.partIdx = 1;
@@ -187,6 +195,14 @@ void EditorMap::InitTiles()
                 else if (IsDirt(x, y - 1))
                 {
                     tile.partIdx = 4;
+                }
+                else if (GetTileType(x-1, y) == EditorTile::Type::EMPTY)
+                {
+                    tile.partIdx = 0;
+                }
+                else if (GetTileType(x+1, y) == EditorTile::Type::EMPTY)
+                {
+                    tile.partIdx = 2;
                 }
                 else
                 {
@@ -252,7 +268,7 @@ void EditorMap::Render()
             EditorTile &tile = m_tiles[x][y];
             PE_Collider *collider = tile.collider;
 
-            PE_Vec2 position((float)x, (float)y);
+            position.x = (float)x; position.y = (float)y;
             SDL_FRect dst = { 0 };
 
             WorldToView(position, dst.x, dst.y, m_viewFactor);

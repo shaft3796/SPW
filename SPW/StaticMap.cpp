@@ -90,6 +90,14 @@ void StaticMap::InitTiles()
                 {
                     tile.partIdx = 4;
                 }
+                else if (GetTileType(x-1, y) == Tile::Type::EMPTY)
+                {
+                    tile.partIdx = 0;
+                }
+                else if (GetTileType(x+1, y) == Tile::Type::EMPTY)
+                {
+                    tile.partIdx = 2;
+                }
                 else
                 {
                     tile.partIdx = 1;
@@ -126,6 +134,14 @@ void StaticMap::InitTiles()
                 else if (IsDirt(x, y - 1))
                 {
                     tile.partIdx = 4;
+                }
+                else if (GetTileType(x-1, y) == Tile::Type::EMPTY)
+                {
+                    tile.partIdx = 0;
+                }
+                else if (GetTileType(x+1, y) == Tile::Type::EMPTY)
+                {
+                    tile.partIdx = 2;
                 }
                 else
                 {
