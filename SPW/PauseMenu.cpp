@@ -93,12 +93,13 @@ PauseMenu::PauseMenu(LevelScene &scene) :
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     font = assets.GetFont(FontID::NORMAL);
 
-    const std::string texts[4] = { u8"Continuer", u8"Revenir au checkpoint", u8"Quitter", "Editer"};
+    const std::string texts[4] = { u8"Continuer", u8"Revenir au checkpoint", "Editer", u8"Quitter"};
     ButtonListener *listener[4] = { 0 };
     listener[0] = new PauseMenuNS::ContinueListener(scene);
     listener[1] = new PauseMenuNS::RestartListener(scene);
-    listener[2] = new PauseMenuNS::QuitListener(scene);
-    listener[3] = new PauseMenuNS::EditListener(scene);
+    listener[2] = new PauseMenuNS::EditListener(scene);
+    listener[3] = new PauseMenuNS::QuitListener(scene);
+    
 
     float curY = topSkip;
     for (int i = 0; i < 4; i++, curY += buttonH + sep)
