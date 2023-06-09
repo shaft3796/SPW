@@ -10,6 +10,7 @@
 #include "Firefly.h"
 #include "Flappy.h"
 #include "Oneway.h"
+#include "GravityModifier.h"
 
 
 LevelParser::LevelParser(const std::string &path)
@@ -247,6 +248,30 @@ void LevelParser::InitScene(LevelScene &scene) const
             {
                 Firefly *firefly = new Firefly(scene);
                 firefly->SetStartPosition(position);
+                break;
+            }
+            case 'z':
+            {
+                GravityModifier *gravityModifier = new GravityModifier(scene, 0.0f, abs(DEFAULT_WORLD_GRAVITY_Y));
+                gravityModifier->SetStartPosition(position);
+                break;
+            }
+            case 'q':
+            {
+                GravityModifier *gravityModifier = new GravityModifier(scene, -abs(DEFAULT_WORLD_GRAVITY_Y), 0.0f);
+                gravityModifier->SetStartPosition(position);
+                break;
+            }
+            case 's':
+            {
+                GravityModifier *gravityModifier = new GravityModifier(scene, 0.0f, -abs(DEFAULT_WORLD_GRAVITY_Y));
+                gravityModifier->SetStartPosition(position);
+                break;
+            }
+            case 'd':
+            {
+                GravityModifier *gravityModifier = new GravityModifier(scene, abs(DEFAULT_WORLD_GRAVITY_Y), 0.0f);
+                gravityModifier->SetStartPosition(position);
                 break;
             }
             default:
