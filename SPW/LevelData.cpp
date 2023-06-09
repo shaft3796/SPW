@@ -3,7 +3,7 @@
 
 void initLevel(std::string path)
 {
-    std::fstream fs; fs.open(path, std::fstream::out);
+    std::fstream fs; fs.open(path, std::fstream::app);
     // If the file is empty, we fill it
     std::fstream rb; rb.open(path, std::fstream::in);
     if (rb.peek() == std::fstream::traits_type::eof())
@@ -11,6 +11,7 @@ void initLevel(std::string path)
         rb.close();
         fs << ".S.\n###\n";
     }
+    fs.close();
 }
 
 LevelData::LevelData(const std::string &nameIn, const std::string &pathIn, ThemeID themeIDIn) :
@@ -35,7 +36,7 @@ std::vector<LevelData> LevelData::Init()
         ThemeID::SKY
     ));
     data.push_back(LevelData(
-        "L'Ile'",
+        "L'Ile",
         u8"../Assets/Level/Lile.txt",
         ThemeID::SKY
     ));
