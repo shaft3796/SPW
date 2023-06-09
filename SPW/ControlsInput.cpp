@@ -177,6 +177,12 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
             crouchDown = false;
             crouchReleased = true;
             break;
+        case SDL_SCANCODE_C:
+            copyPressed = true;
+            break;
+        case SDL_SCANCODE_V:
+            pastePressed = true;
+            break;
 
         default:
             break;
@@ -203,4 +209,6 @@ void ControlsInput::Reset()
     crouchDown = false;
     crouchReleased = false;
     fillDown = false;
+    copyPressed = false;
+    pastePressed = false;
 }

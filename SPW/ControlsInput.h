@@ -28,4 +28,7 @@ public:
 
     bool crouchDown;
     bool crouchReleased;
+
+    bool copyPressed;
+    bool pastePressed;
 };

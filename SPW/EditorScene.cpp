@@ -120,6 +120,18 @@ bool EditorScene::Update()
         controlsInput.savePressed = false;
     }
 
+    /* --- COPY/PASTE --- */
+    if(controlsInput.copyPressed)
+    {
+        Copy((int)worldPos.x, (int)worldPos.y, true);
+        controlsInput.copyPressed = false;
+    }
+    if(controlsInput.pastePressed)
+    {
+        Paste((int)worldPos.x, (int)worldPos.y);
+        controlsInput.pastePressed = false;
+    }
+
     /* --- TILES PLACE --- */
     EditorTile::Type fromTile {m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)};
     EditorTile::Type currentTile {m_ui->GetCurrentTileType()};
@@ -362,3 +374,39 @@ void EditorScene::mZoomOut()
     m_staticMap.SetFactor(factor);
 }
 
+// Copy an area of tiles while tile is not empty
+void EditorScene::Copy(int x, int y, bool origin)
+{
+    printf("X: %d, Y: %d\n", x, y);
+    if(origin)
+    {
+        m_clipboard.clear();
+        m_currentRecDepth = 0;
+    }
+    m_currentRecDepth++;
+    if(m_currentRecDepth > 2000) return;
+    Directive directive {m_staticMap.GetTileType(x, y), x, y};
+    if(directive.type == EditorTile::Type::EMPTY) return;
+    // if these coordinates are already in the clipboard, we don't add them
+    for(Directive d : m_clipboard)
+    {
+        if(d.x == directive.x && d.y == directive.y) return;
+    }
+    m_clipboard.push_back(directive);
+    if(x > 0) Copy(x-1, y, false);
+    if(x < m_staticMap.GetRealWidth()-1) Copy(x+1, y, false);
+    if(y > 0) Copy(x, y-1, false);
+    if(y < m_staticMap.GetRealHeight()-1) Copy(x, y+1, false);
+}
+
+// Paste the clipboard at the given position
+void EditorScene::Paste(int x, int y)
+{
+    if(m_clipboard.size() == 0) return;
+    for(Directive directive : m_clipboard)
+    {
+        bool extend = !(directive.x == 0 && directive.y == 0);
+        m_staticMap.SetTile(x+(directive.x-m_clipboard[0].x),  y+(directive.y-m_clipboard[0].y), directive.type, 0, extend);
+    }
+    m_staticMap.InitTiles();
+}
