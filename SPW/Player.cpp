@@ -390,6 +390,9 @@ void Player::OnRespawn()
     body->SetPosition(GetStartPosition() + PE_Vec2(0.5f, 0.0f));
     body->SetVelocity(PE_Vec2::zero);
 
+    PE_Vec2 gravity = PE_Vec2(DEFAULT_WORLD_GRAVITY_X, DEFAULT_WORLD_GRAVITY_Y );
+    m_scene.GetWorld().SetGravity(gravity);
+
     m_heartCount = MAX_HEART_COUNT;
     m_state = State::IDLE;
     m_hDirection = 0.0f;
