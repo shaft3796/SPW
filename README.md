@@ -3,10 +3,6 @@
 
 **By Hugo & Loe**
 
-## Editeur de niveau
-
-<img src="https://cdn.discordapp.com/attachments/738091114166222929/1116823628726677514/image.png" height="300px">
-
 ## Gameplay
 
 ### Sauts
@@ -22,6 +18,9 @@
 ### Pentes
 - Ajustement de la vitesse en fonction de l'angle de la pente et la direction du joueur
 - Ajustement de l'angle du sprite du joueur en fonction de l'angle de la pente
+
+### Toits
+- Ajout des toits.
 
 ### Ennemis
 - Noisette ➔ suit le joueur
