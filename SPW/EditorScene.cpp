@@ -218,38 +218,53 @@ bool EditorScene::Update()
     if(mouseInput.leftReleased || mouseInput.rightReleased) m_extending = false;
 
     /* --- CAMERA MOVE USING ARROWS --- */
-    PE_AABB worldView = m_activeCam->GetWorldView();
-    PE_AABB worldBounds = m_activeCam->GetWorldBounds();
-    if (m_inputManager.GetControls().goDownDown and worldBounds.lower.y <= worldView.lower.y -0.15)
+    float move = 0.15f/m_staticMap.getFactor();
+    PE_Vec2 position {0, 0};
+    m_staticMap.ViewToWorld(0, 0, position);
+    float x0 = position.x;
+    float y1 = position.y;
+    m_staticMap.ViewToWorld((float)GetActiveCamera()->GetWidth(), (float)GetActiveCamera()->GetHeight(), position);
+    float x1 = position.x;
+    float y0 = position.y;
+    
+    PE_Vec2 transl {0.0f, 0.0f};
+    if (m_inputManager.GetControls().goDownDown)
     {
-        PE_Vec2 transl {0.0f, -0.15f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.y = -move;
     }
     if (m_inputManager.GetControls().goUpDown)
     {
-        PE_Vec2 transl {0.0f, 0.15f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.y = move;
     }
-    if (m_inputManager.GetControls().goLeftDown and worldBounds.lower.x <= worldView.lower.x -0.15)
+    if (m_inputManager.GetControls().goLeftDown)
     {
-        PE_Vec2 transl {-0.15f, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = -move;
     }
     if (m_inputManager.GetControls().goRightDown)
     {
-        PE_Vec2 transl {0.15f, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = move;
+        
     }
+    if(transl.y != 0.0f or transl.x != 0.0f)
+    {
+        // Bottom and left bounds
+        if(!(x0+transl.x+0.01f < 0) and !(y0+transl.y+0.01f < 0)){
+            // Top and right bounds
+            if(!(x1+transl.x-0.01 > m_staticMap.GetWidth()) and !(y1+transl.y-0.01 > m_staticMap.GetHeight())){
+                m_activeCam->TranslateWorldView(transl);
+            }
+        }
+        
+    }
+
     
     if(m_resetCamera)
     {
-        PE_Vec2 transl {-worldView.lower.x, -worldView.lower.y};
+        PE_Vec2 transl {-x0, -y0};
         m_activeCam->TranslateWorldView(transl);
-    }
-    if(worldView.lower.y <= 0.0f and worldView.lower.x <= 0.0f)
-    {
         m_resetCamera = false;
     }
+    
     
     m_mode = UpdateMode::EDITOR;
     if(m_goToMainMenu) Quit();
@@ -323,17 +338,19 @@ void EditorScene::mZoomIn()
 {
     float factor = m_staticMap.getFactor();
     factor -= 0.05f;
-    if(factor < 0.25f) factor = 0.25f;
+    if(factor < 0.1f) factor = 0.1f;
     // Test if the camera is not out of the map
-    PE_AABB worldView = m_activeCam->GetWorldView();
-    float worldViewLowerX = worldView.lower.x/factor;
-    float worldViewLowerY = worldView.lower.y/factor;
-    float worldViewUpperX = worldView.upper.x/factor;
-    float worldViewUpperY = worldView.upper.y/factor;
-    if(worldViewLowerX < 0.0f) return;
-    if(worldViewLowerY < 0.0f) return;
-    if(worldViewUpperX > (float)m_staticMap.GetWidth()) return;
-    if(worldViewUpperY > (float)m_staticMap.GetHeight()) return;
+    PE_Vec2 position {0, 0};
+    m_staticMap.ViewToWorld(0, 0, position);
+    float x0 = position.x;
+    float y1 = position.y;
+    m_staticMap.ViewToWorld((float)GetActiveCamera()->GetWidth(), (float)GetActiveCamera()->GetHeight(), position);
+    float x1 = position.x;
+    float y0 = position.y;
+    y1/=factor;
+    x1/=factor;
+    if(y1 > (float)m_staticMap.GetWidth()) return;
+    if(x1 > (float)m_staticMap.GetHeight()) return;
     m_staticMap.SetFactor(factor);
 }
 
