@@ -3,8 +3,8 @@
 
 **By Hugo & Loe**
 
-<img src="https://media.discordapp.net/attachments/738091114166222929/1116845092053975160/image.png?width=1067&height=600" height="100px">
-<img src="https://media.discordapp.net/attachments/738091114166222929/1116846109910900856/image.png?width=1067&height=600" height="100px">
+<img src="https://media.discordapp.net/attachments/738091114166222929/1116845092053975160/image.png?width=1067&height=600" height="300">
+<img src="https://media.discordapp.net/attachments/738091114166222929/1116846109910900856/image.png?width=1067&height=600" height="300">
 
 
 ## Gameplay
