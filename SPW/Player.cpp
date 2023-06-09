@@ -192,7 +192,7 @@ void Player::FixedUpdate()
     // Modifie le collider
     PE_ColliderDef colliderDef;
     PE_CapsuleShape capsule(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.85f), 0.35f);
-    if(m_crouching) capsule = PE_CapsuleShape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.50f), 0.35f);
+    if(m_crouching || m_state == State::CLIMBBING) capsule = PE_CapsuleShape(PE_Vec2(0.0f, 0.35f), PE_Vec2(0.0f, 0.50f), 0.35f);
     colliderDef.friction = 1.0f;
     colliderDef.filter.categoryBits = CATEGORY_PLAYER;
     colliderDef.shape = &capsule;
