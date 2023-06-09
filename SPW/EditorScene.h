@@ -11,6 +11,13 @@
 #include "StaticMap.h"
 #include "EditorSaver.h"
 
+struct Directive
+{
+    EditorTile::Type type;
+    int x;
+    int y;
+};
+
 class EditorScene : public Scene{
 public:
     /* CONSTRUCTOR */
@@ -37,6 +44,11 @@ public:
     void mZoomOut();
     void SetGoPlay(bool goPlay) { m_goPlay = goPlay; }
     bool GetGoPlay() { return m_goPlay; }
+    void Copy(int x, int y, bool origin);
+    void Paste(int x, int y);
+    void Rotate(int x, int y);
+    void FlipV(int x, int y);
+    void FlipH(int x, int y);
 
 private:
     std::array<Camera *, 2> m_cameras;
@@ -75,6 +87,8 @@ private:
     void Fill(int x, int y, EditorTile::Type type, int partIdx, bool origin);
 
     bool m_goPlay;
+
+    std::vector<Directive> m_clipboard;
 };
 
 

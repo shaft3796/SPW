@@ -87,7 +87,7 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx, bool e
 {
     if (x < 0 || x >= m_width || y < 0 || y >= m_height)
     {
-        assert(false);
+        return;
         // TODO: EXTEND THE MATRIX HERE
     }
 

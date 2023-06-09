@@ -120,6 +120,34 @@ bool EditorScene::Update()
         controlsInput.savePressed = false;
     }
 
+    /* --- COPY/PASTE/ROTATE/FLIP --- */
+    if(controlsInput.copyPressed)
+    {
+        Copy((int)worldPos.x, (int)worldPos.y, true);
+        controlsInput.copyPressed = false;
+    }
+    if(controlsInput.pastePressed)
+    {
+        Paste((int)worldPos.x, (int)worldPos.y);
+        controlsInput.pastePressed = false;
+    }
+    if(controlsInput.rotatePressed)
+    {
+        Rotate((int)worldPos.x, (int)worldPos.y);
+        controlsInput.rotatePressed = false;
+    }
+    if(controlsInput.flipHPressed)
+    {
+        FlipH((int)worldPos.x, (int)worldPos.y);
+        controlsInput.flipHPressed = false;
+    }
+    if(controlsInput.flipVPressed)
+    {
+        FlipV((int)worldPos.x, (int)worldPos.y);
+        controlsInput.flipVPressed = false;
+    }
+    
+
     /* --- TILES PLACE --- */
     EditorTile::Type fromTile {m_staticMap.GetTileType((int)worldPos.x, (int)worldPos.y)};
     EditorTile::Type currentTile {m_ui->GetCurrentTileType()};
@@ -362,3 +390,241 @@ void EditorScene::mZoomOut()
     m_staticMap.SetFactor(factor);
 }
 
+// Copy an area of tiles while tile is not empty
+void EditorScene::Copy(int x, int y, bool origin)
+{
+    if(origin)
+    {
+        m_clipboard.clear();
+        m_currentRecDepth = 0;
+    }
+    m_currentRecDepth++;
+    if(m_currentRecDepth > 2000) return;
+    Directive directive {m_staticMap.GetTileType(x, y), x, y};
+    if(directive.type == EditorTile::Type::EMPTY) return;
+    // if these coordinates are already in the clipboard, we don't add them
+    for(Directive d : m_clipboard)
+    {
+        if(d.x == directive.x && d.y == directive.y) return;
+    }
+    m_clipboard.push_back(directive);
+    if(x > 0) Copy(x-1, y, false);
+    if(x < m_staticMap.GetRealWidth()-1) Copy(x+1, y, false);
+    if(y > 0) Copy(x, y-1, false);
+    if(y < m_staticMap.GetRealHeight()-1) Copy(x, y+1, false);
+}
+
+// Paste the clipboard at the given position
+void EditorScene::Paste(int x, int y)
+{
+    if(m_clipboard.size() == 0) return;
+    for(Directive directive : m_clipboard)
+    {
+        bool extend = !(directive.x-m_clipboard[0].x == 0 && directive.y-m_clipboard[0].y == 0);
+        m_staticMap.SetTile(x+(directive.x-m_clipboard[0].x),  y+(directive.y-m_clipboard[0].y), directive.type, 0, extend);
+    }
+    m_staticMap.InitTiles();
+}
+
+// rotate an area by copying it to the clipboard, rotating it from 90 degrees and pasting it back
+void EditorScene::Rotate(int x, int y)
+{
+    Copy(x, y, true);
+    if(m_clipboard.size() == 0) return;
+    // Clear the area
+    for(Directive directive : m_clipboard)
+    {
+        bool extend = !(directive.x-m_clipboard[0].x == 0 && directive.y-m_clipboard[0].y == 0);
+        m_staticMap.SetTile(directive.x, directive.y, EditorTile::Type::EMPTY, 0, extend);
+    }
+    // Rotate the clipboard
+    for(int i=0 ; i<(int)m_clipboard.size() ; i++)
+    {
+        int _x = m_clipboard[i].x;
+        int _y = m_clipboard[i].y;
+        m_clipboard[i].x = +_y;
+        m_clipboard[i].y = -_x;
+    }
+    // Paste the clipboard
+    for(Directive directive : m_clipboard)
+    {
+        m_staticMap.SetTile(x+(directive.x-m_clipboard[0].x),  y+(directive.y-m_clipboard[0].y), directive.type, 0, true);
+    }
+    m_staticMap.InitTiles();
+}
+
+void EditorScene::FlipV(int x, int y)
+{
+    Copy(x, y, true);
+    if(m_clipboard.size() == 0) return;
+    // Clear the area
+    for(Directive directive : m_clipboard)
+    {
+        bool extend = !(directive.x-m_clipboard[0].x == 0 && directive.y-m_clipboard[0].y == 0);
+        m_staticMap.SetTile(directive.x, directive.y, EditorTile::Type::EMPTY, 0, extend);
+    }
+    // Rotate the clipboard
+    for(int i=0 ; i<(int)m_clipboard.size() ; i++)
+    {
+        int _x = m_clipboard[i].x;
+        int _y = m_clipboard[i].y;
+        m_clipboard[i].x = _x;
+        m_clipboard[i].y = -_y;
+        switch (m_clipboard[i].type)
+        {
+        case EditorTile::Type::STEEP_SLOPE_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_L;
+            break;
+        case EditorTile::Type::STEEP_SLOPE_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_R;
+            break;
+        case EditorTile::Type::STEEP_ROOF_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_L;
+            break;
+        case EditorTile::Type::STEEP_ROOF_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_R;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L2;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R2;
+            break;
+        default:
+            break;
+        }
+            
+    }
+    // Paste the clipboard
+    for(Directive directive : m_clipboard)
+    {
+        m_staticMap.SetTile(x+(directive.x-m_clipboard[0].x),  y+(directive.y-m_clipboard[0].y), directive.type, 0, true);
+    }
+    m_staticMap.InitTiles();
+}
+
+void EditorScene::FlipH(int x, int y)
+{
+    Copy(x, y, true);
+    if(m_clipboard.size() == 0) return;
+    // Clear the area
+    for(Directive directive : m_clipboard)
+    {
+        bool extend = !(directive.x-m_clipboard[0].x == 0 && directive.y-m_clipboard[0].y == 0);
+        m_staticMap.SetTile(directive.x, directive.y, EditorTile::Type::EMPTY, 0, extend);
+    }
+    // Rotate the clipboard
+    for(int i=0 ; i<(int)m_clipboard.size() ; i++)
+    {
+        int _x = m_clipboard[i].x;
+        int _y = m_clipboard[i].y;
+        m_clipboard[i].x = -_x;
+        m_clipboard[i].y = _y;
+switch (m_clipboard[i].type)
+        {
+        case EditorTile::Type::STEEP_SLOPE_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_L;
+            break;
+        case EditorTile::Type::STEEP_SLOPE_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_R;
+            break;
+        case EditorTile::Type::STEEP_ROOF_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_L;
+            break;
+        case EditorTile::Type::STEEP_ROOF_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_R;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L2;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R2;
+            break;
+        default:
+            break;
+        }
+        switch (m_clipboard[i].type)
+        {
+        case EditorTile::Type::STEEP_SLOPE_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_R;
+            break;
+        case EditorTile::Type::STEEP_SLOPE_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_SLOPE_L;
+            break;
+        case EditorTile::Type::STEEP_ROOF_L:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_R;
+            break;
+        case EditorTile::Type::STEEP_ROOF_R:
+            m_clipboard[i].type = EditorTile::Type::STEEP_ROOF_L;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_R2;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L1;
+            break;
+        case EditorTile::Type::GENTLE_SLOPE_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_SLOPE_L2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_L2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_R2;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R1:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L1;
+            break;
+        case EditorTile::Type::GENTLE_ROOF_R2:
+            m_clipboard[i].type = EditorTile::Type::GENTLE_ROOF_L2;
+            break;
+        default:
+            break;
+        }
+    }
+    // Paste the clipboard
+    for(Directive directive : m_clipboard)
+    {
+        m_staticMap.SetTile(x+(directive.x-m_clipboard[0].x),  y+(directive.y-m_clipboard[0].y), directive.type, 0, true);
+    }
+    m_staticMap.InitTiles();
+}
