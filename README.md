@@ -3,17 +3,22 @@
 
 **By Hugo & Loe**
 
+<img src="https://media.discordapp.net/attachments/738091114166222929/1116845092053975160/image.png?width=1067&height=600" height="100px">
+<img src="https://media.discordapp.net/attachments/738091114166222929/1116821326099927091/image.png?width=1067&height=600" height="100px">
+<img src="https://media.discordapp.net/attachments/738091114166222929/1116821326099927091/image.png?width=1067&height=600" height="100px">
+
+
 ## Gameplay
 
 ### Sauts
 - Possibilité de sauter en restant appuyé
-- **Wall jumps**: possibilité de d'accrocher et sauter de mur en mur
+- **Wall jumps**: possibilité de s'accrocher et sauter de mur en mur
 - Saut plus ou moins long/haut en fonction du temps de pression
 
 ### Plongeons
 - Possibilité de **plonger vers le bas** avec une animation du futur
 - Le plongeon passe à travers les dalles "one way" et les détruit
-- Plonger sur un ennemi fait sauter le joueur plus haut
+- Plonger sur un ennemi fait sauter le joueur plus haut.
 
 ### Pentes
 - **Ajustement de la vitesse** en fonction de l'angle de la pente et la direction du joueur
@@ -25,15 +30,15 @@
 ### Ennemis
 - Noisette ➔ suit le joueur
 - Pique ➔ statique
-- Flappy ➔ fait des aller-retour en volant de haut en bas
+- Flappy ➔ fait des allers-retours en volant de haut en bas
 
 ### Gravité
 - Bonus qui permet de changer la **direction de la gravité** quand le joueur passe dedans
 - Exemple dans le niveau "gravité"
 
 ### Santé
-- Système de vies qui décroient à chaque dégat et tue le joueur quand toutes les vies sont perdues
-- **Invincibilité** pendant un certain temps après avoir pris des dégats
+- Système de vies. Tue le joueur quand toutes les vies sont perdues
+- **Invincibilité** pendant un certain temps après avoir pris des dégâts.
 
 ### Autre
 - Briques cassables en sautant dessous
