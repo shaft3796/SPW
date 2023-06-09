@@ -69,6 +69,6 @@ void LevelEnd::OnCollisionEnter(GameCollision &collision)
 
         if (player->IsDead() && player->GetHeartCount() <= 0) return;
 
-        m_scene.Quit();
+        levelScene->SetPaused(true, true);
     }
 }

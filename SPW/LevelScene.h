@@ -20,7 +20,7 @@ public:
 
     Player *GetPlayer() const;
     bool IsPaused() const;
-    void SetPaused(bool isPaused);
+    void SetPaused(bool isPaused, bool isEnd = false);
     void GoEdit();
     bool DoWeGoEdit();
 
