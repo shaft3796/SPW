@@ -44,6 +44,23 @@ Player::Player(Scene &scene) :
     invincibleAnim->SetCycleCount(-1);
     invincibleAnim->SetCycleTime(0.2f);
 
+    // Animation "Crouching idle"
+    part = atlas->GetPart("Crouch_Idle");
+    AssertNew(part);
+    RE_TexAnim *chouchIdleAnim = new RE_TexAnim(
+            m_animator, "Crouch_Idle", part
+    );
+    chouchIdleAnim->SetCycleCount(0);
+
+    // Animation "Crouching running"
+    part = atlas->GetPart("Crouch_Running");
+    AssertNew(part);
+    RE_TexAnim *chouchRunningAnim = new RE_TexAnim(
+            m_animator, "Crouch_Running", part
+    );
+    chouchRunningAnim->SetCycleCount(-1);
+    chouchRunningAnim->SetCycleTime(0.15f);
+
     // Animation "Diving"
     part = atlas->GetPart("DiveLoading");
     AssertNew(part);
@@ -128,7 +145,7 @@ void Player::Update()
     if (controls.goDownDown && (m_state == State::FALLING)) m_dive = true;
 
     // Crouching
-    if(controls.crouchDown && (m_state == State::IDLE or m_state == State::FALLING or m_state == State::WALKING or m_state == State::RUNNING)) m_crouching = true;
+    if(controls.crouchDown && m_onGround && (m_state == State::IDLE or m_state == State::FALLING or m_state == State::WALKING or m_state == State::RUNNING)) m_crouching = true;
     else if(controls.crouchReleased &&  m_crouching) m_crouching = false;
 }
 
@@ -149,11 +166,6 @@ void Player::Render()
 
     rect.h = 1.375f * scale;
     rect.w = 1.0f * scale;
-    if(m_crouching)
-    {
-        rect.h = 1.0f * scale;
-        rect.w = 1.0f * scale;
-    }
     camera->WorldToView(GetPosition(), rect.x, rect.y);
 
     double angle {0.0f};
@@ -312,7 +324,12 @@ void Player::FixedUpdate()
         } break;
 
         case State::IDLE:{
-            m_animator.PlayAnimation("Idle");
+            if (controls.crouchDown) m_animator.PlayAnimation("Crouch_Idle");
+            else m_animator.PlayAnimation("Idle");
+        }
+        case State::RUNNING:{
+            if (controls.crouchDown && !m_crouching) m_animator.PlayAnimation("Crouch_Running");
+            if (!controls.crouchDown && m_crouching) m_animator.PlayAnimation("Running");
         }
     }
 
@@ -324,12 +341,14 @@ void Player::FixedUpdate()
     // Additional
     if (m_onGround){
         if (m_state != State::IDLE && velocity.x == 0.0f) {
-            m_animator.PlayAnimation("Idle");
+            if (controls.crouchDown) m_animator.PlayAnimation("Crouch_Idle");
+            else m_animator.PlayAnimation("Idle");
             m_state = State::IDLE;
         }
-        else if (m_state != State::RUNNING && (velocity.x < -3 || velocity.x > 3))
+        else if (m_state != State::RUNNING && (velocity.x < -1 || velocity.x > 1))
         {
-            m_animator.PlayAnimation("Running");
+            if (controls.crouchDown) m_animator.PlayAnimation("Crouch_Running");
+            else m_animator.PlayAnimation("Running");
             m_state = State::RUNNING;
         }
         // Réinitialise le timer
