@@ -7,8 +7,50 @@
 
 <img src="https://cdn.discordapp.com/attachments/738091114166222929/1116823628726677514/image.png" height="300px">
 
-Notre jeu est doté d'un éditeur de niveau complet et sophistiqué. 
-Il permet de créer des niveaux de manière intuitive et rapide. 
+## Gameplay
+
+### Sauts
+- Possibilité de sauter en restant appuyé
+- Wall jumps
+- Saut plus ou moins long/haut en fonction du temps de pression
+
+### Plongeons
+- Possibilité de plonger vers le bas avec une animation du futur
+- Le plongeon passe à travers les dalles "one way" et les détruit
+- Plonger sur un ennemi fait sauter le joueur plus haut
+
+### Pentes
+- Ajustement de la vitesse en fonction de l'angle de la pente et la direction du joueur
+- Ajustement de l'angle du sprite du joueur en fonction de l'angle de la pente
+
+### Ennemis
+- Noisette ➔ suit le joueur
+- Pique ➔ statique
+- Flappy ➔ fait des aller-retour en volant de haut en bas
+
+### Gravité
+- Bonus qui permet de changer la direction de la gravité quand le joueur passe dedans
+- Exemple dans le niveau "gravité"
+
+### Santé
+- Système de vies qui décroient à chaque dégat et tue le joueur quand toutes les vies sont perdues
+- Invincibilité pendant un certain temps après avoir pris des dégats
+
+### Autre
+- Briques cassables en sautant dessous
+- Checkpoint sous forme de levier
+- Système de vies qui décroient à chaque dégat et tue le joueur quand toutes les vies sont perdues
+- Invincibilité pendant un certain temps après avoir pris des dégats
+- Possibilité de s'accroupir avec LSHIFT ou flèche du bas
+- Timer
+- Menu de fin qui affiche le temps
+
+## Editeur de niveau
+
+<img src="https://cdn.discordapp.com/attachments/738091114166222929/1116823628726677514/image.png" height="300px">
+
+Notre jeu est doté d'un éditeur de niveau complet et sophistiqué.
+Il permet de créer des niveaux de manière intuitive et rapide.
 Il est possible de sauvegarder les niveaux créés et de les charger pour y jouer.
 
 ### Placement et suppression de tuiles
@@ -35,15 +77,15 @@ Il est possible de sauvegarder les niveaux créés et de les charger pour y joue
 ### Centrer
 - Le Bouton `Centrer` permet de centrer la caméra à l'origine du niveau.
 
-### Menu 
+### Menu
 - Le Bouton `Menu` permet de revenir au menu principal.
 
 ### Jouer
 - Le Bouton `Jouer` permet de jouer directement au niveau créé.
 
 ### Retour et avant
-- L'éditeur est doté de deux boutons `Retour` et `Avant`. Tout l'historique d'ajout et de suppression de 
-tuiles est sauvegardé, les tuiles placées en groupes sont aussi sauvegardées. Ces boutons permettent de naviguer entre les changements.
+- L'éditeur est doté de deux boutons `Retour` et `Avant`. Tout l'historique d'ajout et de suppression de
+  tuiles est sauvegardé, les tuiles placées en groupes sont aussi sauvegardées. Ces boutons permettent de naviguer entre les changements.
 - le système de retour fonctionne pour les actions suivantes :
     - Placement de tuile
     - Suppression de tuile
@@ -60,8 +102,8 @@ tuiles est sauvegardé, les tuiles placées en groupes sont aussi sauvegardées.
 
 
 ### Placement de zone
-- Il est possible de placer ou de supprimer une zone de blocs en maintenant la touche `LCtrl` enfoncée et en 
-maintenant le clic gauche ou droit enfoncé.
+- Il est possible de placer ou de supprimer une zone de blocs en maintenant la touche `LCtrl` enfoncée et en
+  maintenant le clic gauche ou droit enfoncé.
 
 <img src="https://cdn.discordapp.com/attachments/738091114166222929/1116828454571229184/image.png" height="100px">
 <img src="https://cdn.discordapp.com/attachments/738091114166222929/1116828652215222405/image.png" height="100px">
@@ -91,7 +133,7 @@ maintenant le clic gauche ou droit enfoncé.
 <img src="https://cdn.discordapp.com/attachments/738091114166222929/1116830185535324300/image.png" height="75px">
 
 ### Copié / Collé
-- Il est possible de copier une zone en appuyant sur la touche `C` au-dessus de la zone en question. 
+- Il est possible de copier une zone en appuyant sur la touche `C` au-dessus de la zone en question.
 - Il est possible de coller une zone en appuyant sur la touche `V` au-dessus de la zone en question.
 
 <img src="https://cdn.discordapp.com/attachments/738091114166222929/1116830185535324300/image.png" height="100px">
@@ -99,4 +141,3 @@ maintenant le clic gauche ou droit enfoncé.
 ### Smart Update
 - L'éditeur met constamment à jour les textures des tuiles en fonction de leur environnement.
 - Lors des symétries, les types de pentes et de toits sont modifiés en fonction de la symétrie.
-
