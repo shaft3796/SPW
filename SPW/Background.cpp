@@ -28,7 +28,7 @@ void Background::Render()
 {
     Camera *camera = m_scene.GetActiveCamera();
     AssertNew(camera);
-
+    
     SDL_Renderer *renderer = m_scene.GetRenderer();
     PE_AABB view = camera->GetWorldView();
 
@@ -36,12 +36,13 @@ void Background::Render()
     if (debugCamera != nullptr)
         return;
 
-    // Dimension du fond dans le référentiel monde
-    float scale = camera->GetWorldToViewScale();
-    float layerW = scale * m_worldDim.x;
-    float layerH = scale * m_worldDim.y;
+    float factor = m_editorMap != nullptr ? m_editorMap->getFactor() : 1.0f;
+    // Dimension du fond dans le rÃ©fÃ©rentiel monde
+    float scale = camera->GetWorldToViewScale()*factor;
+    float layerW = scale * m_worldDim.x/factor;
+    float layerH = scale * m_worldDim.y/factor;
 
-    // Dessine les différents calques du fond (parallax)
+    // Dessine les diffÃ©rents calques du fond (parallax)
     for (int i = 0; i < m_layers.size(); ++i)
     {
         if (m_layers[i] == nullptr)

@@ -125,9 +125,9 @@ void EditorMap::SetTile(int x, int y, EditorTile::Type type, int partIdx, bool e
 
 void EditorMap::InitTiles()
 {
-    for (int x = 0; x < m_width; x++)
+    for (int x = 0; x < m_realWidth; x++)
     {
-        for (int y = 0; y < m_height; y++)
+        for (int y = 0; y < m_realHeight; y++)
         {
             EditorTile &tile = m_tiles[x][y];
             EditorTile::Type type = GetTileType(x, y);

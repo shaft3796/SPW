@@ -1,5 +1,6 @@
 #pragma once
 
+#include "EditorMap.h"
 #include "Settings.h"
 #include "GameObject.h"
 
@@ -15,10 +16,14 @@ public:
     void SetWorldDimensions(const PE_Vec2 &dimensions);
     void SetTexture(int i, SDL_Texture *texture, PE_Vec2 factor);
 
+    inline void SetEditorMap(EditorMap* editorMap) { m_editorMap = editorMap; }
+
 private:
     PE_Vec2 m_worldDim;
     std::vector<SDL_Texture *> m_layers;
     std::vector<PE_Vec2> m_shiftFactors;
+
+    EditorMap* m_editorMap {nullptr};
 };
 
 inline void Background::SetWorldDimensions(const PE_Vec2 &dimensions)

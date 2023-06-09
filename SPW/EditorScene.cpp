@@ -33,6 +33,7 @@ Scene(renderer, mainTime, levelData.themeID), m_camIndex(0), m_cameras(), m_stat
 
     // Background
     Background* background = new Background(*this, Layer::BACKGROUND);
+    background->SetEditorMap(&m_staticMap);
     std::vector<SDL_Texture*> m_textures = m_assetManager.GetBackgrounds();
     switch (m_levelData.themeID)
     {
@@ -223,30 +224,46 @@ bool EditorScene::Update()
     float worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
     float worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
     float move = 0.15f/m_staticMap.getFactor();
+    bool moved {false};
+    PE_Vec2 transl {0.0f, 0.0f};
     if (m_inputManager.GetControls().goDownDown and 0 < worldViewLowerY - move)
     {
-        PE_Vec2 transl {0.0f, -move};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = 0.0f; transl.y = -move;
+        moved = true;
     }
     if (m_inputManager.GetControls().goUpDown and worldViewUpperY + move < (float)m_staticMap.GetHeight()-10)
     {
-        PE_Vec2 transl {0.0f, move};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = 0.0f; transl.y = move;
+        moved = true;
     }
     if (m_inputManager.GetControls().goLeftDown and 0 < worldViewLowerX - move)
     {
-        PE_Vec2 transl {-move, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = -move; transl.y = 0.0f;
+        moved = true;
     }
     if (m_inputManager.GetControls().goRightDown and worldViewUpperX + move < (float)m_staticMap.GetWidth()-10)
     {
-        PE_Vec2 transl {move, 0.0f};
-        m_activeCam->TranslateWorldView(transl);
+        transl.x = move; transl.y = 0.0f;
+        moved = true;
     }
+    
+    // Post check to address potting camera out of bounds
+    worldView = m_activeCam->GetWorldView();
+    worldViewLowerX = worldView.lower.x/m_staticMap.getFactor();
+    worldViewLowerY = worldView.lower.y/m_staticMap.getFactor();
+    worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
+    worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
+    if(worldViewLowerY < 0.0f or worldViewLowerX < 0.0f)
+    {
+        moved = false;
+        m_resetCamera = true;
+    }
+    
+    if(moved) m_activeCam->TranslateWorldView(transl);
     
     if(m_resetCamera)
     {
-        PE_Vec2 transl {-worldView.lower.x, -worldView.lower.y};
+        transl.x = -worldView.lower.x; transl.y = -worldView.lower.y;
         m_activeCam->TranslateWorldView(transl);
     }
     if(worldView.lower.y <= 0.0f and worldView.lower.x <= 0.0f)
@@ -325,8 +342,8 @@ void EditorScene::Fill(int x, int y, EditorTile::Type type, int partIdx, bool or
 void EditorScene::mZoomIn()
 {
     float factor = m_staticMap.getFactor();
-    factor -= 0.1f;
-    if(factor < 0.1f) factor = 0.1f;
+    factor -= 0.05f;
+    if(factor < 0.25f) factor = 0.25f;
     // Test if the camera is not out of the map
     PE_AABB worldView = m_activeCam->GetWorldView();
     float worldViewLowerX = worldView.lower.x/factor;
@@ -343,7 +360,7 @@ void EditorScene::mZoomIn()
 void EditorScene::mZoomOut()
 {
     float factor = m_staticMap.getFactor();
-    factor += 0.1f;
+    factor += 0.05f;
     if(factor > 1.0f) factor = 1.0f;
     m_staticMap.SetFactor(factor);
 }
