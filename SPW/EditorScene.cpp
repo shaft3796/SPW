@@ -222,13 +222,14 @@ bool EditorScene::Update()
     float worldViewLowerY = worldView.lower.y/m_staticMap.getFactor();
     float worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
     float worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
+    printf("WorldView: %f %f %f %f\n", worldViewLowerX, worldViewLowerY, worldViewUpperX, worldViewUpperY);
     float move = 0.15f/m_staticMap.getFactor();
     if (m_inputManager.GetControls().goDownDown and 0 < worldViewLowerY - move)
     {
         PE_Vec2 transl {0.0f, -move};
         m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goUpDown and worldViewUpperY + move < (float)m_staticMap.GetHeight())
+    if (m_inputManager.GetControls().goUpDown and worldViewUpperY + move < (float)m_staticMap.GetHeight()-10)
     {
         PE_Vec2 transl {0.0f, move};
         m_activeCam->TranslateWorldView(transl);
@@ -238,7 +239,7 @@ bool EditorScene::Update()
         PE_Vec2 transl {-move, 0.0f};
         m_activeCam->TranslateWorldView(transl);
     }
-    if (m_inputManager.GetControls().goRightDown and worldViewUpperX + move < (float)m_staticMap.GetWidth())
+    if (m_inputManager.GetControls().goRightDown and worldViewUpperX + move < (float)m_staticMap.GetWidth()-10)
     {
         PE_Vec2 transl {move, 0.0f};
         m_activeCam->TranslateWorldView(transl);

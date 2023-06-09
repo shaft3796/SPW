@@ -116,9 +116,11 @@ void ControlsInput::OnEventProcess(SDL_Event evt)
         
         case SDL_SCANCODE_LCTRL:
             areaDown = true;
+            break;
 
         case SDL_SCANCODE_LALT:
             fillDown = true;
+            break;
         
         case SDL_SCANCODE_LSHIFT:
             crouchDown = true;
