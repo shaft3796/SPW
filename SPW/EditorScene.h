@@ -35,6 +35,8 @@ public:
     void Forward();
     void mZoomIn();
     void mZoomOut();
+    void SetGoPlay(bool goPlay) { m_goPlay = goPlay; }
+    bool GetGoPlay() { return m_goPlay; }
 
 private:
     std::array<Camera *, 2> m_cameras;
@@ -71,6 +73,8 @@ private:
 
     void PlaceBox(int lowerX, int lowerY, int upperX, int upperY, EditorTile::Type type, int partIdx);
     void Fill(int x, int y, EditorTile::Type type, int partIdx, bool origin);
+
+    bool m_goPlay;
 };
 
 

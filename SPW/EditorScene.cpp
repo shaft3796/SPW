@@ -222,7 +222,6 @@ bool EditorScene::Update()
     float worldViewLowerY = worldView.lower.y/m_staticMap.getFactor();
     float worldViewUpperX = worldView.upper.x/m_staticMap.getFactor();
     float worldViewUpperY = worldView.upper.y/m_staticMap.getFactor();
-    printf("WorldView: %f %f %f %f\n", worldViewLowerX, worldViewLowerY, worldViewUpperX, worldViewUpperY);
     float move = 0.15f/m_staticMap.getFactor();
     if (m_inputManager.GetControls().goDownDown and 0 < worldViewLowerY - move)
     {

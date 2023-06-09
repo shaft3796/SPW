@@ -118,6 +118,26 @@ namespace EditorUiNS
         EditorScene &m_editorScene;
         EditorUi &m_editorUi;
     };
+
+    class PlayListener : public ButtonListener
+    {
+    public:
+        PlayListener(EditorScene &editorScene, EditorUi &editorUi) : m_editorScene(editorScene), m_editorUi(editorUi){}
+
+        virtual void OnPress() override
+        {
+            
+            m_editorScene.SetGoPlay(true);
+            m_editorScene.getSaver()->SaveMap(m_editorScene.getPath());
+            m_editorScene.SetNoSetTile(true);
+            m_editorScene.GoToMainMenu();
+            
+        }
+
+    private:
+        EditorScene &m_editorScene;
+        EditorUi &m_editorUi;
+    };
     
 }
 
@@ -197,26 +217,29 @@ EditorUi::EditorUi(EditorScene& scene): UIObject(scene)
     SDL_Color colorHover = assets.GetColor(ColorID::BLACK);
     SDL_Color colorDown = assets.GetColor(ColorID::NORMAL);
     TTF_Font *font = assets.GetFont(FontID::NORMAL);
-    int size {6};
-    const std::string texts[6] = {"Sauvegarder", "Nettoyer", "Centrer", "Menu", "<", ">"};
-    ButtonListener *listener[6] = { 0 };
+    int size {7};
+    const std::string texts[7] = {"Sauvegarder", "Nettoyer", "Centrer", "Menu", "Jouer", "<", ">"};
+    ButtonListener *listener[7] = { 0 };
     listener[0] = new EditorUiNS::SaveListener(scene, *this);
     listener[1] = new EditorUiNS::ClearListener(scene, *this);
     listener[2] = new EditorUiNS::CenterListener(scene, *this);
     listener[3] = new EditorUiNS::TitleListener(scene, *this);
-    listener[4] = new EditorUiNS::RollbackListener(scene, *this);
-    listener[5] = new EditorUiNS::ForwardListener(scene, *this);
-    
+    listener[4] = new EditorUiNS::PlayListener(scene, *this);
+    listener[5] = new EditorUiNS::RollbackListener(scene, *this);
+    listener[6] = new EditorUiNS::ForwardListener(scene, *this);
+
+    float bkp = originX;
     for(int i=0; i<size; i++){
         Button *button = new Button(scene, buttonPart);
         button->GetLocalRect().anchorMin.Set(0.0f, 0.0f);
         button->GetLocalRect().anchorMax.Set(1.0f, 0.0f);
+        float wrap = (i==5 or i==6) ? 75.0f : 0.0f;
         switch (i)
-        { case 0:  originX += 10.0f; break; case 1:  originX += 10.0f; break; case 2:  originX += 10.0f; break; case 3:  originX += 10.0f; break; case 4:  originX += 10.0f; break; case 5:  originX += 0.0f; break;}
-        button->GetLocalRect().offsetMin.Set(originX, 25.0f);
+        { case 0:  originX += 10.0f; break; case 1:  originX += 10.0f; break; case 2:  originX += 10.0f; break; case 3:  originX += 10.0f; break; case 4:  originX += 10.0f; break; case 5:  originX = bkp+10; break; case 6:  originX += 0.0f; break;}
+        button->GetLocalRect().offsetMin.Set(originX, 25.0f + wrap);
         switch (i)
-        { case 0:  originX += 190.0f; break; case 1:  originX += 140.0f; break; case 2:  originX += 120.0f; break; case 3:  originX += 100.0f; break; case 4:  originX += 50.0f; break; case 5:  originX += 50.0f; break;}
-        button->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f);
+        { case 0:  originX += 190.0f; break; case 1:  originX += 140.0f; break; case 2:  originX += 120.0f; break; case 3:  originX += 100.0f; break; case 4:  originX += 110.0f; break; case 5:  originX += 50.0f; break; case 6:  originX += 50.0f; break;}
+        button->GetLocalRect().offsetMax.Set(originX, 25.0f + 50.0f + wrap);
         originX += 10.0f;
         m_buttonPositions.push_back(button->GetLocalRect());
         button->SetBorders(new UIBorders(25, 25, 25, 25));
