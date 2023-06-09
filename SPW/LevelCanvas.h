@@ -3,6 +3,7 @@
 #include "Settings.h"
 #include "UIObject.h"
 #include "PauseMenu.h"
+#include "EndMenu.h"
 
 class LevelScene;
 
@@ -15,10 +16,13 @@ public:
     virtual void OnRespawn() override;
     virtual void Render() override;
 
+    void OpenEndMenu();
+    
     void OpenPauseMenu();
     void ClosePauseMenu();
 
 private:
+    EndMenu *m_endMenu;
     PauseMenu *m_pauseMenu;
     LevelScene &m_levelScene;
 };
