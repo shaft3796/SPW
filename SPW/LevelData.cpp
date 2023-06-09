@@ -22,6 +22,7 @@ LevelData::LevelData(const std::string &nameIn, const std::string &pathIn, Theme
 std::vector<LevelData> LevelData::Init()
 {
     initLevel("../Assets/Level/La Grotte.txt");
+    initLevel("../Assets/Level/Gravity.txt");
     initLevel("../Assets/Level/Le Tronc.txt");
     initLevel("../Assets/Level/Lile.txt");
     initLevel("../Assets/Level/LevelDemo.txt");
@@ -37,13 +38,18 @@ std::vector<LevelData> LevelData::Init()
         ThemeID::SKY
     ));
     data.push_back(LevelData(
-        "La Grotte",
-        u8"../Assets/Level/La Grotte.txt",
+        "Les Iles",
+        u8"../Assets/Level/Lile.txt",
         ThemeID::SKY
     ));
     data.push_back(LevelData(
-        "L'Ile",
-        u8"../Assets/Level/Lile.txt",
+        "Gravity",
+        u8"../Assets/Level/Gravity.txt",
+        ThemeID::SKY
+    ));
+    data.push_back(LevelData(
+        "La Grotte",
+        u8"../Assets/Level/La Grotte.txt",
         ThemeID::SKY
     ));
     data.push_back(LevelData(
