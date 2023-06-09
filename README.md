@@ -5,7 +5,6 @@
 
 <img src="https://media.discordapp.net/attachments/738091114166222929/1116845092053975160/image.png?width=1067&height=600" height="100px">
 <img src="https://media.discordapp.net/attachments/738091114166222929/1116846109910900856/image.png?width=1067&height=600" height="100px">
-<img src="https://media.discordapp.net/attachments/738091114166222929/1116821326099927091/image.png?width=1067&height=600" height="100px">
 
 
 ## Gameplay
@@ -31,10 +30,6 @@
 - Noisette ➔ suit le joueur
 - Pique ➔ statique
 - Flappy ➔ fait des allers-retours en volant de haut en bas
-
-### Gravité
-- Bonus qui permet de changer la **direction de la gravité** quand le joueur passe dedans
-- Exemple dans le niveau "gravité"
 
 ### Santé
 - Système de vies. Tue le joueur quand toutes les vies sont perdues
