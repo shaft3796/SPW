@@ -5,8 +5,8 @@
 
 #define SKIP_MENU
 
-//#define FHD
-//#define FULLSCREEN
+#define FHD
+#define FULLSCREEN
 #define DEFAUT_LEVEL 0
 
 #ifdef FHD

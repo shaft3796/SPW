@@ -53,8 +53,14 @@ public:
     void ForwardGroup();
     void Rollback(int n);
     void RollbackGroup();
+    void WorldToView(PE_Vec2 position, float& x, float& y, float factor);
+    void ViewToWorld(float x, float y, PE_Vec2 &position);
+
+    void SetFactor(float factor);
+    float getFactor();
 
 private:
+    float m_viewFactor {1.0f};
 
     RE_AtlasPart *m_woodPart;
     RE_AtlasPart *m_oneWayPart;
@@ -102,4 +108,14 @@ inline int EditorMap::GetRealWidth()
 inline int EditorMap::GetRealHeight()
 {
     return m_realHeight;
+}
+
+inline void EditorMap::SetFactor(float factor)
+{
+    m_viewFactor = factor;
+}
+
+inline float EditorMap::getFactor()
+{
+    return m_viewFactor;
 }

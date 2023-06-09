@@ -15,6 +15,8 @@ Scene(renderer, mainTime, levelData.themeID), m_camIndex(0), m_cameras(), m_stat
     m_inputManager.GetMouse().SetEnabled(true);
     m_inputManager.GetControls().SetEnabled(true);
     m_inputManager.GetDebug().SetEnabled(true);
+
+    m_staticMap.SetFactor(1.0f);
     
 
     m_cameras[0] = new EditorCamera(*this);
@@ -92,7 +94,18 @@ bool EditorScene::Update()
     MouseInput &mouseInput = m_inputManager.GetMouse();
     ControlsInput &controlsInput = m_inputManager.GetControls();
     PE_Vec2 viewPos {mouseInput.viewPos};
-    PE_Vec2 worldPos {}; m_activeCam->ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
+    PE_Vec2 worldPos {}; m_staticMap.ViewToWorld(mouseInput.viewPos.x, mouseInput.viewPos.y, worldPos);
+
+    if(mouseInput.wheel >= 1)
+    {
+        mZoomOut();
+    }
+    else if(mouseInput.wheel <= -1)
+    {
+        mZoomIn();
+    }
+    
+    
     
     if (appInput.quitPressed)
     {

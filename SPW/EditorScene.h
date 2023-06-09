@@ -33,6 +33,8 @@ public:
     void GoToMainMenu();
     void Rollback();
     void Forward();
+    void mZoomIn();
+    void mZoomOut();
 
 private:
     std::array<Camera *, 2> m_cameras;
@@ -72,4 +74,20 @@ private:
 inline void EditorScene::GoToMainMenu()
 {
     m_goToMainMenu = true;
+}
+
+inline void EditorScene::mZoomIn()
+{
+    float factor = m_staticMap.getFactor();
+    factor -= 0.1f;
+    if(factor < 0.1f) factor = 0.1f;
+    m_staticMap.SetFactor(factor);
+}
+
+inline void EditorScene::mZoomOut()
+{
+    float factor = m_staticMap.getFactor();
+    factor += 0.1f;
+    if(factor > 1.0f) factor = 1.0f;
+    m_staticMap.SetFactor(factor);
 }

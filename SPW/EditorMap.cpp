@@ -224,6 +224,9 @@ void EditorMap::Render()
 {
     SDL_Renderer *renderer = m_scene.GetRenderer();
     Camera *camera = m_scene.GetActiveCamera();
+    
+    float scale = camera->GetWorldToViewScale();
+    scale*=m_viewFactor;
 
     PE_AABB view = camera->GetWorldView();
     int x0 = (int)view.lower.x - 1;
@@ -236,6 +239,9 @@ void EditorMap::Render()
     x1 = PE_Min(x1, m_width);
     y1 = PE_Min(y1, m_height);
 
+    x1 = (int)((float)x1/(m_viewFactor));
+    y1 = (int)((float)y1/(m_viewFactor));
+    
     for (int x = x0; x < x1; ++x)
     {
         for (int y = y0; y < y1; ++y)
@@ -246,10 +252,9 @@ void EditorMap::Render()
             PE_Vec2 position((float)x, (float)y);
             SDL_FRect dst = { 0 };
 
-            camera->WorldToView(position, dst.x, dst.y);
-            float scale = camera->GetWorldToViewScale();
-            dst.w = scale * 1.0f;
-            dst.h = scale * 1.0f;
+            WorldToView(position, dst.x, dst.y, m_viewFactor);
+            dst.w = scale;
+            dst.h = scale;
 
             switch (tile.type)
             {
@@ -412,3 +417,28 @@ void EditorMap::RollbackGroup()
     InitTiles();
 }
 
+void EditorMap::WorldToView(PE_Vec2 position, float& x, float& y, float factor)
+{
+    Camera *camera = m_scene.GetActiveCamera();
+    float w = camera->GetWorldView().GetWidth();
+    float h = camera->GetWorldView().GetHeight();
+    w/=factor; h/=factor;
+    float xScale = (float)camera->GetWidth()  / w;
+    float yScale = (float)camera->GetHeight() / h;
+    x = (position.x - camera->GetWorldView().lower.x) * xScale;
+    y = (position.y - camera->GetWorldView().lower.y) * yScale;
+    y = (float)camera->GetHeight() - y;
+}
+
+void EditorMap::ViewToWorld(float x, float y, PE_Vec2 &position)
+{
+    Camera *camera = m_scene.GetActiveCamera();
+    y = (float)camera->GetHeight() - y;
+    float w = camera->GetWorldView().GetWidth();
+    float h = camera->GetWorldView().GetHeight();
+    w/=m_viewFactor; h/=m_viewFactor;
+    float xRatio = x / (float)camera->GetWidth();
+    float yRatio = y / (float)camera->GetHeight();
+    position.x = camera->GetWorldView().lower.x + xRatio * w;
+    position.y = camera->GetWorldView().lower.y + yRatio * h;
+}
