@@ -133,7 +133,7 @@ Il est possible de sauvegarder les niveaux créés et de les charger pour y joue
 - Il est possible de copier une zone en appuyant sur la touche `C` au-dessus de la zone en question.
 - Il est possible de coller une zone en appuyant sur la touche `V` au-dessus de la zone en question.
 
-<img src="https://cdn.discordapp.com/attachments/738091114166222929/1116845092053975160/image.png" height="100px">
+<img src="https://cdn.discordapp.com/attachments/738091114166222929/1116830494265462804/image.png" height="100px">
 
 ### Smart Update
 - L'éditeur met constamment à jour les textures des tuiles en fonction de leur environnement.
